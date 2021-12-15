@@ -36,6 +36,9 @@ deploy {
         }
     }
 }
+repositories {
+  maven { url 'https://jitpack.io' }
+}
 
 // Set this to true to enable desktop support.
 def includeDesktopSupport = false
@@ -62,8 +65,8 @@ dependencies {
     // Websocket extensions require additional configuration.
     // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, false)
     // simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
+    implementation "com.github.Oblarg.Oblog:lib:4.0.8"
 }
-
 // Simulation configuration (e.g. environment variables).
 sim {
     // Sets the websocket client remote host.

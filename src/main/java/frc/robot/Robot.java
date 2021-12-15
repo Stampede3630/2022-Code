@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   
-  public XboxController xbox;
+  public static XboxController xbox= new XboxController(0);
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -32,8 +32,9 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+    Logger.configureLoggingAndConfig(this, false);
     RobotMap.driveRobotInit();
-    xbox = new XboxController(0);
+    
   }
 
   /**
@@ -88,9 +89,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    if(xbox.getX(Hand.kLeft) >.2 || xbox.getX(Hand.kRight) >.2 || xbox.getY(Hand.kLeft) > .2){
-      RobotMap.drive(xbox.getX(Hand.kLeft)*Constants.MAX_SPEED, xbox.getY(Hand.kLeft)*Constants.MAX_SPEED, xbox.getX(Hand.kRight)*Constants.MAX_SPEED, false);
-    }
+
+   
     
   }
 
