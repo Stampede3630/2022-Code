@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 
 public class RobotMap {
-    public static final AHRS ahrs = new AHRS(Port.kMXP);
+    public static AHRS ahrs; 
 
     private static final Translation2d m_frontLeftLocation = new Translation2d(0.155, 0.155);
     private static final Translation2d m_frontRightLocation = new Translation2d(0.155, -0.155);
@@ -41,7 +41,7 @@ public class RobotMap {
         new SteeringSensor(Constants.BLSensorID,Constants.BLSensorOffset));
     private static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
-    private static final SwerveDriveOdometry m_odometry =  new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(ahrs.getAngle())));
+    //private static final SwerveDriveOdometry m_odometry =  new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(ahrs.getYaw())));
    /**
    * Method to drive the robot using joystick info.
    *
@@ -54,10 +54,12 @@ public class RobotMap {
     public static void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
         SwerveModuleState[] moduleStates =
 
+        // m_kinematics.toSwerveModuleStates(
+        //     fieldRelative
+        //         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, new Rotation2d(Math.toRadians(ahrs.getYaw())))
+        //         : new ChassisSpeeds(xSpeed, ySpeed, rot));
         m_kinematics.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, new Rotation2d(Math.toRadians(ahrs.getAngle())))
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+            new ChassisSpeeds(xSpeed, ySpeed, rot));
 
     SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED);
 
@@ -68,14 +70,14 @@ public class RobotMap {
   }
   /** Updates the field relative position of the robot. */
 
-  public void updateOdometry() {
-    m_odometry.update(
-        new Rotation2d(Math.toRadians(ahrs.getAngle())),
-        FrontLeftSwerveModule.getState(),
-        FrontRightSwerveModule.getState(),
-        BackLeftSwerveModule.getState(),
-        BackRightSwerveModule.getState());
-  }
+//   public void updateOdometry() {
+//     m_odometry.update(
+//         new Rotation2d(Math.toRadians(ahrs.getYaw())),
+//         FrontLeftSwerveModule.getState(),
+//         FrontRightSwerveModule.getState(),
+//         BackLeftSwerveModule.getState(),
+//         BackRightSwerveModule.getState());
+//   }
 
 
     public static void driveRobotInit() {
@@ -83,6 +85,7 @@ public class RobotMap {
         BackRightSwerveModule.swerveRobotInit();
         FrontLeftSwerveModule.swerveRobotInit();
         BackLeftSwerveModule.swerveRobotInit();
+        //ahrs = new AHRS(Port.kMXP);
     }
 
     public static void driveDisabledInit(){
