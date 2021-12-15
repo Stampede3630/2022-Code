@@ -2,26 +2,27 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
 public class RobotMap {
-    public SwerveModule FrontRightSwerveModule = new SwerveModule(new DriveMotor(Constants.FRDriveID, TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.FRSteerID, Constants.FRGains), new SteeringSensor(Constants.FRSensorID,0));
-    public SwerveModule FrontLeftSwerveModule = new SwerveModule(new DriveMotor(Constants.FLDriveID,TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.FLSteerID, Constants.FLGains), new SteeringSensor(Constants.FLSensorID,0));
-    public SwerveModule BackRightSwerveModule = new SwerveModule(new DriveMotor(Constants.BRDriveID,TalonFXInvertType.CounterClockwise) , new SteeringMotor(Constants.BRSteerID, Constants.BRGains), new SteeringSensor(Constants.BRSensorID,0));
-    public SwerveModule BackLeftSwerveModule = new SwerveModule(new DriveMotor(Constants.BLDriveID,TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.BLSteerID, Constants.BLGains), new SteeringSensor(Constants.BLSensorID,0));
+    public static final SwerveModule FrontRightSwerveModule = new SwerveModule(new DriveMotor(Constants.FRDriveID, TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.FRSteerID, Constants.FRGains), new SteeringSensor(Constants.FRSensorID,0));
+    public static final SwerveModule FrontLeftSwerveModule = new SwerveModule(new DriveMotor(Constants.FLDriveID,TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.FLSteerID, Constants.FLGains), new SteeringSensor(Constants.FLSensorID,0));
+    public static final SwerveModule BackRightSwerveModule = new SwerveModule(new DriveMotor(Constants.BRDriveID,TalonFXInvertType.CounterClockwise) , new SteeringMotor(Constants.BRSteerID, Constants.BRGains), new SteeringSensor(Constants.BRSensorID,0));
+    public static final SwerveModule BackLeftSwerveModule = new SwerveModule(new DriveMotor(Constants.BLDriveID,TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.BLSteerID, Constants.BLGains), new SteeringSensor(Constants.BLSensorID,0));
     
     
-    private RobotMap() {
-        FrontRightSwerveModule.init();
-        BackRightSwerveModule.init();
-        FrontLeftSwerveModule.init();
-        BackLeftSwerveModule.init();
+    public static robotInit() {
+        FrontRightSwerveModule.robotInit();
+        BackRightSwerveModule.robotInit();
+        FrontLeftSwerveModule.robotInit();
+        BackLeftSwerveModule.robotInit();
     }
 
 
-    public class SteeringMotor extends WPI_TalonFX{  
+    public static class SteeringMotor extends WPI_TalonFX{  
         public Constants.Gains kGAINS;
 
         public SteeringMotor(int _talonID, Constants.Gains _gains) {
@@ -30,7 +31,7 @@ public class RobotMap {
         }
     }
 
-    public class DriveMotor extends WPI_TalonFX{
+    public static class DriveMotor extends WPI_TalonFX{
         public TalonFXInvertType kWheelDirectionType;
         public DriveMotor (int _talonID, TalonFXInvertType _direction){
             super(_talonID);
@@ -38,7 +39,7 @@ public class RobotMap {
         }
     }
 
-    public class SteeringSensor extends CANCoder{
+    public static class SteeringSensor extends CANCoder{
         public double kOffsetDegrees;
 
         public SteeringSensor (int _sensorID, int _offsetDegrees){
@@ -57,7 +58,7 @@ public class RobotMap {
      *    may be slightly to vastly different
      * 
      */
-    public class SwerveModule {
+    public static class SwerveModule {
         public final SteeringMotor kSteeringMotor;
         public final SteeringSensor kSteeringSensor;
         public final DriveMotor kDriveMotor;
@@ -68,7 +69,7 @@ public class RobotMap {
             kDriveMotor = _DriveMotor;
                        
         }
-        public void init(){
+        public void robotInit(){
             //Setup the drive motor
             kDriveMotor.setInverted(kDriveMotor.kWheelDirectionType);
 
@@ -86,6 +87,20 @@ public class RobotMap {
             kSteeringMotor.config_kI(Constants.kDefaultPIDSlotID, kSteeringMotor.kGAINS.kI, Constants.kDefaultTimeout);
             kSteeringMotor.config_kD(Constants.kDefaultPIDSlotID, kSteeringMotor.kGAINS.kD, Constants.kDefaultTimeout);  
         }
+
+        public void disabledInit(){
+            FrontLeftSwerveModule.kDriveMotor.setNeutralMode(NeutralMode.Coast);
+            FrontRightSwerveModule.kDriveMotor.setNeutralMode(NeutralMode.Coast);
+            BackLeftSwerveModule.kDriveMotor.setNeutralMode(NeutralMode.Coast);
+            BackRightSwerveModule.kDriveMotor.setNeutralMode(NeutralMode.Coast);
+
+            FrontLeftSwerveModule.kSteeringMotor.setNeutralMode(NeutralMode.Coast);
+            FrontRightSwerveModule.kSteeringMotor.setNeutralMode(NeutralMode.Coast);
+            BackLeftSwerveModule.kSteeringMotor.setNeutralMode(NeutralMode.Coast);
+            BackRightSwerveModule.kSteeringMotor.setNeutralMode(NeutralMode.Coast);
+        }
+
+        
         /** 
          * This method takes in setAngle in DEGREES, 
          * 
