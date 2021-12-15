@@ -5,6 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -20,6 +22,7 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   
+  XboxController xbox;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -30,6 +33,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     RobotMap.driveRobotInit();
+    xbox = new XboxController(0);
   }
 
   /**
@@ -58,6 +62,7 @@ public class Robot extends TimedRobot {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
     RobotMap.driveEnabledInit();
+    
   }
 
   /** This function is called periodically during autonomous. */
@@ -82,7 +87,11 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    xbox.getX(Hand.kLeft);
+    RobotMap.drive(xbox.getX(Hand.kLeft)*Constants.MAX_SPEED, xbox.getY(Hand.kLeft)*Constants.MAX_SPEED, xbox.getX(Hand.kRight)*Constants.MAX_SPEED, false);
+    
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
