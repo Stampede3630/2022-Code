@@ -1,5 +1,5 @@
 package frc.robot;
-import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
@@ -16,7 +16,7 @@ public class SwerveDrive {
     private static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
         m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
     private static final SwerveDriveOdometry m_odometry =  new SwerveDriveOdometry(m_kinematics, new Rotation2d(
-            Math.toRadians(RobotMap.GYRO.getAngle())));
+            Math.toRadians(RobotMap.GYRO.getYaw())));
    /**
    * Method to drive the robot using joystick info.
    *
@@ -32,7 +32,7 @@ public class SwerveDrive {
       m_kinematics.toSwerveModuleStates(
           fieldRelative
               ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, new Rotation2d(
-                Math.toRadians(RobotMap.GYRO.getAngle())))
+                Math.toRadians(RobotMap.GYRO.getYaw())))
               : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
   SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED);
@@ -47,7 +47,7 @@ public class SwerveDrive {
 public void updateOdometry() {
   m_odometry.update(
     new Rotation2d(
-        Math.toRadians(RobotMap.GYRO.getAngle())),
+        Math.toRadians(RobotMap.GYRO.getYaw())),
       RobotMap.FrontLeftSwerveModule.getState(),
       RobotMap.FrontRightSwerveModule.getState(),
       RobotMap.BackLeftSwerveModule.getState(),
