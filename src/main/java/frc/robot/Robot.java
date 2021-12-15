@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    RobotMap.robotInit();
+    RobotMap.driveRobotInit();
   }
 
   /**
@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+    RobotMap.driveEnabledInit();
   }
 
   /** This function is called periodically during autonomous. */
@@ -75,7 +76,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    RobotMap.driveEnabledInit();
+  }
 
   /** This function is called periodically during operator control. */
   @Override
@@ -83,7 +86,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    RobotMap.driveDisabledInit();
+  }
 
   /** This function is called periodically when disabled. */
   @Override

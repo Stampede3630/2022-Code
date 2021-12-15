@@ -17,14 +17,19 @@ public class Constants{
     public static final int BRSensorID = 2;
     public static final int BLSensorID = 1;
 
-    public static final Gains FRGains = new Gains(1.1, .6, 0);
-    public static final Gains FLGains = new Gains(1.1, .6, 0);
-    public static final Gains BRGains = new Gains(1.1, .6, 0);
-    public static final Gains BLGains = new Gains(1.1, .6, 0);
+    public static final Gains FRGains = new Gains(1.2, 0, 0);
+    public static final Gains FLGains = new Gains(1.2, 0, 0);
+    public static final Gains BRGains = new Gains(1.2, 0, 0);
+    public static final Gains BLGains = new Gains(1.2, 0, 0);
+
+    public static double FRSensorOffset = -48.955;
+    public static double FLSensorOffset = 52.119;
+    public static double BRSensorOffset = 175.518;
+    public static double BLSensorOffset = -34.453;
 
     public static final int kDefaultPIDSlotID = 0;
     public static final int kDefaultTimeout = 30;//milliseconds
-    public static final int kDefaultClosedLoopError = 10;//sensor units
+    public static final int kDefaultClosedLoopError = 5;//sensor units
 
     public static class Gains {
         public final double kP;
@@ -38,7 +43,7 @@ public class Constants{
          * @param _kI
          * @param _kD
          */
-        public Gains(double _kP, double _kI, double _kD){
+        public Gains(double _kP, double _kD, double _kI){
             kP = _kP;
             kI = _kI;
             kD = _kD;

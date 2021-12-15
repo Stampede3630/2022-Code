@@ -7,20 +7,36 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+
 public class RobotMap {
-    public static final SwerveModule FrontRightSwerveModule = new SwerveModule(new DriveMotor(Constants.FRDriveID, TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.FRSteerID, Constants.FRGains), new SteeringSensor(Constants.FRSensorID,0));
-    public static final SwerveModule FrontLeftSwerveModule = new SwerveModule(new DriveMotor(Constants.FLDriveID,TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.FLSteerID, Constants.FLGains), new SteeringSensor(Constants.FLSensorID,0));
-    public static final SwerveModule BackRightSwerveModule = new SwerveModule(new DriveMotor(Constants.BRDriveID,TalonFXInvertType.CounterClockwise) , new SteeringMotor(Constants.BRSteerID, Constants.BRGains), new SteeringSensor(Constants.BRSensorID,0));
-    public static final SwerveModule BackLeftSwerveModule = new SwerveModule(new DriveMotor(Constants.BLDriveID,TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.BLSteerID, Constants.BLGains), new SteeringSensor(Constants.BLSensorID,0));
+    public static final SwerveModule FrontRightSwerveModule = new SwerveModule(new DriveMotor(Constants.FRDriveID, TalonFXInvertType.Clockwise), new SteeringMotor(Constants.FRSteerID, Constants.FRGains), new SteeringSensor(Constants.FRSensorID,Constants.FRSensorOffset));
+    public static final SwerveModule FrontLeftSwerveModule = new SwerveModule(new DriveMotor(Constants.FLDriveID,TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.FLSteerID, Constants.FLGains), new SteeringSensor(Constants.FLSensorID,Constants.FLSensorOffset));
+    public static final SwerveModule BackRightSwerveModule = new SwerveModule(new DriveMotor(Constants.BRDriveID,TalonFXInvertType.Clockwise) , new SteeringMotor(Constants.BRSteerID, Constants.BRGains), new SteeringSensor(Constants.BRSensorID,Constants.BRSensorOffset));
+    public static final SwerveModule BackLeftSwerveModule = new SwerveModule(new DriveMotor(Constants.BLDriveID,TalonFXInvertType.CounterClockwise), new SteeringMotor(Constants.BLSteerID, Constants.BLGains), new SteeringSensor(Constants.BLSensorID,Constants.BLSensorOffset));
     
     
-    public static robotInit() {
-        FrontRightSwerveModule.robotInit();
-        BackRightSwerveModule.robotInit();
-        FrontLeftSwerveModule.robotInit();
-        BackLeftSwerveModule.robotInit();
+    public static void driveRobotInit() {
+        FrontRightSwerveModule.swerveRobotInit();
+        BackRightSwerveModule.swerveRobotInit();
+        FrontLeftSwerveModule.swerveRobotInit();
+        BackLeftSwerveModule.swerveRobotInit();
     }
 
+    public static void driveDisabledInit(){
+        FrontRightSwerveModule.swerveDisabledInit();
+        BackRightSwerveModule.swerveDisabledInit();
+        FrontLeftSwerveModule.swerveDisabledInit();
+        BackLeftSwerveModule.swerveDisabledInit();
+    }
+
+    public static void driveEnabledInit(){
+        FrontRightSwerveModule.swerveEnabledInit();
+        BackRightSwerveModule.swerveEnabledInit();
+        FrontLeftSwerveModule.swerveEnabledInit();
+        BackLeftSwerveModule.swerveEnabledInit();
+    }
 
     public static class SteeringMotor extends WPI_TalonFX{  
         public Constants.Gains kGAINS;
@@ -42,7 +58,7 @@ public class RobotMap {
     public static class SteeringSensor extends CANCoder{
         public double kOffsetDegrees;
 
-        public SteeringSensor (int _sensorID, int _offsetDegrees){
+        public SteeringSensor (int _sensorID, double _offsetDegrees){
             super(_sensorID);
             kOffsetDegrees = _offsetDegrees;
          }       
@@ -59,47 +75,57 @@ public class RobotMap {
      * 
      */
     public static class SwerveModule {
-        public final SteeringMotor kSteeringMotor;
+        public final SteeringMotor mSteeringMotor;
         public final SteeringSensor kSteeringSensor;
-        public final DriveMotor kDriveMotor;
+        public final DriveMotor mDriveMotor;
 
         public SwerveModule (DriveMotor _DriveMotor, SteeringMotor _SteeringMotor, SteeringSensor _SteeringSensor){
-            kSteeringMotor = _SteeringMotor;
+            mSteeringMotor = _SteeringMotor;
             kSteeringSensor = _SteeringSensor;
-            kDriveMotor = _DriveMotor;
+            mDriveMotor = _DriveMotor;
                        
         }
-        public void robotInit(){
+        public void swerveRobotInit(){
             //Setup the drive motor
-            kDriveMotor.setInverted(kDriveMotor.kWheelDirectionType);
+            mDriveMotor.setInverted(mDriveMotor.kWheelDirectionType);
+            mDriveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, Constants.kDefaultTimeout);
 
             //Setup the Steering Sensor
             kSteeringSensor.configSensorDirection(false);
             kSteeringSensor.configMagnetOffset(kSteeringSensor.kOffsetDegrees);
-
+            kSteeringSensor.setPositionToAbsolute();
             //Setup the the closed-loop PID for the steering module loop
             
-            kSteeringMotor.configFactoryDefault();
-            kSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0,0,Constants.kDefaultTimeout);
-            kSteeringMotor.configAllowableClosedloopError(Constants.kDefaultPIDSlotID, Constants.kDefaultClosedLoopError, Constants.kDefaultTimeout);
-            kSteeringMotor.config_kF(Constants.kDefaultPIDSlotID, kSteeringMotor.kGAINS.kF, Constants.kDefaultTimeout);
-            kSteeringMotor.config_kP(Constants.kDefaultPIDSlotID, kSteeringMotor.kGAINS.kP, Constants.kDefaultTimeout);
-            kSteeringMotor.config_kI(Constants.kDefaultPIDSlotID, kSteeringMotor.kGAINS.kI, Constants.kDefaultTimeout);
-            kSteeringMotor.config_kD(Constants.kDefaultPIDSlotID, kSteeringMotor.kGAINS.kD, Constants.kDefaultTimeout);  
+            mSteeringMotor.configFactoryDefault();
+            mSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0,0,Constants.kDefaultTimeout);
+            mSteeringMotor.configRemoteFeedbackFilter(kSteeringSensor, 0);
+            mSteeringMotor.configAllowableClosedloopError(Constants.kDefaultPIDSlotID, Constants.kDefaultClosedLoopError, Constants.kDefaultTimeout);
+            mSteeringMotor.config_kF(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kF, Constants.kDefaultTimeout);
+            mSteeringMotor.config_kP(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kP, Constants.kDefaultTimeout);
+            mSteeringMotor.config_kI(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kI, Constants.kDefaultTimeout);
+            mSteeringMotor.config_kD(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kD, Constants.kDefaultTimeout);  
+        }
+        public void swerveDisabledInit(){
+            mDriveMotor.setNeutralMode(NeutralMode.Coast);
+            mSteeringMotor.setNeutralMode(NeutralMode.Coast);
+        }
+        public void swerveEnabledInit(){
+            mDriveMotor.setNeutralMode(NeutralMode.Brake);
+            mSteeringMotor.setNeutralMode(NeutralMode.Brake);
         }
 
-        public void disabledInit(){
-            FrontLeftSwerveModule.kDriveMotor.setNeutralMode(NeutralMode.Coast);
-            FrontRightSwerveModule.kDriveMotor.setNeutralMode(NeutralMode.Coast);
-            BackLeftSwerveModule.kDriveMotor.setNeutralMode(NeutralMode.Coast);
-            BackRightSwerveModule.kDriveMotor.setNeutralMode(NeutralMode.Coast);
+        public SwerveModuleState getState() {
 
-            FrontLeftSwerveModule.kSteeringMotor.setNeutralMode(NeutralMode.Coast);
-            FrontRightSwerveModule.kSteeringMotor.setNeutralMode(NeutralMode.Coast);
-            BackLeftSwerveModule.kSteeringMotor.setNeutralMode(NeutralMode.Coast);
-            BackRightSwerveModule.kSteeringMotor.setNeutralMode(NeutralMode.Coast);
+            return new SwerveModuleState(mDriveMotor.getSelectedSensorVelocity()*10, new Rotation2d(Math.toRadians(kSteeringSensor.getAbsolutePosition())));
+        
         }
 
+        public void setDesiredState(SwerveModuleState desiredState){
+            SwerveModuleState kState = SwerveModuleState.optimize(desiredState, new Rotation2d(Math.toRadians(kSteeringSensor.getAbsolutePosition())));
+
+            setSteeringAngle(kState.angle.getDegrees());
+            mDriveMotor.set(ControlMode.PercentOutput, kState.speedMetersPerSecond);
+        }
         
         /** 
          * This method takes in setAngle in DEGREES, 
@@ -121,7 +147,7 @@ public class RobotMap {
                 newAngleDemand = (_angle - 180)*4096/360 - kSteeringSensor.getPosition();
             }   
             
-            kSteeringMotor.set(ControlMode.Position, newAngleDemand);
+            mSteeringMotor.set(ControlMode.Position, newAngleDemand);
         }
 
         public double getSteeringAngle(){
