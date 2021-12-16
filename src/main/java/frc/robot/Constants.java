@@ -3,7 +3,11 @@ package frc.robot;
 
 
 public class Constants{
+    public static final double XBOXDEADBAND = .1;
+    
+    //Constants for conversion maths
     public static final double WHEEL_RADIUS_METERS = .051;
+    public static final double WHEEL_BASE_METERS = 9 * 2.54/1000; //9 inch wheel base to meters
     public static final double MAX_SPEED_TICKSper100MS = 21900;
     public static final double SECONDSper100MS = .1;
     public static final double TICKSperREVOLUTION = 14000;
@@ -11,6 +15,7 @@ public class Constants{
     public static final double MAX_SPEED_METERSperSECOND = MAX_SPEED_TICKSper100MS/SECONDSper100MS/TICKSperREVOLUTION*METERSperREVOLUTION;
     public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/.0254/(SwerveDrive.m_frontLeftLocation.getX()*Math.sqrt(2));
     public static final double SPEED_GOVERNOR =.1;
+    
     //Swerve Drive Motor IDs
     public static final int FRDriveID = 6;
     public static final int FLDriveID = 12;
@@ -52,8 +57,6 @@ public class Constants{
     public static final int kDefaultPIDSlotID = 0;
     public static final int kDefaultTimeout = 30;//milliseconds
     public static final int kDefaultClosedLoopError = 5;//sensor units
-
-    public static enum inputmode {TELEOP, DEBUG, AUTO};
 
     public static class Gains {
         public final double kP;
