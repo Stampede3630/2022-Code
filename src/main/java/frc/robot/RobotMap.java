@@ -6,14 +6,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
-import com.kauailabs.navx.frc.AHRS;
+//mport com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 
 public class RobotMap {
-    public static final AHRS GYRO = new AHRS(SPI.Port.kMXP);
+    //public static final AHRS GYRO = new AHRS(SPI.Port.kMXP);
     public static final SwerveModule FrontRightSwerveModule = new SwerveModule(
         new DriveMotor(Constants.FRDriveID, TalonFXInvertType.Clockwise, Constants.FRDriveGains), 
         new SteeringMotor(Constants.FRSteerID, Constants.FRSteerGains), 

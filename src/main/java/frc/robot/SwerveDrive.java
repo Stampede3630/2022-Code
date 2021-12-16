@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
-
+import com.kauailabs.navx.frc.AHRS;
 
 public class SwerveDrive {
     private static final Translation2d m_frontLeftLocation = new Translation2d(0.155, 0.155);
@@ -15,8 +15,7 @@ public class SwerveDrive {
     private static final Translation2d m_backRightLocation = new Translation2d(-0.155, -0.155);
     private static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
         m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
-    private static final SwerveDriveOdometry m_odometry =  new SwerveDriveOdometry(m_kinematics, new Rotation2d(
-            Math.toRadians(RobotMap.GYRO.getYaw())));
+    //private static final SwerveDriveOdometry m_odometry =  new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(RobotMap.GYRO.getYaw())));
    /**
    * Method to drive the robot using joystick info.
    *
@@ -32,7 +31,7 @@ public class SwerveDrive {
       m_kinematics.toSwerveModuleStates(
           fieldRelative
               ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, new Rotation2d(
-                Math.toRadians(RobotMap.GYRO.getYaw())))
+                Math.toRadians(0)))
               : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
   SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED);
@@ -44,13 +43,13 @@ public class SwerveDrive {
 }
 /** Updates the field relative position of the robot. */
 
-public void updateOdometry() {
-  m_odometry.update(
-    new Rotation2d(
-        Math.toRadians(RobotMap.GYRO.getYaw())),
-      RobotMap.FrontLeftSwerveModule.getState(),
-      RobotMap.FrontRightSwerveModule.getState(),
-      RobotMap.BackLeftSwerveModule.getState(),
-      RobotMap.BackRightSwerveModule.getState());
-}
+// public void updateOdometry() {
+//   m_odometry.update(
+//     new Rotation2d(
+//         Math.toRadians(RobotMap.GYRO.getYaw())),
+//       RobotMap.FrontLeftSwerveModule.getState(),
+//       RobotMap.FrontRightSwerveModule.getState(),
+//       RobotMap.BackLeftSwerveModule.getState(),
+//       RobotMap.BackRightSwerveModule.getState());
+// }
 }
