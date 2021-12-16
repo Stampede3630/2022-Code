@@ -1,11 +1,16 @@
 package frc.robot;
 
+
+
 public class Constants{
-    public static final double MAX_SPEED = 4.3;// 
-    public static final double Converted_MAX_SPEED = 12676;//4.3/10/(.051*2*Math.PI*9200);
-    
-    public static final double WHEEL_RADIUS = .051;
-    
+    public static final double WHEEL_RADIUS_METERS = .051;
+    public static final double MAX_SPEED_TICKSper100MS = 21900;
+    public static final double SECONDSper100MS = .1;
+    public static final double TICKSperREVOLUTION = 14000;
+    public static final double METERSperREVOLUTION = 2*Math.PI*WHEEL_RADIUS_METERS;
+    public static final double MAX_SPEED_METERSperSECOND = MAX_SPEED_TICKSper100MS/SECONDSper100MS/TICKSperREVOLUTION*METERSperREVOLUTION;
+    public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/.0254/(SwerveDrive.m_frontLeftLocation.getX()*Math.sqrt(2));
+    public static final double SPEED_GOVERNOR =.1;
     //Swerve Drive Motor IDs
     public static final int FRDriveID = 6;
     public static final int FLDriveID = 12;
@@ -26,7 +31,7 @@ public class Constants{
 
     //Swerve CANCoder offsets
     //CHANGE TO 0 first, reset the sensor, zero out the motor and place the OPPOSITE of the value
-    public static double FRSensorOffset = -48.955;
+    public static double FRSensorOffset = -21.06;
     public static double FLSensorOffset = 52.119;
     public static double BRSensorOffset = 175.518;
     public static double BLSensorOffset = -34.453;
@@ -38,10 +43,10 @@ public class Constants{
     public static Gains BLSteerGains = new Gains(1.2, 0, 0);
 
     //Swerve Driving PIDs (kP, kI, kD)
-    public static Gains FRDriveGains = new Gains(0.1, 0.001, 5, 1023.0/Constants.Converted_MAX_SPEED);
-    public static Gains FLDriveGains = new Gains(0.1, 0.001, 5, 1023.0/Constants.Converted_MAX_SPEED);
-    public static Gains BRDriveGains = new Gains(0.1, 0.001, 5, 1023.0/Constants.Converted_MAX_SPEED);
-    public static Gains BLDriveGains = new Gains(0.1, 0.001, 5, 1023.0/Constants.Converted_MAX_SPEED);
+    public static Gains FRDriveGains = new Gains(0.025, 0, 0, 1023.0/20660.0);
+    public static Gains FLDriveGains = new Gains(0.025, 0, 0, 1023.0/20660.0);
+    public static Gains BRDriveGains = new Gains(0.025, 0, 0, 1023.0/20660.0);
+    public static Gains BLDriveGains = new Gains(0.025, 0, 0, 1023.0/20660.0);
 
     //CTRE CAN-based constants
     public static final int kDefaultPIDSlotID = 0;
@@ -70,7 +75,7 @@ public class Constants{
             kIzone = 0;
             kPeakOutput = 1;
         }
-        public Gains(double _kP, double _kD, double _kI, double _kF){
+        public Gains(double _kP, double _kI, double _kD, double _kF){
             kP = _kP;
             kI = _kI;
             kD = _kD;

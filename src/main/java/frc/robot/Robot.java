@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Log;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -33,9 +35,9 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    //Logger.configureLoggingAndConfig(this, false);
-    RobotMap.driveRobotInit();
-    
+    SwerveDrive.zeroSwerveDrive();
+    SwerveMap.driveRobotInit();
+    Logger.configureLoggingAndConfig(this, false);
   }
 
   /**
@@ -46,7 +48,9 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    Logger.updateEntries();
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -63,7 +67,7 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
-    RobotMap.driveEnabledInit();
+    SwerveMap.driveEnabledInit();
     
   }
 
@@ -84,12 +88,19 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    RobotMap.driveEnabledInit();
+    SwerveMap.driveEnabledInit();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    SwerveDrive.swerveTeleop();
+    SwerveDrive.drive(
+      SwerveDrive.SDxSpeed, 
+      SwerveDrive.SDySpeed, 
+      SwerveDrive.SDrotation, 
+      SwerveDrive.SDfieldRelative
+      );
 
    
     
@@ -98,7 +109,9 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    RobotMap.driveDisabledInit();
+    SwerveMap.driveDisabledInit();
+    SwerveDrive.zeroSwerveDrive();
+
   }
 
   /** This function is called periodically when disabled. */
@@ -112,4 +125,10 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+  @Log
+  double getExampleValue() {
+    return SwerveDrive.SDySpeed;
+  }
+
 }

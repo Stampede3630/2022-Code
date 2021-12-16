@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 
-public class RobotMap {
+public class SwerveMap {
     //public static final AHRS GYRO = new AHRS(SPI.Port.kMXP);
     public static final SwerveModule FrontRightSwerveModule = new SwerveModule(
         new DriveMotor(Constants.FRDriveID, TalonFXInvertType.Clockwise, Constants.FRDriveGains), 
@@ -95,12 +95,12 @@ public class RobotMap {
      */
     public static class SwerveModule {
         public final SteeringMotor mSteeringMotor;
-        public final SteeringSensor kSteeringSensor;
+        public final SteeringSensor mSteeringSensor;
         public final DriveMotor mDriveMotor;
 
         public SwerveModule (DriveMotor _DriveMotor, SteeringMotor _SteeringMotor, SteeringSensor _SteeringSensor){
             mSteeringMotor = _SteeringMotor;
-            kSteeringSensor = _SteeringSensor;
+            mSteeringSensor = _SteeringSensor;
             mDriveMotor = _DriveMotor;
                        
         }
@@ -115,14 +115,14 @@ public class RobotMap {
             mDriveMotor.config_IntegralZone(0, mDriveMotor.kGAINS.kIzone);
  
             //Setup the Steering Sensor
-            kSteeringSensor.configSensorDirection(false);
-            kSteeringSensor.configMagnetOffset(kSteeringSensor.kOffsetDegrees);
-            kSteeringSensor.setPositionToAbsolute();
+            mSteeringSensor.configSensorDirection(false);
+            mSteeringSensor.configMagnetOffset(mSteeringSensor.kOffsetDegrees);
+            mSteeringSensor.setPositionToAbsolute();
             //Setup the the closed-loop PID for the steering module loop
             
             mSteeringMotor.configFactoryDefault();
             mSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0,0,Constants.kDefaultTimeout);
-            mSteeringMotor.configRemoteFeedbackFilter(kSteeringSensor, 0);
+            mSteeringMotor.configRemoteFeedbackFilter(mSteeringSensor, 0);
             mSteeringMotor.configAllowableClosedloopError(Constants.kDefaultPIDSlotID, Constants.kDefaultClosedLoopError, Constants.kDefaultTimeout);
             mSteeringMotor.config_kF(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kF, Constants.kDefaultTimeout);
             mSteeringMotor.config_kP(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kP, Constants.kDefaultTimeout);
@@ -139,14 +139,15 @@ public class RobotMap {
         }
 
         public SwerveModuleState getState() {
-            return new SwerveModuleState(mDriveMotor.getSelectedSensorVelocity()*10, new Rotation2d(Math.toRadians(kSteeringSensor.getAbsolutePosition())));
+            return new SwerveModuleState(mDriveMotor.getSelectedSensorVelocity()*10, new Rotation2d(Math.toRadians(mSteeringSensor.getPosition()*360/4096)));
         }
 
         public void setDesiredState(SwerveModuleState desiredState){
-            SwerveModuleState kState = SwerveModuleState.optimize(desiredState, new Rotation2d(Math.toRadians(kSteeringSensor.getAbsolutePosition())));
-
+            SwerveModuleState kState = optimize(desiredState, new Rotation2d(Math.toRadians(mSteeringSensor.getPosition())));
+            double convertedspeed = kState.speedMetersPerSecond*(Constants.SECONDSper100MS)*Constants.TICKSperREVOLUTION/(Constants.METERSperREVOLUTION);           
             setSteeringAngle(kState.angle.getDegrees());
-            mDriveMotor.set(ControlMode.Velocity, kState.speedMetersPerSecond/Constants.MAX_SPEED*Constants.Converted_MAX_SPEED);
+            mDriveMotor.set(ControlMode.Velocity, convertedspeed);
+            
         }
         
         /** 
@@ -163,18 +164,32 @@ public class RobotMap {
          */
         public void setSteeringAngle(double _angle){
             double newAngleDemand;
-            if(Math.abs(_angle*4096/360 - kSteeringSensor.getPosition()) > Math.abs((_angle - 180)*4096/360 - kSteeringSensor.getPosition())){
-                newAngleDemand = _angle*4096/360 - kSteeringSensor.getPosition();
-            } else {
-                newAngleDemand = (_angle - 180)*4096/360 - kSteeringSensor.getPosition();
-            }   
-            
+            newAngleDemand = _angle*4096/360;
+            if(newAngleDemand - mSteeringMotor.getSelectedSensorPosition() > 2200){
+                newAngleDemand -= 4096;
+            } else if (newAngleDemand - mSteeringMotor.getSelectedSensorPosition() < -2200){
+                newAngleDemand += 4096;
+            }
             mSteeringMotor.set(ControlMode.Position, newAngleDemand);
         }
 
         public double getSteeringAngle(){
-            return kSteeringSensor.getAbsolutePosition();
+            return mSteeringSensor.getAbsolutePosition();
         }
+
+        public static SwerveModuleState optimize(
+            SwerveModuleState desiredState, Rotation2d currentAngle) {
+          var delta = desiredState.angle.minus(currentAngle);
+          if (Math.abs(delta.getDegrees()) > 90.0) {
+            return new SwerveModuleState(
+                -desiredState.speedMetersPerSecond,
+                desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
+          } else {
+            return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+          }
+        }
+      
+    
     }
     
 }
