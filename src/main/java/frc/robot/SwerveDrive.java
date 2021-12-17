@@ -30,7 +30,7 @@ public class SwerveDrive {
   public static final Translation2d m_backRightLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, -Constants.WHEEL_BASE_METERS/2);
   public static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
-  //private static final SwerveDriveOdometry m_odometry =  new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(RobotMap.GYRO.getYaw())));
+  private static final SwerveDriveOdometry m_odometry =  new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(SwerveMap.GYRO.getYaw())));
   /**
   * Method to drive the robot using joystick info.
   *
@@ -112,13 +112,13 @@ public static double deadband(double _input){
 
 /** Updates the field relative position of the robot. */
 
-// public void updateOdometry() {
-//   m_odometry.update(
-//     new Rotation2d(
-//         Math.toRadians(RobotMap.GYRO.getYaw())),
-//       RobotMap.FrontLeftSwerveModule.getState(),
-//       RobotMap.FrontRightSwerveModule.getState(),
-//       RobotMap.BackLeftSwerveModule.getState(),
-//       RobotMap.BackRightSwerveModule.getState());
-// }
+public void updateOdometry() {
+  m_odometry.update(
+    new Rotation2d(
+        Math.toRadians(SwerveMap.GYRO.getYaw())),
+        SwerveMap.FrontLeftSwerveModule.getState(),
+        SwerveMap.FrontRightSwerveModule.getState(),
+        SwerveMap.BackLeftSwerveModule.getState(),
+        SwerveMap.BackRightSwerveModule.getState());
+}
 }

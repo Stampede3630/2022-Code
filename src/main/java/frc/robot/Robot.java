@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
+import com.kauailabs.navx.frc.AHRS;
 
 
 /**
@@ -38,6 +39,7 @@ public class Robot extends TimedRobot {
     SwerveDrive.zeroSwerveDrive();
     SwerveMap.driveRobotInit();
     Logger.configureLoggingAndConfig(this, false);
+    SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
   }
 
   /**
