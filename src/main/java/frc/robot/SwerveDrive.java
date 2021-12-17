@@ -1,19 +1,19 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
-import com.kauailabs.navx.frc.AHRS;
 
-public class SwerveDrive {
+public class SwerveDrive implements Loggable {
   
-  @Log.Graph
+  @Log
   public static double SDxSpeed=0;
   @Log
   public static double SDySpeed=0;
@@ -30,7 +30,12 @@ public class SwerveDrive {
   public static final Translation2d m_backRightLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, -Constants.WHEEL_BASE_METERS/2);
   public static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
-  private static final SwerveDriveOdometry m_odometry =  new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(SwerveMap.GYRO.getYaw())));
+  private static SwerveDriveOdometry m_odometry;
+  
+  public SwerveDrive(){
+    m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.GYRO.getRotation2d());
+  }
+  
   /**
   * Method to drive the robot using joystick info.
   *
@@ -44,7 +49,7 @@ public class SwerveDrive {
       SwerveModuleState[] moduleStates =
 
       m_kinematics.toSwerveModuleStates( _fieldRelative ? 
-        ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, new Rotation2d(Math.toRadians(0)))
+        ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, SwerveMap.GYRO.getRotation2d())
         : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
 
       SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
@@ -53,20 +58,22 @@ public class SwerveDrive {
       SwerveMap.FrontRightSwerveModule.setDesiredState(moduleStates[1]);
       SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
       SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
-  }
+}
 
-public static void swerveTeleop(){
+public static void joystickDrive(){
   double x = Robot.xbox.getY(Hand.kLeft);
   double y = Robot.xbox.getX(Hand.kLeft);
-  double rot = Robot.xbox.getY(Hand.kRight);
+  double rot = Robot.xbox.getX(Hand.kRight);
 
   SDxSpeed = convertToMetersPerSecond(deadband(x))*Constants.SPEED_GOVERNOR;
   SDySpeed = convertToMetersPerSecond(deadband(y))*Constants.SPEED_GOVERNOR;
-  SDrotation = convertToRadiansPerSecond(deadband(rot))*Constants.SPEED_GOVERNOR;;
+  SDrotation = convertToRadiansPerSecond(deadband(rot))*Constants.SPEED_GOVERNOR*.05;
   System.out.println(SDrotation);
   
 }
-
+/**
+ * MUST BE ADDED TO PERIODIC (NOT INIT METHODS)
+ */
 public static void setToCoast(){
          
   if (NeutralMode == "Brake" &&
@@ -114,11 +121,40 @@ public static double deadband(double _input){
 
 public void updateOdometry() {
   m_odometry.update(
-    new Rotation2d(
-        Math.toRadians(SwerveMap.GYRO.getYaw())),
-        SwerveMap.FrontLeftSwerveModule.getState(),
-        SwerveMap.FrontRightSwerveModule.getState(),
-        SwerveMap.BackLeftSwerveModule.getState(),
-        SwerveMap.BackRightSwerveModule.getState());
+    
+  SwerveMap.GYRO.getRotation2d(),
+  SwerveMap.FrontLeftSwerveModule.getState(),
+  SwerveMap.FrontRightSwerveModule.getState(),
+  SwerveMap.BackLeftSwerveModule.getState(),
+  SwerveMap.BackRightSwerveModule.getState());
+}
+
+
+@Log 
+public static double getSDxSpeed() {
+  return SDxSpeed;
+}
+@Log
+public static double getSDYSpeed(){
+  return SDySpeed;
+}
+
+@Log
+public static double getSDRotation() {
+  return SDrotation;
+}
+
+@Config
+public static void setSDxSpeed(double _input) {
+  SDxSpeed = _input;
+}
+
+@Config
+public static void setSDySpeed(double _input) {
+  SDySpeed = _input;
+}
+@Config.NumberSlider(name = "Testlog")
+public static void setSDxRotation(double _input) {
+  SDrotation = _input;
 }
 }

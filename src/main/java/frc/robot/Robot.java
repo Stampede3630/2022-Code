@@ -4,9 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Logger;
@@ -40,6 +40,7 @@ public class Robot extends TimedRobot {
     SwerveMap.driveRobotInit();
     Logger.configureLoggingAndConfig(this, false);
     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+
   }
 
   /**
@@ -69,7 +70,7 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
-    SwerveMap.driveEnabledInit();
+    SwerveDrive.setToBrake();
     
   }
 
@@ -96,7 +97,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    SwerveDrive.swerveTeleop();
+    SwerveDrive.joystickDrive();
     SwerveDrive.drive(
       SwerveDrive.SDxSpeed, 
       SwerveDrive.SDySpeed, 
