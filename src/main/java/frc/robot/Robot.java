@@ -88,7 +88,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    SwerveMap.driveEnabledInit();
+    SwerveDrive.setToBrake();
   }
 
   /** This function is called periodically during operator control. */
@@ -109,14 +109,14 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    SwerveMap.driveDisabledInit();
     SwerveDrive.zeroSwerveDrive();
-
   }
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    SwerveDrive.setToCoast();
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override

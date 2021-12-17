@@ -22,10 +22,12 @@ public class SwerveDrive {
   @Log
   public static boolean SDfieldRelative=false;
 
-  public static final Translation2d m_frontLeftLocation = new Translation2d(0.155, 0.155);
-  public static final Translation2d m_frontRightLocation = new Translation2d(0.155, -0.155);
-  public static final Translation2d m_backLeftLocation = new Translation2d(-0.155, 0.155);
-  public static final Translation2d m_backRightLocation = new Translation2d(-0.155, -0.155);
+  public static String NeutralMode = "Brake";
+
+  public static final Translation2d m_frontLeftLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, Constants.WHEEL_BASE_METERS/2);
+  public static final Translation2d m_frontRightLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, -Constants.WHEEL_BASE_METERS/2);
+  public static final Translation2d m_backLeftLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, Constants.WHEEL_BASE_METERS/2);
+  public static final Translation2d m_backRightLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, -Constants.WHEEL_BASE_METERS/2);
   public static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
   //private static final SwerveDriveOdometry m_odometry =  new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(RobotMap.GYRO.getYaw())));
@@ -41,19 +43,17 @@ public class SwerveDrive {
   public static void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
       SwerveModuleState[] moduleStates =
 
-      m_kinematics.toSwerveModuleStates(
-        _fieldRelative
-              ? ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, new Rotation2d(
-                Math.toRadians(0)))
-              : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
+      m_kinematics.toSwerveModuleStates( _fieldRelative ? 
+        ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, new Rotation2d(Math.toRadians(0)))
+        : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
 
-  SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
+      SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
 
-  SwerveMap.FrontLeftSwerveModule.setDesiredState(moduleStates[0]);
-  SwerveMap.FrontRightSwerveModule.setDesiredState(moduleStates[1]);
-  SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
-  SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
-}
+      SwerveMap.FrontLeftSwerveModule.setDesiredState(moduleStates[0]);
+      SwerveMap.FrontRightSwerveModule.setDesiredState(moduleStates[1]);
+      SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
+      SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
+  }
 
 public static void swerveTeleop(){
   double x = Robot.xbox.getY(Hand.kLeft);
@@ -65,6 +65,30 @@ public static void swerveTeleop(){
   SDrotation = convertToRadiansPerSecond(deadband(rot))*Constants.SPEED_GOVERNOR;;
   System.out.println(SDrotation);
   
+}
+
+public static void setToCoast(){
+         
+  if (NeutralMode == "Brake" &&
+    SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()  < 100 &&
+    SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()   < 100 &&
+    SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity() < 100 &&
+    SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()  < 100) {
+      SwerveMap.FrontRightSwerveModule.swerveDisabledInit();
+      SwerveMap.BackRightSwerveModule.swerveDisabledInit();
+      SwerveMap.FrontLeftSwerveModule.swerveDisabledInit();
+      SwerveMap.BackLeftSwerveModule.swerveDisabledInit();
+      NeutralMode = "Coast";
+    }
+
+}
+
+public static void setToBrake(){
+  SwerveMap.FrontRightSwerveModule.swerveEnabledInit();
+  SwerveMap.BackRightSwerveModule.swerveEnabledInit();
+  SwerveMap.FrontLeftSwerveModule.swerveEnabledInit();
+  SwerveMap.BackLeftSwerveModule.swerveEnabledInit();
+  NeutralMode = "Brake";
 }
 
 public static void zeroSwerveDrive(){
@@ -80,7 +104,7 @@ private static double convertToRadiansPerSecond(double _input){
   return _input*Constants.MAX_SPEED_RADIANSperSECOND;
 }
 public static double deadband(double _input){
-    if(Math.abs(_input)<=.1){
+    if(Math.abs(_input)<= Constants.XBOXDEADBAND){
       _input = 0;
     }
     return _input;

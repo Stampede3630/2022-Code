@@ -40,20 +40,6 @@ public class SwerveMap {
         //ahrs = new AHRS(Port.kMXP);
     }
 
-    public static void driveDisabledInit(){
-        FrontRightSwerveModule.swerveDisabledInit();
-        BackRightSwerveModule.swerveDisabledInit();
-        FrontLeftSwerveModule.swerveDisabledInit();
-        BackLeftSwerveModule.swerveDisabledInit();
-    }
-
-    public static void driveEnabledInit(){
-        FrontRightSwerveModule.swerveEnabledInit();
-        BackRightSwerveModule.swerveEnabledInit();
-        FrontLeftSwerveModule.swerveEnabledInit();
-        BackLeftSwerveModule.swerveEnabledInit();
-    }
-
     public static class SteeringMotor extends WPI_TalonFX{  
         public Constants.Gains kGAINS;
 
