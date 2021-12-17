@@ -63,6 +63,7 @@ public static void swerveTeleop(){
   SDxSpeed = convertToMetersPerSecond(deadband(x))*Constants.SPEED_GOVERNOR;
   SDySpeed = convertToMetersPerSecond(deadband(y))*Constants.SPEED_GOVERNOR;
   SDrotation = convertToRadiansPerSecond(deadband(rot))*Constants.SPEED_GOVERNOR;;
+  System.out.println(SDrotation);
   
 }
 
