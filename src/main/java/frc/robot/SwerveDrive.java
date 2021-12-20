@@ -1,6 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
@@ -12,28 +14,27 @@ import io.github.oblarg.oblog.annotations.Log;
 
 
 public class SwerveDrive implements Loggable {
-  
-  @Log
-  public static double SDxSpeed=0;
-  @Log
-  public static double SDySpeed=0;
-  @Log
-  public static double SDrotation=0;
-  @Log
-  public static boolean SDfieldRelative=false;
+  private static SwerveDrive SINGLE_INSTANCE = new SwerveDrive();
+  private double SDxSpeed=0;
+  private double SDySpeed=0;
+  private double SDrotation=0;
+  private boolean SDFieldRelative=true;
 
-  public static String NeutralMode = "Brake";
+  public String NeutralMode = "Brake";
 
-  public static final Translation2d m_frontLeftLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, Constants.WHEEL_BASE_METERS/2);
-  public static final Translation2d m_frontRightLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, -Constants.WHEEL_BASE_METERS/2);
-  public static final Translation2d m_backLeftLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, Constants.WHEEL_BASE_METERS/2);
-  public static final Translation2d m_backRightLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, -Constants.WHEEL_BASE_METERS/2);
-  public static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+  public final Translation2d m_frontLeftLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, Constants.WHEEL_BASE_METERS/2);
+  public final Translation2d m_frontRightLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, -Constants.WHEEL_BASE_METERS/2);
+  public final Translation2d m_backLeftLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, Constants.WHEEL_BASE_METERS/2);
+  public final Translation2d m_backRightLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, -Constants.WHEEL_BASE_METERS/2);
+  public final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
-  private static SwerveDriveOdometry m_odometry;
+  public SwerveDriveOdometry m_odometry;
   
-  public SwerveDrive(){
-    m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.GYRO.getRotation2d());
+  public static SwerveDrive getInstance() {
+    return SINGLE_INSTANCE;}
+    
+    {
+    m_odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
   }
   
   /**
@@ -45,11 +46,11 @@ public class SwerveDrive implements Loggable {
   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
   */
   @SuppressWarnings("ParameterName")
-  public static void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
+  public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
       SwerveModuleState[] moduleStates =
 
       m_kinematics.toSwerveModuleStates( _fieldRelative ? 
-        ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, SwerveMap.GYRO.getRotation2d())
+        ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())))
         : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
 
       SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
@@ -59,22 +60,24 @@ public class SwerveDrive implements Loggable {
       SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
       SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
 }
-
-public static void joystickDrive(){
-  double x = Robot.xbox.getY(Hand.kLeft);
-  double y = Robot.xbox.getX(Hand.kLeft);
+public void init(){
+  m_odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+}
+public void joystickDrive(){
+  double x = -Robot.xbox.getY(Hand.kLeft);
+  double y = -Robot.xbox.getX(Hand.kLeft);
   double rot = Robot.xbox.getX(Hand.kRight);
 
   SDxSpeed = convertToMetersPerSecond(deadband(x))*Constants.SPEED_GOVERNOR;
   SDySpeed = convertToMetersPerSecond(deadband(y))*Constants.SPEED_GOVERNOR;
-  SDrotation = convertToRadiansPerSecond(deadband(rot))*Constants.SPEED_GOVERNOR*.05;
-  System.out.println(SDrotation);
+  SDrotation = convertToRadiansPerSecond(deadband(rot))*Constants.SPEED_GOVERNOR;
+  //System.out.println(SDrotation);
   
 }
 /**
  * MUST BE ADDED TO PERIODIC (NOT INIT METHODS)
  */
-public static void setToCoast(){
+public void setToCoast(){
          
   if (NeutralMode == "Brake" &&
     SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()  < 100 &&
@@ -90,7 +93,7 @@ public static void setToCoast(){
 
 }
 
-public static void setToBrake(){
+public void setToBrake(){
   SwerveMap.FrontRightSwerveModule.swerveEnabledInit();
   SwerveMap.BackRightSwerveModule.swerveEnabledInit();
   SwerveMap.FrontLeftSwerveModule.swerveEnabledInit();
@@ -98,19 +101,19 @@ public static void setToBrake(){
   NeutralMode = "Brake";
 }
 
-public static void zeroSwerveDrive(){
+public void zeroSwerveDrive(){
   SDxSpeed = 0;
   SDySpeed = 0;
   SDrotation = 0;
 }
-private static double convertToMetersPerSecond(double _input){
+private double convertToMetersPerSecond(double _input){
   return _input*Constants.MAX_SPEED_METERSperSECOND;
 }
 
-private static double convertToRadiansPerSecond(double _input){
+private double convertToRadiansPerSecond(double _input){
   return _input*Constants.MAX_SPEED_RADIANSperSECOND;
 }
-public static double deadband(double _input){
+public double deadband(double _input){
     if(Math.abs(_input)<= Constants.XBOXDEADBAND){
       _input = 0;
     }
@@ -122,39 +125,58 @@ public static double deadband(double _input){
 public void updateOdometry() {
   m_odometry.update(
     
-  SwerveMap.GYRO.getRotation2d(),
+  new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())),
   SwerveMap.FrontLeftSwerveModule.getState(),
   SwerveMap.FrontRightSwerveModule.getState(),
   SwerveMap.BackLeftSwerveModule.getState(),
   SwerveMap.BackRightSwerveModule.getState());
+  System.out.println("x= " + m_odometry.getPoseMeters().getX() + " y="+m_odometry.getPoseMeters().getY());
+  System.out.println("FL: " + Math.round(SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " FR: " +Math.round(SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
+  System.out.println("BL: " + Math.round(SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " BR: " +Math.round(SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
 }
 
 
 @Log 
-public static double getSDxSpeed() {
+public double getSDxSpeed() {
   return SDxSpeed;
 }
 @Log
-public static double getSDYSpeed(){
+public double getSDySpeed(){
   return SDySpeed;
 }
 
 @Log
-public static double getSDRotation() {
+public double getSDRotation() {
   return SDrotation;
 }
 
+@Log
+public boolean getSDFieldRelative() {
+  return SDFieldRelative;
+}
+
 @Config
-public static void setSDxSpeed(double _input) {
+public void setSDxSpeed(double _input) {
   SDxSpeed = _input;
 }
 
 @Config
-public static void setSDySpeed(double _input) {
+public void resetOdometry(){
+  m_odometry.resetPosition(new Pose2d(), new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+}
+
+
+@Config
+public void setSDySpeed(double _input) {
   SDySpeed = _input;
 }
 @Config.NumberSlider(name = "Testlog")
-public static void setSDxRotation(double _input) {
+public void setSDRotation(double _input) {
   SDrotation = _input;
 }
+@Config.ToggleButton(name = "FieldOrienter?", defaultValue = true)
+public void setSDFieldRelative(boolean _input) {
+  SDFieldRelative = _input;
+}
+
 }

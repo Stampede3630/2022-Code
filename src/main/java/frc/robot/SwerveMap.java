@@ -89,6 +89,7 @@ public class SwerveMap {
                        
         }
         public void swerveRobotInit(){
+
             //Setup the drive motor
             mDriveMotor.setInverted(mDriveMotor.kWheelDirectionType);
             mDriveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, Constants.kDefaultTimeout);
@@ -123,14 +124,21 @@ public class SwerveMap {
         }
 
         public SwerveModuleState getState() {
-            return new SwerveModuleState(mDriveMotor.getSelectedSensorVelocity()*10, new Rotation2d(Math.toRadians(mSteeringSensor.getPosition()*360/4096)));
+
+            return new SwerveModuleState(mDriveMotor.getSelectedSensorVelocity()*Constants.METERSperREVOLUTION/(Constants.TICKSperREVOLUTION*Constants.SECONDSper100MS), new Rotation2d(mSteeringSensor.getPosition()*2*Math.PI/4096));
         }
 
         public void setDesiredState(SwerveModuleState desiredState){
             SwerveModuleState kState = optimize(desiredState, new Rotation2d(Math.toRadians(mSteeringSensor.getPosition())));
             double convertedspeed = kState.speedMetersPerSecond*(Constants.SECONDSper100MS)*Constants.TICKSperREVOLUTION/(Constants.METERSperREVOLUTION);           
             setSteeringAngle(kState.angle.getDegrees());
-            mDriveMotor.set(ControlMode.Velocity, convertedspeed);
+            
+            if (Robot.CHARACTERIZE_ROBOT){
+
+                mDriveMotor.set(ControlMode.PercentOutput, kState.speedMetersPerSecond/Constants.MAX_SPEED_METERSperSECOND); 
+            } else {
+                mDriveMotor.set(ControlMode.Velocity, convertedspeed);
+            }
             
         }
         

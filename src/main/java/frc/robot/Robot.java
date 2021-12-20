@@ -4,14 +4,13 @@
 
 package frc.robot;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Logger;
-import io.github.oblarg.oblog.annotations.Log;
-import com.kauailabs.navx.frc.AHRS;
 
 
 /**
@@ -21,11 +20,11 @@ import com.kauailabs.navx.frc.AHRS;
  * project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  public static final boolean CHARACTERIZE_ROBOT = true;
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  
+  public static SwerveDrive SWERVEDRIVE;
+  public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static XboxController xbox= new XboxController(0);
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -33,13 +32,18 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
-    SwerveDrive.zeroSwerveDrive();
-    SwerveMap.driveRobotInit();
-    Logger.configureLoggingAndConfig(this, false);
     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+    SWERVEDRIVE =   SwerveDrive.getInstance();
+    SWERVEDRIVE.init();
+    SWERVEDRIVE.zeroSwerveDrive();
+    SwerveMap.driveRobotInit();
+    SwerveMap.GYRO.reset();
+    if(CHARACTERIZE_ROBOT){
+      SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();
+    }
+    Logger.configureLoggingAndConfig(this, false);
+    
+
 
   }
 
@@ -53,6 +57,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     Logger.updateEntries();
+    SWERVEDRIVE.updateOdometry();
   }
 
   /**
@@ -70,39 +75,42 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
-    SwerveDrive.setToBrake();
-    
+    SWERVEDRIVE.setToBrake();
+    if (CHARACTERIZE_ROBOT) {
+      SWERVERCHARACTERIZATION.init();
+    }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
+    if (CHARACTERIZE_ROBOT) {
+      SWERVERCHARACTERIZATION.periodic();
     }
+    SWERVEDRIVE.drive(
+      SWERVEDRIVE.getSDxSpeed(), 
+      SWERVEDRIVE.getSDySpeed(), 
+      SWERVEDRIVE.getSDRotation(), 
+      SWERVEDRIVE.getSDFieldRelative()
+      );
+    
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    SwerveDrive.setToBrake();
+    SWERVEDRIVE.setToBrake();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    SwerveDrive.joystickDrive();
-    SwerveDrive.drive(
-      SwerveDrive.SDxSpeed, 
-      SwerveDrive.SDySpeed, 
-      SwerveDrive.SDrotation, 
-      SwerveDrive.SDfieldRelative
+    SWERVEDRIVE.joystickDrive();
+    SWERVEDRIVE.drive(
+      SWERVEDRIVE.getSDxSpeed(), 
+      SWERVEDRIVE.getSDySpeed(), 
+      SWERVEDRIVE.getSDRotation(), 
+      SWERVEDRIVE.getSDFieldRelative()
       );
 
    
@@ -112,13 +120,17 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    SwerveDrive.zeroSwerveDrive();
+    if (CHARACTERIZE_ROBOT) {
+      SWERVERCHARACTERIZATION.disabled(false);
+      //SwerveCharacterization.init();
+    }
+    SWERVEDRIVE.zeroSwerveDrive();
   }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    SwerveDrive.setToCoast();
+    SWERVEDRIVE.setToCoast();
   }
 
   /** This function is called once when test mode is enabled. */
@@ -129,9 +141,5 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {}
 
-  @Log
-  double getExampleValue() {
-    return SwerveDrive.SDySpeed;
-  }
 
 }

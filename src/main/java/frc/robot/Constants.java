@@ -6,15 +6,15 @@ public class Constants{
     public static final double XBOXDEADBAND = .1;
     
     //Constants for conversion maths
-    public static final double WHEEL_RADIUS_METERS = .051;
-    public static final double WHEEL_BASE_METERS = 9 * 2.54/1000; //9 inch wheel base to meters
+    public static final double WHEEL_RADIUS_METERS = .0508;
+    public static final double WHEEL_BASE_METERS = 9 * 2.54/100; //9 inch wheel base to meters
     public static final double MAX_SPEED_TICKSper100MS = 21900;
     public static final double SECONDSper100MS = .1;
-    public static final double TICKSperREVOLUTION = 14000;
+    public static final double TICKSperREVOLUTION = 6.86*2048;//Gearing * 1 full rotation of Talon
     public static final double METERSperREVOLUTION = 2*Math.PI*WHEEL_RADIUS_METERS;
     public static final double MAX_SPEED_METERSperSECOND = MAX_SPEED_TICKSper100MS/SECONDSper100MS/TICKSperREVOLUTION*METERSperREVOLUTION;
-    public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/.0254/(SwerveDrive.m_frontLeftLocation.getX()*Math.sqrt(2));
-    public static final double SPEED_GOVERNOR =.1;
+    public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/(WHEEL_BASE_METERS*Math.sqrt(2));
+    public static final double SPEED_GOVERNOR =.15;
     
     //Swerve Drive Motor IDs
     public static final int FRDriveID = 6;
@@ -36,10 +36,10 @@ public class Constants{
 
     //Swerve CANCoder offsets
     //CHANGE TO 0 first, reset the sensor, zero out the motor and place the OPPOSITE of the value
-    public static double FRSensorOffset = -21.06;
-    public static double FLSensorOffset = 52.119;
-    public static double BRSensorOffset = 175.518;
-    public static double BLSensorOffset = -34.453;
+    public static double FRSensorOffset = -21.06+8.174;
+    public static double FLSensorOffset = 52.119+2.725;
+    public static double BRSensorOffset = 175.518+1.494;
+    public static double BLSensorOffset = -34.453+10.371;
 
     //Swerve Steering PIDs (kP, kI, kD)
     public static Gains FRSteerGains = new Gains(1.2, 0, 0);
