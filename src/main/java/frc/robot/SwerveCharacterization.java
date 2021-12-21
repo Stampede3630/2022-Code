@@ -31,23 +31,24 @@ public class SwerveCharacterization implements Loggable{
         return SINGLE_INSTANCE;
     }
 
-    @Config
-    public void init() {
-        SwerveMap.GYRO.reset();
-        Robot.SWERVEDRIVE.m_odometry.resetPosition(new Pose2d(), new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+    @Config.ToggleSwitch(name="reset char?", defaultValue = false)
+    public void init(boolean _input) {
+        if (_input){
         NetworkTableInstance.getDefault().setUpdateRate(10.0e-3);
         counter = 0;
+        _input = false;
+        }
     }
     
     public void periodic() {
         double now = Timer.getFPGATimestamp();
-        double position = Robot.SWERVEDRIVE.m_odometry.getPoseMeters().getX();
+        double position = Robot.SWERVEDRIVE.m_odometry.getPoseMeters().getX()/Constants.METERSperREVOLUTION;
         System.out.println(position);
-        double velocity = (SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()
-                + SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()
-                + SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()
-                + SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity())/Constants.TICKSperREVOLUTION/Constants.SECONDSper100MS
-                / 4;
+        double velocity = (Robot.SWERVEDRIVE.getBackLeftXVector()+
+        Robot.SWERVEDRIVE.getFrontLeftXVector()+
+        Robot.SWERVEDRIVE.getBackRightXVector()+
+        Robot.SWERVEDRIVE.getFrontRightXVector())
+                / 4 / Constants.METERSperREVOLUTION;
 
         double battery = RobotController.getBatteryVoltage();
         double motorVoltage = battery * Math.abs(priorAutospeed);

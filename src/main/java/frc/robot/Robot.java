@@ -9,7 +9,6 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Logger;
 
 
@@ -20,9 +19,8 @@ import io.github.oblarg.oblog.Logger;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static final boolean CHARACTERIZE_ROBOT = true;
+  public static final boolean CHARACTERIZE_ROBOT = false;
   private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
   public static SwerveDrive SWERVEDRIVE;
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static XboxController xbox= new XboxController(0);
@@ -38,9 +36,8 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.zeroSwerveDrive();
     SwerveMap.driveRobotInit();
     SwerveMap.GYRO.reset();
-    if(CHARACTERIZE_ROBOT){
-      SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();
-    }
+    //SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();
+    
     Logger.configureLoggingAndConfig(this, false);
     
 
@@ -72,21 +69,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
     SWERVEDRIVE.setToBrake();
-    if (CHARACTERIZE_ROBOT) {
-      SWERVERCHARACTERIZATION.init();
-    }
+
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    if (CHARACTERIZE_ROBOT) {
-      SWERVERCHARACTERIZATION.periodic();
-    }
+      //SWERVERCHARACTERIZATION.periodic();
+    
     SWERVEDRIVE.drive(
       SWERVEDRIVE.getSDxSpeed(), 
       SWERVEDRIVE.getSDySpeed(), 
@@ -120,10 +111,8 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    if (CHARACTERIZE_ROBOT) {
-      SWERVERCHARACTERIZATION.disabled(false);
+      //SWERVERCHARACTERIZATION.disabled(false);
       //SwerveCharacterization.init();
-    }
     SWERVEDRIVE.zeroSwerveDrive();
   }
 

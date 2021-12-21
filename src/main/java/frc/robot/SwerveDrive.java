@@ -1,6 +1,9 @@
 package frc.robot;
 
+import java.lang.System.Logger;
+
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -8,6 +11,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -19,6 +23,7 @@ public class SwerveDrive implements Loggable {
   private double SDySpeed=0;
   private double SDrotation=0;
   private boolean SDFieldRelative=true;
+ // private ProfiledPIDController holdAngle = new ProfiledPIDController(.1*Constants.MAX_SPEED_RADIANSperSECOND,0.0, 0.0,TrapezoidProfile)
 
   public String NeutralMode = "Brake";
 
@@ -100,7 +105,7 @@ public void setToBrake(){
   SwerveMap.BackLeftSwerveModule.swerveEnabledInit();
   NeutralMode = "Brake";
 }
-
+@Config
 public void zeroSwerveDrive(){
   SDxSpeed = 0;
   SDySpeed = 0;
@@ -130,10 +135,13 @@ public void updateOdometry() {
   SwerveMap.FrontRightSwerveModule.getState(),
   SwerveMap.BackLeftSwerveModule.getState(),
   SwerveMap.BackRightSwerveModule.getState());
-  System.out.println("x= " + m_odometry.getPoseMeters().getX() + " y="+m_odometry.getPoseMeters().getY());
-  System.out.println("FL: " + Math.round(SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " FR: " +Math.round(SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
-  System.out.println("BL: " + Math.round(SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " BR: " +Math.round(SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
+  //System.out.println("x= " + m_odometry.getPoseMeters().getX() + " y="+m_odometry.getPoseMeters().getY());
+  //System.out.println("FL: " + Math.round(SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " FR: " +Math.round(SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
+  //System.out.println("BL: " + Math.round(SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " BR: " +Math.round(SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
 }
+
+
+//public double holdAngle (double _input){
 
 
 @Log 
@@ -161,12 +169,6 @@ public void setSDxSpeed(double _input) {
 }
 
 @Config
-public void resetOdometry(){
-  m_odometry.resetPosition(new Pose2d(), new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
-}
-
-
-@Config
 public void setSDySpeed(double _input) {
   SDySpeed = _input;
 }
@@ -178,5 +180,38 @@ public void setSDRotation(double _input) {
 public void setSDFieldRelative(boolean _input) {
   SDFieldRelative = _input;
 }
+@Config
+public void resetOdometry(){
+  m_odometry.resetPosition(new Pose2d(), new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+}
+@Log.NumberBar(min=-5,max=5)
+public double getFrontLeftXVector(){
+  return SwerveMap.FrontLeftSwerveModule.getState().speedMetersPerSecond;
+}
+@Log.NumberBar(min=-5,max=5)
+public double getFrontRightXVector(){
+  return SwerveMap.FrontRightSwerveModule.getState().speedMetersPerSecond;
+}
+@Log.NumberBar(min=-5,max=5)
+public double getBackLeftXVector(){
+  return SwerveMap.BackLeftSwerveModule.getState().speedMetersPerSecond;
+}
+@Log.NumberBar(min=-5,max=5)
+public double getBackRightXVector(){
+  return SwerveMap.BackRightSwerveModule.getState().speedMetersPerSecond;
+}
+@Log
+public double getXPos(){
+  return m_odometry.getPoseMeters().getX();
+}
+@Config.ToggleSwitch(name="ResetGyroAndOdometry", defaultValue = true)
+public void resetGyroAndOdometry(boolean _input){
+  if(_input){
+  SwerveMap.GYRO.reset();
+  Robot.SWERVEDRIVE.m_odometry.resetPosition(new Pose2d(), new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+  _input = false;
+}
+}
+
 
 }
