@@ -9,6 +9,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import io.github.oblarg.oblog.Logger;
 
 
@@ -20,7 +21,6 @@ import io.github.oblarg.oblog.Logger;
  */
 public class Robot extends TimedRobot {
   public static final boolean CHARACTERIZE_ROBOT = false;
-  private String m_autoSelected;
   public static SwerveDrive SWERVEDRIVE;
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static XboxController xbox= new XboxController(0);
@@ -31,17 +31,14 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
-    SWERVEDRIVE =   SwerveDrive.getInstance();
-    SWERVEDRIVE.init();
-    SWERVEDRIVE.zeroSwerveDrive();
     SwerveMap.driveRobotInit();
     SwerveMap.GYRO.reset();
-    //SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();
-    
-    Logger.configureLoggingAndConfig(this, false);
-    
+    SWERVEDRIVE = SwerveDrive.getInstance();
+    SWERVEDRIVE.init();
+    SWERVEDRIVE.zeroSwerveDrive();
 
-
+    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
+    Logger.configureLoggingAndConfig(this, false);//keep this statement on the BOTTOM of your init
   }
 
   /**
@@ -57,33 +54,20 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.updateOdometry();
   }
 
-  /**
-   * This autonomous (along with the chooser code above) shows how to select between different
-   * autonomous modes using the dashboard. The sendable chooser code works with the Java
-   * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the chooser code and
-   * uncomment the getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to the switch structure
-   * below with additional strings. If using the SendableChooser make sure to add them to the
-   * chooser code above as well.
-   */
   @Override
   public void autonomousInit() {
+    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
     SWERVEDRIVE.setToBrake();
+    SwerveTrajectory.resetTrajectoryStatus();
+    
 
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-      //SWERVERCHARACTERIZATION.periodic();
-    
-    SWERVEDRIVE.drive(
-      SWERVEDRIVE.getSDxSpeed(), 
-      SWERVEDRIVE.getSDySpeed(), 
-      SWERVEDRIVE.getSDRotation(), 
-      SWERVEDRIVE.getSDFieldRelative()
-      );
+    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.periodic();}
+    SwerveTrajectory.trajectoryRunner(TrajectoryContainer.jonahTrajectory, SWERVEDRIVE.m_odometry, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
     
   }
 
@@ -91,6 +75,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     SWERVEDRIVE.setToBrake();
+    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
   }
 
   /** This function is called periodically during operator control. */
@@ -111,7 +96,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-      //SWERVERCHARACTERIZATION.disabled(false);
+    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.disabled(false);}
       //SwerveCharacterization.init();
     SWERVEDRIVE.zeroSwerveDrive();
   }

@@ -1,12 +1,11 @@
 package frc.robot;
 
 import java.util.ArrayList;
+
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 
@@ -42,13 +41,13 @@ public class SwerveCharacterization implements Loggable{
     
     public void periodic() {
         double now = Timer.getFPGATimestamp();
-        double position = Robot.SWERVEDRIVE.m_odometry.getPoseMeters().getX()/Constants.METERSperREVOLUTION;
+        double position = Robot.SWERVEDRIVE.m_odometry.getPoseMeters().getX()/Constants.METERSperWHEEL_REVOLUTION;
         System.out.println(position);
         double velocity = (Robot.SWERVEDRIVE.getBackLeftXVector()+
         Robot.SWERVEDRIVE.getFrontLeftXVector()+
         Robot.SWERVEDRIVE.getBackRightXVector()+
         Robot.SWERVEDRIVE.getFrontRightXVector())
-                / 4 / Constants.METERSperREVOLUTION;
+                / 4 / Constants.METERSperWHEEL_REVOLUTION;
 
         double battery = RobotController.getBatteryVoltage();
         double motorVoltage = battery * Math.abs(priorAutospeed);

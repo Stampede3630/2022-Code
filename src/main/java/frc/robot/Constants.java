@@ -1,8 +1,6 @@
 package frc.robot;
 
-
-
-public class Constants{
+public class Constants {
     public static final double XBOXDEADBAND = .1;
     
     //Constants for conversion maths
@@ -10,11 +8,14 @@ public class Constants{
     public static final double WHEEL_BASE_METERS = 9 * 2.54/100; //9 inch wheel base to meters
     public static final double MAX_SPEED_TICKSper100MS = 21900;
     public static final double SECONDSper100MS = .1;
-    public static final double TICKSperREVOLUTION = 6.86*2048;//Gearing * 1 full rotation of Talon
-    public static final double METERSperREVOLUTION = 2*Math.PI*WHEEL_RADIUS_METERS;
-    public static final double MAX_SPEED_METERSperSECOND = MAX_SPEED_TICKSper100MS/SECONDSper100MS/TICKSperREVOLUTION*METERSperREVOLUTION;
-    public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/(WHEEL_BASE_METERS*Math.sqrt(2));
-    public static final double SPEED_GOVERNOR =.15;
+    public static final double STEERING_SENSOR_TICKSperROTATION = 4096;
+    public static final double STEERING_SENSOR_DEGREESperTICKS = 360/STEERING_SENSOR_TICKSperROTATION;
+    public static final double DRIVE_MOTOR_TICKSperREVOLUTION = 6.86*2048;//Gearing * 1 full rotation of Talon FX (CPR)
+    public static final double METERSperWHEEL_REVOLUTION = 2*Math.PI*WHEEL_RADIUS_METERS;
+    public static final double METERSperROBOT_REVOLUTION =  2*Math.PI*(WHEEL_BASE_METERS*1.414213);//Math.sqrt(2)
+    public static final double MAX_SPEED_METERSperSECOND = MAX_SPEED_TICKSper100MS/SECONDSper100MS/DRIVE_MOTOR_TICKSperREVOLUTION*METERSperWHEEL_REVOLUTION;
+    public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/METERSperROBOT_REVOLUTION*(2*Math.PI);
+    public static final double SPEED_GOVERNOR =.11;
     
     //Swerve Drive Motor IDs
     public static final int FRDriveID = 6;
@@ -48,10 +49,10 @@ public class Constants{
     public static Gains BLSteerGains = new Gains(1.2, 0, 0);
 
     //Swerve Driving PIDs (kP, kI, kD)
-    public static Gains FRDriveGains = new Gains(0.025, 0, 0, 1023.0/20660.0);
-    public static Gains FLDriveGains = new Gains(0.025, 0, 0, 1023.0/20660.0);
-    public static Gains BRDriveGains = new Gains(0.025, 0, 0, 1023.0/20660.0);
-    public static Gains BLDriveGains = new Gains(0.025, 0, 0, 1023.0/20660.0);
+    public static Gains FRDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
+    public static Gains FLDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
+    public static Gains BRDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
+    public static Gains BLDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
 
     //CTRE CAN-based constants
     public static final int kDefaultPIDSlotID = 0;
