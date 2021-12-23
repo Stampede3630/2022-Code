@@ -53,6 +53,8 @@ public class SwerveDrive implements Loggable {
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
     if (_rot == 0 && holdRobotAngleEnabled){
       _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
+    } else {
+      holdRobotAngleSetpoint = -SwerveMap.GYRO.getAngle();
     }
     SwerveModuleState[] moduleStates =
       m_kinematics.toSwerveModuleStates( _fieldRelative ? 
@@ -66,18 +68,7 @@ public class SwerveDrive implements Loggable {
       SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
       SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
     }
-    public void drive(ChassisSpeeds _CSpeeds) {
-
-      SwerveModuleState[] moduleStates =
-        m_kinematics.toSwerveModuleStates(_CSpeeds);
-  
-        SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
-  
-        SwerveMap.FrontLeftSwerveModule.setDesiredState(moduleStates[0]);
-        SwerveMap.FrontRightSwerveModule.setDesiredState(moduleStates[1]);
-        SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
-        SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
-      }
+    
   public void init(){
     m_odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
     holdRobotAngleController.enableContinuousInput(-2*Math.PI, 2*Math.PI);
@@ -173,7 +164,7 @@ public class SwerveDrive implements Loggable {
     return SDySpeed;
   }
 
-  @Log
+  @Log.Graph
   public double getSDRotation() {
     return SDrotation;
   }

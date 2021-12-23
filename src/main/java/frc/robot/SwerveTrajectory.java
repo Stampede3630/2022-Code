@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import io.github.oblarg.oblog.Loggable;
 
@@ -40,9 +42,12 @@ public class SwerveTrajectory implements Loggable {
                 break;
             case "execute":
                 if (elapsedTime <_trajectory.getTotalTimeSeconds()){
-                    Robot.SWERVEDRIVE.drive(HDC.calculate(
-                    _odometry.getPoseMeters(), 
-                    _trajectory.sample(Timer.getFPGATimestamp()-timetrajectoryStarted),_rotation2d));
+                    ChassisSpeeds _speeds = HDC.calculate(
+                        _odometry.getPoseMeters(), 
+                        _trajectory.sample(Timer.getFPGATimestamp()-timetrajectoryStarted),_rotation2d);
+                    Robot.SWERVEDRIVE.drive(_speeds.vxMetersPerSecond,
+                    _speeds.vyMetersPerSecond, 
+                    _speeds.omegaRadiansPerSecond,false);
                     
                 } else {
                     Robot.SWERVEDRIVE.drive(0,0,0,false);
