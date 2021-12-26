@@ -8,13 +8,15 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 
 public class SwerveMap {
     public static AHRS GYRO;
     public static TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
-    
+    public static SimpleMotorFeedforward driveMotorFeedforward = new SimpleMotorFeedforward(Constants.kS, Constants.kV);
     public static final SwerveModule FrontRightSwerveModule = new SwerveModule(
         new DriveMotor(Constants.FRDriveID, TalonFXInvertType.Clockwise, Constants.FRDriveGains), 
         new SteeringMotor(Constants.FRSteerID, Constants.FRSteerGains), 
@@ -106,7 +108,7 @@ public class SwerveMap {
             mDriveMotor.config_kI(Constants.kDefaultPIDSlotID, mDriveMotor.kGAINS.kI, Constants.kDefaultTimeout);
             mDriveMotor.config_kD(Constants.kDefaultPIDSlotID, mDriveMotor.kGAINS.kD, Constants.kDefaultTimeout);  
             mDriveMotor.config_IntegralZone(0, mDriveMotor.kGAINS.kIzone);
- 
+
             //Setup the Steering Sensor
             mSteeringSensor.configSensorDirection(false);
             mSteeringSensor.configMagnetOffset(mSteeringSensor.kOffsetDegrees);
@@ -114,15 +116,19 @@ public class SwerveMap {
             //Setup the the closed-loop PID for the steering module loop
             
             mSteeringMotor.configFactoryDefault();
-            mSteeringMotor.configFeedbackNotContinuous(true, Constants.kDefaultTimeout);
-            mSteeringMotor.configSelectedFeedbackCoefficient(Constants.STEERING_SENSOR_DEGREESperTICKS);
-            mSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0,0,Constants.kDefaultTimeout);
+            mSteeringMotor.configFeedbackNotContinuous(false, Constants.kDefaultTimeout);
+            mSteeringMotor.configSelectedFeedbackCoefficient(1/Constants.TICKSperTALONFX_DEGREE,0,Constants.kDefaultTimeout);
+            mSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor,0,Constants.kDefaultTimeout);
+
+            mSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0,1,Constants.kDefaultTimeout);
             mSteeringMotor.configRemoteFeedbackFilter(mSteeringSensor, 0);
+            mSteeringMotor.configSelectedFeedbackCoefficient(Constants.STEERING_SENSOR_DEGREESperTICKS, 1, Constants.kDefaultTimeout);
             mSteeringMotor.configAllowableClosedloopError(Constants.kDefaultPIDSlotID, Constants.kDefaultClosedLoopError, Constants.kDefaultTimeout);
             mSteeringMotor.config_kF(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kF/Constants.STEERING_SENSOR_DEGREESperTICKS, Constants.kDefaultTimeout);
             mSteeringMotor.config_kP(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kP/Constants.STEERING_SENSOR_DEGREESperTICKS, Constants.kDefaultTimeout);
             mSteeringMotor.config_kI(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kI/Constants.STEERING_SENSOR_DEGREESperTICKS, Constants.kDefaultTimeout);
             mSteeringMotor.config_kD(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kD/Constants.STEERING_SENSOR_DEGREESperTICKS, Constants.kDefaultTimeout);  
+            zeroSwerveAngle();
         }
         public void swerveDisabledInit(){
             mDriveMotor.setNeutralMode(NeutralMode.Coast);
@@ -133,24 +139,32 @@ public class SwerveMap {
             mSteeringMotor.setNeutralMode(NeutralMode.Brake);
         }
 
+        public void zeroSwerveAngle() {
+            mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getAbsolutePosition(),0,Constants.kDefaultTimeout);
+        }
+
         public SwerveModuleState getState() {
 
             return new SwerveModuleState( 
                 mDriveMotor.getSelectedSensorVelocity()*
                 Constants.METERSperWHEEL_REVOLUTION/(Constants.DRIVE_MOTOR_TICKSperREVOLUTION*
-                Constants.SECONDSper100MS), new Rotation2d(mSteeringSensor.getPosition()*2*Math.PI/4096));
+                Constants.SECONDSper100MS), new Rotation2d(Math.toRadians(mSteeringMotor.getSelectedSensorPosition())));
         }
 
+
         public void setDesiredState(SwerveModuleState desiredState){
-            SwerveModuleState kState = optimize(desiredState, new Rotation2d(Math.toRadians(mSteeringSensor.getAbsolutePosition())));
+            SwerveModuleState kState = optimize(desiredState, new Rotation2d(Math.toRadians(mSteeringMotor.getSelectedSensorPosition())));
             double convertedspeed = kState.speedMetersPerSecond*(Constants.SECONDSper100MS)*Constants.DRIVE_MOTOR_TICKSperREVOLUTION/(Constants.METERSperWHEEL_REVOLUTION);           
             setSteeringAngle(kState.angle.getDegrees());
             
             if (Robot.CHARACTERIZE_ROBOT){
 
                 mDriveMotor.set(ControlMode.PercentOutput, kState.speedMetersPerSecond/Constants.MAX_SPEED_METERSperSECOND); 
-            } else {
+            } else if(Constants.kS == 0 && Constants.kV == 0) {
+                
                 mDriveMotor.set(ControlMode.Velocity, convertedspeed);
+            } else {
+                mDriveMotor.setVoltage(driveMotorFeedforward.calculate(kState.speedMetersPerSecond));
             }
             
         }
@@ -170,11 +184,11 @@ public class SwerveMap {
         public void setSteeringAngle(double _angle){
             double newAngleDemand;
             newAngleDemand = _angle;
-            //  if(newAngleDemand - mSteeringMotor.getSelectedSensorPosition() > 190){
-            //      newAngleDemand -= 360;
-            //  } else if (newAngleDemand - mSteeringMotor.getSelectedSensorPosition() < -190){
-            //      newAngleDemand += 360;
-            //  }
+              if(newAngleDemand - mSteeringMotor.getSelectedSensorPosition() > 190){
+                  newAngleDemand -= 360;
+              } else if (newAngleDemand - mSteeringMotor.getSelectedSensorPosition() < -190){
+                  newAngleDemand += 360;
+              }
             mSteeringMotor.set(ControlMode.Position, newAngleDemand);
         }
         

@@ -20,9 +20,9 @@ public class SwerveDrive implements Loggable {
   private double SDySpeed=0;
   private double SDrotation=0;
   private boolean SDFieldRelative=true;
-  @Config.PIDController
-  private PIDController holdRobotAngleController = new PIDController(15, 0, 0);
-  public boolean holdRobotAngleEnabled = false;
+  private boolean holdRobotAngleEnabled = true;
+  private PIDController holdRobotAngleController = new PIDController(10, 0, 0);
+  @Log.Dial(min = -180, max = 180, rowIndex = 0, columnIndex =4)
   public double holdRobotAngleSetpoint = 0;
   public String NeutralMode = "Brake";
 
@@ -39,6 +39,12 @@ public class SwerveDrive implements Loggable {
     return SINGLE_INSTANCE;
   }
 
+  public void init(){
+    m_odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+    holdRobotAngleController.disableContinuousInput();
+    holdRobotAngleController.setTolerance(Math.toRadians(2));
+  }
+
 
   
   /**
@@ -52,7 +58,7 @@ public class SwerveDrive implements Loggable {
   @SuppressWarnings("ParameterName")
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
     if (_rot == 0 && holdRobotAngleEnabled){
-      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
+      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), Math.toRadians(holdRobotAngleSetpoint));
     } else {
       holdRobotAngleSetpoint = -SwerveMap.GYRO.getAngle();
     }
@@ -69,10 +75,6 @@ public class SwerveDrive implements Loggable {
       SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
     }
     
-  public void init(){
-    m_odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
-    holdRobotAngleController.enableContinuousInput(-2*Math.PI, 2*Math.PI);
-  }
   public void joystickDrive(){
     double x = -Robot.xbox.getY(Hand.kLeft);
     double y = -Robot.xbox.getX(Hand.kLeft);
@@ -95,10 +97,10 @@ public class SwerveDrive implements Loggable {
   public void setToCoast(){
           
     if (NeutralMode == "Brake" &&
-      SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()  < 100 &&
-      SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()   < 100 &&
-      SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity() < 100 &&
-      SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()  < 100) {
+      Math.abs(SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity())  < 100 &&
+      Math.abs(SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity())   < 100 &&
+      Math.abs(SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()) < 100 &&
+      Math.abs(SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity())  < 100) {
         SwerveMap.FrontRightSwerveModule.swerveDisabledInit();
         SwerveMap.BackRightSwerveModule.swerveDisabledInit();
         SwerveMap.FrontLeftSwerveModule.swerveDisabledInit();
@@ -155,78 +157,102 @@ public class SwerveDrive implements Loggable {
   //public double holdAngle (double _input){
 
 
-  @Log 
+  @Log.NumberBar(min = -5, max = 5, rowIndex = 0, columnIndex = 7, height = 1, width = 1) 
   public double getSDxSpeed() {
     return SDxSpeed;
   }
-  @Log
+  @Log.NumberBar(min = -5, max = 5, rowIndex = 0, columnIndex = 8,height = 1, width = 1)
   public double getSDySpeed(){
     return SDySpeed;
   }
 
-  @Log.Graph
+  @Log.Dial(rowIndex = 0, columnIndex = 9, height = 1, width = 1)
   public double getSDRotation() {
     return SDrotation;
   }
 
-  @Log
+ 
   public boolean getSDFieldRelative() {
     return SDFieldRelative;
   }
 
-  @Config
   public void setSDxSpeed(double _input) {
     SDxSpeed = _input;
   }
 
-  @Config
   public void setSDySpeed(double _input) {
     SDySpeed = _input;
   }
-  @Config.NumberSlider(name = "Testlog")
+ 
   public void setSDRotation(double _input) {
     SDrotation = _input;
   }
-  @Config.ToggleButton(name = "FieldOriented?", defaultValue = true)
+  @Config.ToggleButton(name = "FieldOriented?", defaultValue = true, rowIndex = 1, columnIndex =0, height = 1, width = 2)
   public void setSDFieldRelative(boolean _input) {
     SDFieldRelative = _input;
   }
 
-  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = false)
+  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = true, rowIndex = 0, columnIndex =0, height = 1, width = 2)
   public void setHoldAngleEnabled(boolean _boolean){
     holdRobotAngleEnabled = _boolean;
   }
 
-  @Config.NumberSlider(name = "Robot Angle Setpoint(degrees)", min = -180, max = 180)
+  
   public void setHoldRobotAngleSetpoint(double _holdRobotAngleSetpoint) {
     holdRobotAngleSetpoint = Math.toRadians(_holdRobotAngleSetpoint);
   }
 
-  @Config
   public void resetOdometry(){
     m_odometry.resetPosition(new Pose2d(), new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
   }
-  @Log.NumberBar(min=-5,max=5)
-  public double getFrontLeftXVector(){
+
+  @Log.NumberBar(name = "FL Speed", min=-5,max=5 , rowIndex = 2, columnIndex =4, height = 1, width = 1)
+  public double getFrontLeftSpeed(){
     return SwerveMap.FrontLeftSwerveModule.getState().speedMetersPerSecond;
   }
-  @Log.NumberBar(min=-5,max=5)
-  public double getFrontRightXVector(){
+  @Log.Dial(name = "FL Angle", min = -90, max = 90, rowIndex = 2, columnIndex =3, height = 1, width = 1)
+  public double getFrontLeftAngle(){
+    return Math.IEEEremainder(SwerveMap.FrontLeftSwerveModule.getState().angle.getDegrees(),180);
+  }
+
+  @Log.NumberBar(name = "FR Speed", min=-5,max=5, rowIndex = 2, columnIndex =7, height = 1, width = 1)
+  public double getFrontRightSpeed(){
     return SwerveMap.FrontRightSwerveModule.getState().speedMetersPerSecond;
   }
-  @Log.NumberBar(min=-5,max=5)
-  public double getBackLeftXVector(){
+  @Log.Dial(name = "FR Angle", min = -90, max = 90, rowIndex = 2, columnIndex =8, height = 1, width = 1)
+  public double getFrontRightAngle(){
+    return Math.IEEEremainder(SwerveMap.FrontRightSwerveModule.getState().angle.getDegrees(),180);
+  }
+
+  @Log.NumberBar(name = "BL Speed", min=-5,max=5, rowIndex = 3, columnIndex =4, height = 1, width = 1)
+  public double getBackLeftSpeed(){
     return SwerveMap.BackLeftSwerveModule.getState().speedMetersPerSecond;
   }
-  @Log.NumberBar(min=-5,max=5)
-  public double getBackRightXVector(){
+  @Log.Dial(name = "BL Angle", min = -90, max = 90, rowIndex = 3, columnIndex =3, height = 1, width = 1)
+  public double getBackLeftAngle(){
+    return Math.IEEEremainder(SwerveMap.BackLeftSwerveModule.getState().angle.getDegrees(),180);
+  }
+
+
+  @Log.NumberBar(name = "BR Speed", min=-5,max=5,  rowIndex =3, columnIndex =7, height = 1, width = 1)
+  public double getBackRightSpeed(){
     return SwerveMap.BackRightSwerveModule.getState().speedMetersPerSecond;
   }
-  @Log
+  @Log.Dial(name = "BR Angle", min = -90, max = 90, rowIndex =3, columnIndex =8, height = 1, width = 1)
+  public double getBackRightAngle(){
+    return Math.IEEEremainder(SwerveMap.BackRightSwerveModule.getState().angle.getDegrees(),180);
+  }
+  
+  @Log(rowIndex = 0, columnIndex = 5, height = 1, width = 1)
   public double getXPos(){
     return m_odometry.getPoseMeters().getX();
   }
-  @Config.ToggleSwitch(name="ResetGyroAndOdometry", defaultValue = true)
+  @Log(rowIndex = 0, columnIndex = 6, height = 1, width = 1)
+  public double getYPos(){
+    return m_odometry.getPoseMeters().getY();
+  }
+
+  @Config.ToggleButton(name="ResetGyroAndOdometry", defaultValue = true, rowIndex = 3, columnIndex = 0, height = 1, width = 2)
   public void resetGyroAndOdometry(boolean _input){
     if(_input){
     SwerveMap.GYRO.reset();

@@ -19,6 +19,21 @@ import io.github.oblarg.oblog.Logger;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
+
+ /*For starting a new Stampede swerve project
+  * 1. Zero out the following constants: ks, kv
+  * 2. Re-measure the following values
+  *     a. WHEEL_RADIUS_METERS  
+  *     b. WHEEL_BASE_METERS
+  *     c. MAX_SPEED_TICKSper100MS (measured by robot on chocks and phoenix tuner)
+  *     d. STEERING_SENSOR_TICKSperROTATION
+  *     e. METERSperROBOT_REVOLUTION
+  *     f. METERSperWHEEL_REVOLUTION
+  * 3. Check Drive, Motor and Sensor IDs
+  * 4. Measure and record CANcoder sensor offset
+  * 5. Recalibrate NAVX Gyro
+  * 6. In SwerveDrive.java turn the Hold Robot Angle "d"efaultValue" to false
+         */
 public class Robot extends TimedRobot {
   public static final boolean CHARACTERIZE_ROBOT = false;
   public static SwerveDrive SWERVEDRIVE;
@@ -59,8 +74,6 @@ public class Robot extends TimedRobot {
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
     SWERVEDRIVE.setToBrake();
     SwerveTrajectory.resetTrajectoryStatus();
-    
-
   }
 
   /** This function is called periodically during autonomous. */

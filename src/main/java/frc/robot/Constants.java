@@ -5,17 +5,22 @@ public class Constants {
     
     //Constants for conversion maths
     public static final double WHEEL_RADIUS_METERS = .0508;
-    public static final double WHEEL_BASE_METERS = 9 * 2.54/100; //9 inch wheel base to meters
+    public static final double WHEEL_BASE_METERS = 18 * 2.54/100; //9 inch wheel base to meters
     public static final double MAX_SPEED_TICKSper100MS = 21900;
     public static final double SECONDSper100MS = .1;
     public static final double STEERING_SENSOR_TICKSperROTATION = 4096;
     public static final double STEERING_SENSOR_DEGREESperTICKS = 360/STEERING_SENSOR_TICKSperROTATION;
-    public static final double DRIVE_MOTOR_TICKSperREVOLUTION = 6.86*2048;//Gearing * 1 full rotation of Talon FX (CPR)
+    public static final double DRIVE_MOTOR_GEARING = 6.86;
+    public static final double TICKSperTALONFX_Rotation = 2048;
+    public static final double DRIVE_MOTOR_TICKSperREVOLUTION = DRIVE_MOTOR_GEARING*TICKSperTALONFX_Rotation;
     public static final double METERSperWHEEL_REVOLUTION = 2*Math.PI*WHEEL_RADIUS_METERS;
-    public static final double METERSperROBOT_REVOLUTION =  2*Math.PI*(WHEEL_BASE_METERS*1.414213);//Math.sqrt(2)
+    public static final double METERSperROBOT_REVOLUTION =  2*Math.PI*(WHEEL_BASE_METERS/2*1.414213);//Math.sqrt(2)
     public static final double MAX_SPEED_METERSperSECOND = MAX_SPEED_TICKSper100MS/SECONDSper100MS/DRIVE_MOTOR_TICKSperREVOLUTION*METERSperWHEEL_REVOLUTION;
     public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/METERSperROBOT_REVOLUTION*(2*Math.PI);
     public static final double SPEED_GOVERNOR =.11;
+    public static final double STEERING_MOTOR_GEARING = 12.8;
+    public static final double TICKSperTALONFX_DEGREE = TICKSperTALONFX_Rotation*STEERING_MOTOR_GEARING/360; 
+
     
     //Swerve Drive Motor IDs
     public static final int FRDriveID = 6;
@@ -34,13 +39,15 @@ public class Constants {
     public static final int FLSensorID = 4;
     public static final int BRSensorID = 2;
     public static final int BLSensorID = 1;
+    public static final double kS = .6076;
+    public static final double kV = 2.3326;
 
     //Swerve CANCoder offsets
     //CHANGE TO 0 first, reset the sensor, zero out the motor and place the OPPOSITE of the value
-    public static double FRSensorOffset = -21.06+8.174;
-    public static double FLSensorOffset = 52.119+2.725;
-    public static double BRSensorOffset = 175.518+1.494;
-    public static double BLSensorOffset = -34.453+10.371;
+    public static double FRSensorOffset = -3.955;
+    public static double FLSensorOffset = 59.326;
+    public static double BRSensorOffset = -176.045;
+    public static double BLSensorOffset = 26.455;
 
     //Swerve Steering PIDs (kP, kI, kD)
     public static Gains FRSteerGains = new Gains(1.2, 0, 0);
@@ -57,7 +64,7 @@ public class Constants {
     //CTRE CAN-based constants
     public static final int kDefaultPIDSlotID = 0;
     public static final int kDefaultTimeout = 30;//milliseconds
-    public static final int kDefaultClosedLoopError = 5;//sensor units
+    public static final int kDefaultClosedLoopError = 2; //degrees 
 
     public static class Gains {
         public final double kP;

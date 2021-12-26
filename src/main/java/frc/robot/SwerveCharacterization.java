@@ -43,10 +43,10 @@ public class SwerveCharacterization implements Loggable{
         double now = Timer.getFPGATimestamp();
         double position = Robot.SWERVEDRIVE.m_odometry.getPoseMeters().getX()/Constants.METERSperWHEEL_REVOLUTION;
         System.out.println(position);
-        double velocity = (Robot.SWERVEDRIVE.getBackLeftXVector()+
-        Robot.SWERVEDRIVE.getFrontLeftXVector()+
-        Robot.SWERVEDRIVE.getBackRightXVector()+
-        Robot.SWERVEDRIVE.getFrontRightXVector())
+        double velocity = (Robot.SWERVEDRIVE.getBackLeftSpeed()+
+        Robot.SWERVEDRIVE.getFrontLeftSpeed()+
+        Robot.SWERVEDRIVE.getBackRightSpeed()+
+        Robot.SWERVEDRIVE.getFrontRightSpeed())
                 / 4 / Constants.METERSperWHEEL_REVOLUTION;
 
         double battery = RobotController.getBatteryVoltage();
