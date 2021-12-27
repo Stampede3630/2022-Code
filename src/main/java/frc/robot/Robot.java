@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -39,6 +38,7 @@ public class Robot extends TimedRobot {
   public static SwerveDrive SWERVEDRIVE;
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static XboxController xbox= new XboxController(0);
+  PathPlannerTrajectory examplePath; 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -51,6 +51,7 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE = SwerveDrive.getInstance();
     SWERVEDRIVE.init();
     SWERVEDRIVE.zeroSwerveDrive();
+    examplePath = PathPlanner.loadPath("path0", 2, 1);
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     Logger.configureLoggingAndConfig(this, false);//keep this statement on the BOTTOM of your init
@@ -74,14 +75,15 @@ public class Robot extends TimedRobot {
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
     SWERVEDRIVE.setToBrake();
     SwerveTrajectory.resetTrajectoryStatus();
+
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.periodic();}
-    SwerveTrajectory.trajectoryRunner(TrajectoryContainer.jonahTrajectory, SWERVEDRIVE.m_odometry, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
-    
+    //SwerveTrajectory.trajectoryRunner(TrajectoryContainer.jonahTrajectory, SWERVEDRIVE.m_odometry, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+    SwerveTrajectory.PathPlannerRunner(examplePath, SWERVEDRIVE.m_odometry, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
   }
 
   /** This function is called once when teleop is enabled. */

@@ -206,6 +206,10 @@ public class SwerveDrive implements Loggable {
     m_odometry.resetPosition(new Pose2d(), new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
   }
 
+  public void resetOdometry(Pose2d _Pose2d, Rotation2d _Rotation2d){
+    m_odometry.resetPosition(_Pose2d, _Rotation2d);
+  }
+
   @Log.NumberBar(name = "FL Speed", min=-5,max=5 , rowIndex = 2, columnIndex =4, height = 1, width = 1)
   public double getFrontLeftSpeed(){
     return SwerveMap.FrontLeftSwerveModule.getState().speedMetersPerSecond;
