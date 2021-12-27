@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.PathPlannerTrajectory.PathPlannerState;
 import io.github.oblarg.oblog.Loggable;
+import com.pathplanner.lib.PathPlanner;
 
 
 public class SwerveTrajectory implements Loggable {
@@ -59,11 +60,14 @@ public class SwerveTrajectory implements Loggable {
         double elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
         switch (trajectoryStatus) {
             case "setup":
+                System.out.println("My Status is:   " + trajectoryStatus);
+                System.out.println(((PathPlannerState) _pathTraj.getEndState()).toString());
                 Robot.SWERVEDRIVE.resetOdometry(((PathPlannerState) _pathTraj.getInitialState()).poseMeters, ((PathPlannerState) _pathTraj.getInitialState()).poseMeters.getRotation()); 
                 timetrajectoryStarted = Timer.getFPGATimestamp();
                 trajectoryStatus = "execute";
                 break;
             case "execute":
+                
                 if (elapsedTime <  ((PathPlannerState) _pathTraj.getEndState()).timeSeconds){
                     ChassisSpeeds _speeds = HDC.calculate(
                         _odometry.getPoseMeters(), 
