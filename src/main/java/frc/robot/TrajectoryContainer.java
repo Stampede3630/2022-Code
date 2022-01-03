@@ -6,9 +6,12 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 
 public class TrajectoryContainer {
+    private static TrajectoryConfig  config = new TrajectoryConfig(Constants.MAX_SPEED_METERSperSECOND*Constants.SPEED_GOVERNOR, Constants.MAX_SPEED_METERSperSECOND);
+
 
         public static Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction
@@ -21,7 +24,7 @@ public class TrajectoryContainer {
             // End 3 meters straight ahead of where we started, facing forward
             new Pose2d(1.5, 0, new Rotation2d(0)),
             // Pass config
-            SwerveTrajectory.config
+            config
         );
 
         public static Trajectory jonahTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -45,10 +48,9 @@ public class TrajectoryContainer {
                 new Translation2d(4.6, .0),
                 new Translation2d(4.7, -0.1)
             ),
-            // End 3 meters straight ahead of where we started, facing forward
             new Pose2d(5, .25, new Rotation2d(0)),
             // Pass config
-            SwerveTrajectory.config
+            config
         );
     
 }

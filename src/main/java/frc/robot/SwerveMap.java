@@ -12,25 +12,26 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import io.github.oblarg.oblog.annotations.Log;
 
 public class SwerveMap {
     public static AHRS GYRO;
     public static TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
-    public static SimpleMotorFeedforward driveMotorFeedforward = new SimpleMotorFeedforward(Constants.kS, Constants.kV);
+    public static SimpleMotorFeedforward driveMotorFeedforward = new SimpleMotorFeedforward(Constants.kS, Constants.kV, Constants.kA);
     public static final SwerveModule FrontRightSwerveModule = new SwerveModule(
-        new DriveMotor(Constants.FRDriveID, TalonFXInvertType.Clockwise, Constants.FRDriveGains), 
+        new DriveMotor(Constants.FRDriveID, Constants.FRInvertType, Constants.FRDriveGains), 
         new SteeringMotor(Constants.FRSteerID, Constants.FRSteerGains), 
         new SteeringSensor(Constants.FRSensorID,Constants.FRSensorOffset));
     public static final SwerveModule FrontLeftSwerveModule = new SwerveModule(
-        new DriveMotor(Constants.FLDriveID,TalonFXInvertType.CounterClockwise, Constants.FLDriveGains),
+        new DriveMotor(Constants.FLDriveID,Constants.FLInvertType, Constants.FLDriveGains),
         new SteeringMotor(Constants.FLSteerID, Constants.FLSteerGains), 
         new SteeringSensor(Constants.FLSensorID,Constants.FLSensorOffset));
     public static final SwerveModule BackRightSwerveModule = new SwerveModule(
-        new DriveMotor(Constants.BRDriveID,TalonFXInvertType.Clockwise, Constants.BRDriveGains) , 
+        new DriveMotor(Constants.BRDriveID,Constants.BRInvertType, Constants.BRDriveGains) , 
         new SteeringMotor(Constants.BRSteerID, Constants.BRSteerGains), 
         new SteeringSensor(Constants.BRSensorID,Constants.BRSensorOffset));
     public static final SwerveModule BackLeftSwerveModule = new SwerveModule(
-        new DriveMotor(Constants.BLDriveID,TalonFXInvertType.CounterClockwise, Constants.BLDriveGains), 
+        new DriveMotor(Constants.BLDriveID,Constants.BLInvertType, Constants.BLDriveGains), 
         new SteeringMotor(Constants.BLSteerID, Constants.BLSteerGains), 
         new SteeringSensor(Constants.BLSensorID,Constants.BLSensorOffset));
 
@@ -42,7 +43,6 @@ public class SwerveMap {
         BackRightSwerveModule.swerveRobotInit();
         FrontLeftSwerveModule.swerveRobotInit();
         BackLeftSwerveModule.swerveRobotInit();
-        //ahrs = new AHRS(Port.kMXP);
     }
 
     public static class SteeringMotor extends WPI_TalonFX{  
@@ -124,10 +124,10 @@ public class SwerveMap {
             mSteeringMotor.configRemoteFeedbackFilter(mSteeringSensor, 0);
             mSteeringMotor.configSelectedFeedbackCoefficient(Constants.STEERING_SENSOR_DEGREESperTICKS, 1, Constants.kDefaultTimeout);
             mSteeringMotor.configAllowableClosedloopError(Constants.kDefaultPIDSlotID, Constants.kDefaultClosedLoopError, Constants.kDefaultTimeout);
-            mSteeringMotor.config_kF(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kF/Constants.STEERING_SENSOR_DEGREESperTICKS, Constants.kDefaultTimeout);
-            mSteeringMotor.config_kP(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kP/Constants.STEERING_SENSOR_DEGREESperTICKS, Constants.kDefaultTimeout);
-            mSteeringMotor.config_kI(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kI/Constants.STEERING_SENSOR_DEGREESperTICKS, Constants.kDefaultTimeout);
-            mSteeringMotor.config_kD(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kD/Constants.STEERING_SENSOR_DEGREESperTICKS, Constants.kDefaultTimeout);  
+            mSteeringMotor.config_kF(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kF, Constants.kDefaultTimeout);
+            mSteeringMotor.config_kP(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kP, Constants.kDefaultTimeout);
+            mSteeringMotor.config_kI(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kI, Constants.kDefaultTimeout);
+            mSteeringMotor.config_kD(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kD, Constants.kDefaultTimeout);  
             zeroSwerveAngle();
         }
         public void swerveDisabledInit(){

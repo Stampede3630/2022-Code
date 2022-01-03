@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -19,11 +21,11 @@ public class SwerveDrive implements Loggable {
   private double SDxSpeed=0;
   private double SDySpeed=0;
   private double SDrotation=0;
-  private boolean SDFieldRelative=true;
-  private boolean holdRobotAngleEnabled = true;
-  private PIDController holdRobotAngleController = new PIDController(10, 0, 0);
-  @Log.Dial(min = -180, max = 180, rowIndex = 0, columnIndex =4)
-  public double holdRobotAngleSetpoint = 0;
+  private boolean SDFieldRelative=Constants.DEFAULT_FIELD_RELATIVE_DRIVE;
+  private boolean holdRobotAngleEnabled = Constants.DEFAULT_HOLD_ROBOT_ANGLE;
+  private PIDController holdRobotAngleController = new PIDController(Constants.ROBOTHoldAngleKP, 0, 0);
+  
+  public double holdRobotAngleSetpoint = Constants.DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT;
   public String NeutralMode = "Brake";
 
   public final Translation2d m_frontLeftLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, Constants.WHEEL_BASE_METERS/2);
@@ -40,31 +42,29 @@ public class SwerveDrive implements Loggable {
   }
 
   public void init(){
-    m_odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+    m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.getRobotAngle());
     holdRobotAngleController.disableContinuousInput();
     holdRobotAngleController.setTolerance(Math.toRadians(2));
   }
-
-
   
   /**
-  * Method to drive the robot using joystick info.
+  * Method to drive the robot using the following params
   *
-  * @param xSpeed Speed of the robot in the x direction (forward).
-  * @param ySpeed Speed of the robot in the y direction (sideways).
-  * @param rot Angular rate of the robot.
-  * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+  * @param _xSpeed Speed of the robot in the x direction (forward).
+  * @param _ySpeed Speed of the robot in the y direction (sideways).
+  * @param _rot Angular rate of the robot.
+  * @param _fieldRelative Whether the provided x and y speeds are relative to the field.
   */
   @SuppressWarnings("ParameterName")
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
     if (_rot == 0 && holdRobotAngleEnabled){
-      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), Math.toRadians(holdRobotAngleSetpoint));
+      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
     } else {
-      holdRobotAngleSetpoint = -SwerveMap.GYRO.getAngle();
+      holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
     }
     SwerveModuleState[] moduleStates =
       m_kinematics.toSwerveModuleStates( _fieldRelative ? 
-        ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())))
+        ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, SwerveMap.getRobotAngle())
         : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
 
       SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
@@ -74,7 +74,7 @@ public class SwerveDrive implements Loggable {
       SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
       SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
     }
-    
+  /**This ONLY saves speeds.  You must also call the drive method */  
   public void joystickDrive(){
     double x = -Robot.xbox.getY(Hand.kLeft);
     double y = -Robot.xbox.getX(Hand.kLeft);
@@ -93,6 +93,8 @@ public class SwerveDrive implements Loggable {
 
   /**
    * MUST BE ADDED TO PERIODIC (NOT INIT METHODS)
+   * sets all the talons (steer and drive motors) to coast.
+   * This allows for easy moving of the robot
    */
   public void setToCoast(){
           
@@ -109,7 +111,7 @@ public class SwerveDrive implements Loggable {
       }
 
   }
-
+/**When we drive around we want the robot to brake... nuff said */
   public void setToBrake(){
     SwerveMap.FrontRightSwerveModule.swerveEnabledInit();
     SwerveMap.BackRightSwerveModule.swerveEnabledInit();
@@ -117,7 +119,7 @@ public class SwerveDrive implements Loggable {
     SwerveMap.BackLeftSwerveModule.swerveEnabledInit();
     NeutralMode = "Brake";
   }
-
+/**Sets the robots speed parameters to zero */
   public void zeroSwerveDrive(){
     SDxSpeed = 0;
     SDySpeed = 0;
@@ -131,7 +133,7 @@ public class SwerveDrive implements Loggable {
   private double convertToRadiansPerSecond(double _input){
     return _input*Constants.MAX_SPEED_RADIANSperSECOND;
   }
-  public double deadband(double _input){
+  private double deadband(double _input){
       if(Math.abs(_input)<= Constants.XBOXDEADBAND){
         _input = 0;
       }
@@ -139,11 +141,10 @@ public class SwerveDrive implements Loggable {
   }
 
   /** Updates the field relative position of the robot. */
-
   public void updateOdometry() {
     m_odometry.update(
       
-    new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())),
+      SwerveMap.getRobotAngle(),
     SwerveMap.FrontLeftSwerveModule.getState(),
     SwerveMap.FrontRightSwerveModule.getState(),
     SwerveMap.BackLeftSwerveModule.getState(),
@@ -154,9 +155,25 @@ public class SwerveDrive implements Loggable {
   }
 
 
-  //public double holdAngle (double _input){
+  
+  @Log.Gyro(name = "Robot Angle", rowIndex = 2, columnIndex = 5)
+  private AHRS getGyro(){
+    return SwerveMap.GYRO;
+  }
 
+  public boolean getSDFieldRelative() {
+    return SDFieldRelative;
+  }
 
+  public void setSDxSpeed(double _input) {
+    SDxSpeed = _input;
+  }
+  public void setSDySpeed(double _input) {
+    SDySpeed = _input;
+  }
+  public void setSDRotation(double _input) {
+    SDrotation = _input;
+  }
   @Log.NumberBar(min = -5, max = 5, rowIndex = 0, columnIndex = 7, height = 1, width = 1) 
   public double getSDxSpeed() {
     return SDxSpeed;
@@ -165,28 +182,11 @@ public class SwerveDrive implements Loggable {
   public double getSDySpeed(){
     return SDySpeed;
   }
-
   @Log.Dial(rowIndex = 0, columnIndex = 9, height = 1, width = 1)
   public double getSDRotation() {
     return SDrotation;
   }
 
- 
-  public boolean getSDFieldRelative() {
-    return SDFieldRelative;
-  }
-
-  public void setSDxSpeed(double _input) {
-    SDxSpeed = _input;
-  }
-
-  public void setSDySpeed(double _input) {
-    SDySpeed = _input;
-  }
- 
-  public void setSDRotation(double _input) {
-    SDrotation = _input;
-  }
   @Config.ToggleButton(name = "FieldOriented?", defaultValue = true, rowIndex = 1, columnIndex =0, height = 1, width = 2)
   public void setSDFieldRelative(boolean _input) {
     SDFieldRelative = _input;
@@ -197,13 +197,21 @@ public class SwerveDrive implements Loggable {
     holdRobotAngleEnabled = _boolean;
   }
 
-  
+  @Log.Dial(name= "Current Robot Angle", min = -180, max = 180, rowIndex = 0, columnIndex =3)
+  public double getRobotAngleDegrees(){
+    return SwerveMap.getRobotAngle().getDegrees();
+  }
+  @Log.Dial(name= "Hold Angle Setpoint", min = -180, max = 180, rowIndex = 0, columnIndex =4)
+  public double getHoldAngleSetpoint(){
+    return Math.toDegrees(holdRobotAngleSetpoint);
+  }
+
   public void setHoldRobotAngleSetpoint(double _holdRobotAngleSetpoint) {
     holdRobotAngleSetpoint = Math.toRadians(_holdRobotAngleSetpoint);
   }
 
   public void resetOdometry(){
-    m_odometry.resetPosition(new Pose2d(), new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+    m_odometry.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
   }
 
   public void resetOdometry(Pose2d _Pose2d, Rotation2d _Rotation2d){
@@ -255,12 +263,16 @@ public class SwerveDrive implements Loggable {
   public double getYPos(){
     return m_odometry.getPoseMeters().getY();
   }
+  @Log.BooleanBox(rowIndex = 1, columnIndex = 5)
+  public boolean getGyroInterference(){
+    return SwerveMap.GYRO.isMagneticDisturbance();
+  }
 
   @Config.ToggleButton(name="ResetGyroAndOdometry", defaultValue = true, rowIndex = 3, columnIndex = 0, height = 1, width = 2)
   public void resetGyroAndOdometry(boolean _input){
     if(_input){
     SwerveMap.GYRO.reset();
-    Robot.SWERVEDRIVE.m_odometry.resetPosition(new Pose2d(), new Rotation2d(Math.toRadians(-SwerveMap.GYRO.getAngle())));
+    Robot.SWERVEDRIVE.m_odometry.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
     _input = false;
     }
   }

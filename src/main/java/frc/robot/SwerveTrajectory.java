@@ -12,23 +12,30 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.PathPlannerTrajectory.PathPlannerState;
 import io.github.oblarg.oblog.Loggable;
-import com.pathplanner.lib.PathPlanner;
+
 
 
 public class SwerveTrajectory implements Loggable {
     // Create config for trajectory
     private static double timetrajectoryStarted;
     private static String trajectoryStatus="";
-    
-    
-    public static TrajectoryConfig  config = new TrajectoryConfig(Constants.MAX_SPEED_METERSperSECOND*.1, Constants.MAX_SPEED_METERSperSECOND);
-    
+    private static SwerveTrajectory SINGLE_INSTANCE = new SwerveTrajectory();    
+
+    public static SwerveTrajectory getInstance(){
+        return SINGLE_INSTANCE;
+    }
     public static HolonomicDriveController HDC = new HolonomicDriveController(
         new PIDController(.69,0, 0), 
         new PIDController(.69, 0, 0), 
-        new ProfiledPIDController(.69/Constants.MAX_SPEED_RADIANSperSECOND*Constants.MAX_SPEED_METERSperSECOND, 0, 0, 
-        new Constraints(Constants.MAX_SPEED_RADIANSperSECOND*.5, Constants.MAX_SPEED_RADIANSperSECOND*.5)));
+        new ProfiledPIDController(.69*Constants.MAX_SPEED_RADIANSperSECOND/Constants.MAX_SPEED_METERSperSECOND, 0, 0, 
+        new Constraints(Constants.MAX_SPEED_RADIANSperSECOND, Constants.MAX_SPEED_RADIANSperSECOND)));
     
+
+    /**This is WPILIBs Trajectory Runner (docs.wpilib.org), it pretends that your robot is NOT a swerve drive.  This will work, but there are better options for 2022
+     * @param _trajectory Pass in a trajectory that's stored in TrajectoryContainer
+     * @param _odometry Pass in the robots odometry from SwerveDrive.java
+     * @param _rotation2d Pass in the current angle of the robot
+     */
     public static void trajectoryRunner(Trajectory _trajectory, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
         double elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
         switch (trajectoryStatus) {
@@ -49,19 +56,27 @@ public class SwerveTrajectory implements Loggable {
                 } else {
                     Robot.SWERVEDRIVE.drive(0,0,0,false);
                     trajectoryStatus = "done";
+
                 }
                 break;
             default:
+                Robot.SWERVEDRIVE.drive(0,0,0,false);
                 break;
         }
     }
 
+
+    //Overload this method to accomdate different starting points, this can be useful when playing with multiple paths
+    /**
+     * This is PathPlanner.  It's awesome :) open up pathplanner.exe on the driverstation laptop.  Point the application to the locaiton of your coding project (must contain build.gradle).  Draw the path.  It will autosave. If everything is characterized correctly and your odometry reflects reality, ie. when the robot goes 1 meter it says it goes one meter--it will work like a charm.
+     * @param _pathTraj run Pathplanner.loadpath("name of file without extension") pass it here
+     * @param _odometry SwerveDrive.java's odometry
+     * @param _rotation2d Pass in the current angle of the robot
+     */
     public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
         double elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
         switch (trajectoryStatus) {
             case "setup":
-                System.out.println("My Status is:   " + trajectoryStatus);
-                System.out.println(((PathPlannerState) _pathTraj.getEndState()).toString());
                 Robot.SWERVEDRIVE.resetOdometry(((PathPlannerState) _pathTraj.getInitialState()).poseMeters, ((PathPlannerState) _pathTraj.getInitialState()).poseMeters.getRotation()); 
                 timetrajectoryStarted = Timer.getFPGATimestamp();
                 trajectoryStatus = "execute";
@@ -71,17 +86,20 @@ public class SwerveTrajectory implements Loggable {
                 if (elapsedTime <  ((PathPlannerState) _pathTraj.getEndState()).timeSeconds){
                     ChassisSpeeds _speeds = HDC.calculate(
                         _odometry.getPoseMeters(), 
-                        ((PathPlannerState) _pathTraj.sample(elapsedTime)),_rotation2d);
+                        ((PathPlannerState) _pathTraj.sample(elapsedTime)),((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
                     Robot.SWERVEDRIVE.drive(_speeds.vxMetersPerSecond,
                     _speeds.vyMetersPerSecond, 
                     _speeds.omegaRadiansPerSecond,false);
                     
                 } else {
                     Robot.SWERVEDRIVE.drive(0,0,0,false);
+                    Robot.SWERVEDRIVE.setHoldRobotAngleSetpoint(((PathPlannerState) _pathTraj.getEndState()).holonomicRotation.getRadians());
                     trajectoryStatus = "done";
+
                 }
                 break;
             default:
+                Robot.SWERVEDRIVE.drive(0,0,0,false);
                 break;
         }
     }
