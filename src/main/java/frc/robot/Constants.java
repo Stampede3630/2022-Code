@@ -15,7 +15,7 @@ public class Constants {
     
     
     //SWERVE Drive Default Values
-    public static final double ROBOTHoldAngleKP = 7; //Start at .7 and see where you go from there
+    public static final double ROBOTHoldAngleKP = 10; //Start at .7 and see where you go from there
     public static final boolean DEFAULT_HOLD_ROBOT_ANGLE = true;
 	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = true;
 	public static final double DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT = 0; 
@@ -42,10 +42,10 @@ public class Constants {
     //CHANGE TO 0 first, reset the sensor, 
     //PHYSICALLY zero out the motor 
     //place the OPPOSITE of the value
-    public static double FRSensorOffset = -3.955;
-    public static double FLSensorOffset = 59.326;
-    public static double BRSensorOffset = -176.045;
-    public static double BLSensorOffset = 26.455;
+    public static double FRSensorOffset = 17.666;
+    public static double FLSensorOffset = 57.744;
+    public static double BRSensorOffset = -165.059;
+    public static double BLSensorOffset = 67.061;
 
 
     //Give a positive input on the joystick or phoenix tuner
@@ -57,10 +57,10 @@ public class Constants {
     public static TalonFXInvertType BLInvertType = TalonFXInvertType.CounterClockwise;
 
     //Swerve Steering PIDs (kP, kI, kD)
-    public static Gains FRSteerGains = new Gains(8, 0, 0);
-    public static Gains FLSteerGains = new Gains(10, 0, 0);
-    public static Gains BRSteerGains = new Gains(8, 0, 0);
-    public static Gains BLSteerGains = new Gains(8, 0, 0);
+    public static Gains FRSteerGains = new Gains(25, 0, 0);
+    public static Gains FLSteerGains = new Gains(25, 0, 0);
+    public static Gains BRSteerGains = new Gains(25, 0, 0);
+    public static Gains BLSteerGains = new Gains(25, 0, 0);
 
     //Swerve Driving PIDs (kP, kI, kD)
     //Once characterized the drive PIDs are meaningless
@@ -75,7 +75,7 @@ public class Constants {
     //CTRE CAN-based constants (shouldn't need to change these)
     public static final int kDefaultPIDSlotID = 0;
     public static final int kDefaultTimeout = 30;//milliseconds
-    public static final int kDefaultClosedLoopError = 3; //degrees 
+    public static final int kDefaultClosedLoopError = 1; //degrees 
     
     //Constants for conversion maths (RARELY THESE SHOULD BE CHANGED)
     public static final double SECONDSper100MS = .1;

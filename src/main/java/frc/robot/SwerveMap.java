@@ -182,14 +182,19 @@ public class SwerveMap {
          * @param _angle (IN DEGREES)
          */
         public void setSteeringAngle(double _angle){
-            double newAngleDemand;
-            newAngleDemand = _angle;
-              if(newAngleDemand - mSteeringMotor.getSelectedSensorPosition() > 190){
+            //double newAngleDemand = _angle;
+            double currentSensorPosition = mSteeringMotor.getSelectedSensorPosition();
+            double remainder = Math.IEEEremainder(currentSensorPosition, 360);
+            double newAngleDemand = _angle + currentSensorPosition -remainder;
+           
+            //System.out.println(mSteeringMotor.getSelectedSensorPosition()-remainder );
+            if(newAngleDemand - currentSensorPosition > 180.1){
                   newAngleDemand -= 360;
-              } else if (newAngleDemand - mSteeringMotor.getSelectedSensorPosition() < -190){
+              } else if (newAngleDemand - currentSensorPosition < -180.1){
                   newAngleDemand += 360;
               }
-            mSteeringMotor.set(ControlMode.Position, newAngleDemand);
+              
+            mSteeringMotor.set(ControlMode.Position, newAngleDemand );
         }
         
         public double getSteeringAngle(){

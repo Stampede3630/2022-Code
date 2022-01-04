@@ -272,6 +272,7 @@ public class SwerveDrive implements Loggable {
   public void resetGyroAndOdometry(boolean _input){
     if(_input){
     SwerveMap.GYRO.reset();
+    holdRobotAngleSetpoint = 0;
     Robot.SWERVEDRIVE.m_odometry.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
     _input = false;
     }
