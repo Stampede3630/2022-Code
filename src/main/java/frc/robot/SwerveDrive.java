@@ -268,12 +268,23 @@ public class SwerveDrive implements Loggable {
     return SwerveMap.GYRO.isMagneticDisturbance();
   }
 
-  @Config.ToggleButton(name="ResetGyroAndOdometry", defaultValue = true, rowIndex = 3, columnIndex = 0, height = 1, width = 2)
+  @Config.ToggleButton(name="ResetGyroAndOdometry", defaultValue = false, rowIndex = 3, columnIndex = 0, height = 1, width = 2)
   public void resetGyroAndOdometry(boolean _input){
     if(_input){
     SwerveMap.GYRO.reset();
     holdRobotAngleSetpoint = 0;
     Robot.SWERVEDRIVE.m_odometry.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
+    _input = false;
+    }
+  }
+
+  @Config.ToggleButton(name="RE-Zero Swerve Angle", defaultValue = false, rowIndex = 4, columnIndex = 0, height = 1, width = 2)
+  public void reZeroSwerveDrive(boolean _input){
+    if(_input){
+      SwerveMap.FrontRightSwerveModule.REzeroSwerveAngle();
+      SwerveMap.BackRightSwerveModule.REzeroSwerveAngle();
+      SwerveMap.FrontLeftSwerveModule.REzeroSwerveAngle();
+      SwerveMap.BackLeftSwerveModule.REzeroSwerveAngle();
     _input = false;
     }
   }

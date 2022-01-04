@@ -44,6 +44,7 @@ public class SwerveMap {
         BackLeftSwerveModule.swerveRobotInit();
     }
 
+
     public static class SteeringMotor extends WPI_TalonFX{  
         public Constants.Gains kGAINS;
 
@@ -71,6 +72,8 @@ public class SwerveMap {
             kOffsetDegrees = _offsetDegrees;
          }       
     }
+
+    
 
     /**
      * Helpful hints:
@@ -140,6 +143,9 @@ public class SwerveMap {
 
         public void zeroSwerveAngle() {
             mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getAbsolutePosition(),0,Constants.kDefaultTimeout);
+        }
+        public void REzeroSwerveAngle() {
+            mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getAbsolutePosition()-mSteeringMotor.getSelectedSensorPosition(),0,Constants.kDefaultTimeout);
         }
 
         public SwerveModuleState getState() {

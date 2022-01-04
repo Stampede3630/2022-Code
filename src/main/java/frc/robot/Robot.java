@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
       SWERVETRAJECTORY = SwerveTrajectory.getInstance();
-      examplePath = PathPlanner.loadPath("New Path", .5, 1);
+      examplePath = PathPlanner.loadPath("New Path", 1, .8);
     }
     //keep this statement on the BOTTOM of your robotInit
     //It's responsible for all the shuffleboard outputs.  
