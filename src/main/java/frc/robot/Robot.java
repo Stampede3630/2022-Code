@@ -5,10 +5,10 @@
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import io.github.oblarg.oblog.Logger;
 
  /*For starting a new Stampede swerve project
