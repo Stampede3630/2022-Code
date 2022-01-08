@@ -2,15 +2,14 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -67,7 +66,7 @@ public class SwerveDrive implements Loggable {
         ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, SwerveMap.getRobotAngle())
         : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
 
-      SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
+      SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
 
       SwerveMap.FrontLeftSwerveModule.setDesiredState(moduleStates[0]);
       SwerveMap.FrontRightSwerveModule.setDesiredState(moduleStates[1]);
@@ -76,9 +75,9 @@ public class SwerveDrive implements Loggable {
     }
   /**This ONLY saves speeds.  You must also call the drive method */  
   public void joystickDrive(){
-    double x = -Robot.xbox.getY(Hand.kLeft);
-    double y = -Robot.xbox.getX(Hand.kLeft);
-    double rot = -Robot.xbox.getX(Hand.kRight);
+    double x = -Robot.xbox.getLeftY();
+    double y = -Robot.xbox.getLeftX();
+    double rot = -Robot.xbox.getRightX();
 
     SDxSpeed = convertToMetersPerSecond(deadband(x))*Constants.SPEED_GOVERNOR;
     SDySpeed = convertToMetersPerSecond(deadband(y))*Constants.SPEED_GOVERNOR;

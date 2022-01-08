@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
