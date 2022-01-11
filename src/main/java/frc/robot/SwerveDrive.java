@@ -25,6 +25,7 @@ public class SwerveDrive implements Loggable {
   private PIDController holdRobotAngleController = new PIDController(Constants.ROBOTHoldAngleKP, 0, 0);
   
   public double holdRobotAngleSetpoint = Constants.DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT;
+  public double joystickDriveGovernor = Constants.SPEED_GOVERNOR;
   public String NeutralMode = "Brake";
 
   public final Translation2d m_frontLeftLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, Constants.WHEEL_BASE_METERS/2);
@@ -265,6 +266,10 @@ public class SwerveDrive implements Loggable {
   @Log.BooleanBox(rowIndex = 1, columnIndex = 5)
   public boolean getGyroInterference(){
     return SwerveMap.GYRO.isMagneticDisturbance();
+  }
+  @Config.NumberSlider(name="Governor", defaultValue = .11, min = 0, max = 1, rowIndex = 2, columnIndex = 0, height = 1, width = 2)
+  public void setJoystickGovernor(double _input){
+    joystickDriveGovernor = _input;
   }
 
   @Config.ToggleButton(name="ResetGyroAndOdometry", defaultValue = false, rowIndex = 3, columnIndex = 0, height = 1, width = 2)
