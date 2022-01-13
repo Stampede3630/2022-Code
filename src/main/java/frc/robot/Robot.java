@@ -25,6 +25,7 @@ public class Robot extends TimedRobot {
   public static final boolean CHARACTERIZE_ROBOT = false;
   public static final boolean RUN_TRAJECTORY = true;
   public static SwerveDrive SWERVEDRIVE;
+  public static SlurpIntake SLURPINTAKE;
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static XboxController xbox= new XboxController(0);
@@ -108,8 +109,8 @@ public class Robot extends TimedRobot {
       SWERVEDRIVE.getSDRotation(), 
       SWERVEDRIVE.getSDFieldRelative()
       );
-
-   
+      SLURPINTAKE.spinIntake();
+      
     
   }
 
