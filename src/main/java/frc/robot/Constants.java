@@ -7,45 +7,46 @@ public class Constants {
     
     //SWERVE MODULE CHARACTERISTICS
     public static final double WHEEL_RADIUS_METERS = .05138;
-    public static final double WHEEL_BASE_METERS = 18 * 2.54/100; //18 inch wheel base to meters
+    public static final double WHEEL_BASE_METERS = 22.5 * 2.54/100; //18 inch wheel base to meters track width is 24in and wheel base is 22.5 in
     public static final double MAX_SPEED_TICKSper100MS = 21900;
     public static final double STEERING_MOTOR_GEARING = 12.8;
     public static final double DRIVE_MOTOR_GEARING = 6.86;
     public static final double SPEED_GOVERNOR =.11; //.11 is a good safe start. Unlock it to "1" when you're confident with the robot
+    public static final double TRACK_WIDE = 24 * 2.54/100;
     
     
     //SWERVE Drive Default Values
-    public static final double ROBOTHoldAngleKP = 10; //Start at .7 and see where you go from there
-    public static final boolean DEFAULT_HOLD_ROBOT_ANGLE = true;
-	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = true;
+    public static final double ROBOTHoldAngleKP = .7; //Start at .7 and see where you go from there
+    public static final boolean DEFAULT_HOLD_ROBOT_ANGLE = false;
+	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = false;
 	public static final double DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT = 0; 
 
     //Swerve Drive Motor IDs
     public static final int FRDriveID = 6;
-    public static final int FLDriveID = 12;
-    public static final int BRDriveID = 8;
-    public static final int BLDriveID = 10;
+    public static final int FLDriveID = 10;
+    public static final int BRDriveID = 12;
+    public static final int BLDriveID = 8;
 
     //Swerve Steer Motor IDs
     public static final int FRSteerID = 7;
-    public static final int FLSteerID = 5;
-    public static final int BRSteerID = 9;
-    public static final int BLSteerID = 11;
+    public static final int FLSteerID =11;
+    public static final int BRSteerID = 5;
+    public static final int BLSteerID = 9;
 
     //Swerve CANCoder Sensor IDs
     public static final int FRSensorID = 3;
-    public static final int FLSensorID = 4;
-    public static final int BRSensorID = 2;
-    public static final int BLSensorID = 1;
+    public static final int FLSensorID = 1;
+    public static final int BRSensorID = 4;
+    public static final int BLSensorID = 2;
 
     //Swerve CANCoder Sensort offsets
     //CHANGE TO 0 first, reset the sensor, 
     //PHYSICALLY zero out the motor 
     //place the OPPOSITE of the value
-    public static double FRSensorOffset = 17.666;
-    public static double FLSensorOffset = 57.744;
-    public static double BRSensorOffset = -165.059;
-    public static double BLSensorOffset = 67.061;
+    public static double FRSensorOffset = 32.080;
+    public static double FLSensorOffset = -47.461;
+    public static double BRSensorOffset = -43.506;
+    public static double BLSensorOffset = -61.26;
 
 
     //Give a positive input on the joystick or phoenix tuner
@@ -84,7 +85,7 @@ public class Constants {
     public static final double TICKSperTALONFX_Rotation = 2048;
     public static final double DRIVE_MOTOR_TICKSperREVOLUTION = DRIVE_MOTOR_GEARING*TICKSperTALONFX_Rotation;
     public static final double METERSperWHEEL_REVOLUTION = 2*Math.PI*WHEEL_RADIUS_METERS;
-    public static final double METERSperROBOT_REVOLUTION =  2*Math.PI*(WHEEL_BASE_METERS/2*1.414213);//Math.sqrt(2)
+    public static final double METERSperROBOT_REVOLUTION =  2*Math.PI*pythagoreanTheorem(TRACK_WIDE, WHEEL_BASE_METERS);
     public static final double MAX_SPEED_METERSperSECOND = MAX_SPEED_TICKSper100MS/SECONDSper100MS/DRIVE_MOTOR_TICKSperREVOLUTION*METERSperWHEEL_REVOLUTION;
     public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/METERSperROBOT_REVOLUTION*(2*Math.PI);
     public static final double TICKSperTALONFX_DEGREE = TICKSperTALONFX_Rotation*STEERING_MOTOR_GEARING/360;
@@ -117,5 +118,10 @@ public class Constants {
             kIzone = 300;
             kPeakOutput = 1;
         }
+    }
+
+    private static double pythagoreanTheorem(double side1, double side2) {
+        double radius = Math.sqrt(Math.pow(side1, 2) + Math.pow(side2, 2));
+        return radius;
     }
 }
