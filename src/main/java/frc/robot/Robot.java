@@ -40,9 +40,13 @@ public class Robot extends TimedRobot {
     SwerveMap.driveRobotInit();
     SwerveMap.GYRO.reset();
     //we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
+    //Swerve method starts here
     SWERVEDRIVE = SwerveDrive.getInstance();
     SWERVEDRIVE.init();
     SWERVEDRIVE.zeroSwerveDrive();
+    //Intake method starts here
+    SLURPINTAKE = SlurpIntake.getInstance();
+    SLURPINTAKE.init();
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
