@@ -2,6 +2,9 @@ package frc.robot;
 
 import java.util.List;
 
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -26,6 +29,8 @@ public class TrajectoryContainer {
             // Pass config
             config
         );
+
+        public static PathPlannerTrajectory heteroPath = PathPlanner.loadPath("autoTest 2022", 6, 2.5);
 
         public static Trajectory jonahTrajectory = TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction

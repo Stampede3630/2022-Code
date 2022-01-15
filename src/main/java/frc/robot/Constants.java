@@ -69,9 +69,9 @@ public class Constants {
     public static Gains FLDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
     public static Gains BRDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
     public static Gains BLDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
-    public static final double kS = 0.60968;
-    public static final double kV = 2.2691;
-    public static final double kA = 0.19335;
+    public static final double kS = 0.4438;//0.60968;
+    public static final double kV = 2.337;//2.2691;
+    public static final double kA = 0.29114;//0.19335;
 
     //CTRE CAN-based constants (shouldn't need to change these)
     public static final int kDefaultPIDSlotID = 0;

@@ -1,9 +1,6 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
-import java.util.ResourceBundle.Control;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
@@ -25,7 +22,7 @@ public class SlurpIntake implements Loggable{
     }
 
 public void spinIntake() {
-        //this makes the intake motor spin when right bumper is pressed
+        //right bumper drives intake to intake balls, left bumper reverses and spits out balls
       if (Robot.xbox.getRightBumper()){
          intakeTalon.set(ControlMode.PercentOutput, -1);
       }else if (Robot.xbox.getLeftBumper()){
@@ -33,7 +30,6 @@ public void spinIntake() {
         }else{
           intakeTalon.set(ControlMode.PercentOutput, 0);
       }
-    //intakeTalon.set(ControlMode.PercentOutput, 1);
     
 }
 

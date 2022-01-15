@@ -22,13 +22,13 @@ import io.github.oblarg.oblog.Logger;
   *    so probably, turn RUN_TRAJECTORY FALSE
          */
 public class Robot extends TimedRobot {
-  public static final boolean CHARACTERIZE_ROBOT = false;
+  public static final boolean CHARACTERIZE_ROBOT = true;
   public static final boolean RUN_TRAJECTORY = true;
   public static SwerveDrive SWERVEDRIVE;
   public static SlurpIntake SLURPINTAKE;
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
-  public static XboxController xbox= new XboxController(0);
+  public static XboxController xbox = new XboxController(0);
   public static PathPlannerTrajectory examplePath; 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -90,7 +90,7 @@ public class Robot extends TimedRobot {
     
     if(RUN_TRAJECTORY){
     //SwerveTrajectory.trajectoryRunner(TrajectoryContainer.jonahTrajectory, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
-    SwerveTrajectory.PathPlannerRunner(examplePath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    SwerveTrajectory.PathPlannerRunner(TrajectoryContainer.heteroPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     }
   }
 
@@ -113,6 +113,7 @@ public class Robot extends TimedRobot {
       SWERVEDRIVE.getSDRotation(), 
       SWERVEDRIVE.getSDFieldRelative()
       );
+      //intake code for teleop
       SLURPINTAKE.spinIntake();
       
     

@@ -80,9 +80,9 @@ public class SwerveDrive implements Loggable {
     double y = -Robot.xbox.getLeftX();
     double rot = -Robot.xbox.getRightX();
 
-    SDxSpeed = convertToMetersPerSecond(deadband(x))*Constants.SPEED_GOVERNOR;
-    SDySpeed = convertToMetersPerSecond(deadband(y))*Constants.SPEED_GOVERNOR;
-    SDrotation = convertToRadiansPerSecond(deadband(rot))*Constants.SPEED_GOVERNOR;
+    SDxSpeed = convertToMetersPerSecond(deadband(x))*joystickDriveGovernor;
+    SDySpeed = convertToMetersPerSecond(deadband(y))*joystickDriveGovernor;
+    SDrotation = convertToRadiansPerSecond(deadband(rot))*joystickDriveGovernor;
     //System.out.println(SDrotation);
     
   }
