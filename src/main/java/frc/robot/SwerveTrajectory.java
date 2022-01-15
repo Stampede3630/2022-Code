@@ -28,9 +28,9 @@ public class SwerveTrajectory implements Loggable {
         return SINGLE_INSTANCE;
     }
     public static HolonomicDriveController HDC = new HolonomicDriveController(
-        new PIDController(.69,0, 0), 
-        new PIDController(.69, 0, 0), 
-        new ProfiledPIDController(.69*Constants.MAX_SPEED_RADIANSperSECOND/Constants.MAX_SPEED_METERSperSECOND, 0, 0, 
+        new PIDController(Constants.kP,0, 0), 
+        new PIDController(Constants.kP, 0, 0), 
+        new ProfiledPIDController(Constants.kP*Constants.MAX_SPEED_RADIANSperSECOND/Constants.MAX_SPEED_METERSperSECOND, 0, 0, 
         new Constraints(Constants.MAX_SPEED_RADIANSperSECOND, Constants.MAX_SPEED_RADIANSperSECOND)));
     
 

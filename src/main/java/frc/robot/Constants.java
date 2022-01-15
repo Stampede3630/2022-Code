@@ -72,6 +72,7 @@ public class Constants {
     public static final double kS = 0.4438;//0.60968;
     public static final double kV = 2.337;//2.2691;
     public static final double kA = 0.29114;//0.19335;
+    public static final double kP = 3.325;
 
     //CTRE CAN-based constants (shouldn't need to change these)
     public static final int kDefaultPIDSlotID = 0;
