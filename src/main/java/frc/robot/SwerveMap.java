@@ -169,7 +169,7 @@ public class SwerveMap {
             return new SwerveModuleState( 
                 mDriveMotor.getSelectedSensorVelocity()*
                 Constants.METERSperWHEEL_REVOLUTION/(Constants.DRIVE_MOTOR_TICKSperREVOLUTION*
-                Constants.SECONDSper100MS), new Rotation2d(Math.toRadians(mSteeringMotor.getSelectedSensorPosition())));
+                Constants.SECONDSper100MS), new Rotation2d(Math.toRadians(readAngle())));
         }
 
 
