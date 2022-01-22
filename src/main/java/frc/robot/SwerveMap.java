@@ -131,7 +131,9 @@ public class SwerveMap {
         }
 
         public void swerveRobotInit(){
-            m_steeringPIDController = new PIDController(mDriveMotor.kGAINS.kP, 0, mDriveMotor.kGAINS.kD);
+            m_steeringPIDController = new PIDController(mSteeringMotor.kGAINS.kP, 0, mSteeringMotor.kGAINS.kD);
+            m_steeringPIDController.enableContinuousInput(-180, 180); 
+            m_steeringPIDController.setTolerance(3);
             //Setup the drive motor, but first set EVERYTHING to DEFAULT
             mDriveMotor.configFactoryDefault();
             
@@ -215,7 +217,7 @@ public class SwerveMap {
                   newAngleDemand += 360;
               }
               var turnOutput = m_steeringPIDController.calculate(currentSensorPosition, newAngleDemand); 
-            mDriveMotor.set(ControlMode.PercentOutput, turnOutput);
+            mSteeringMotor.set(ControlMode.PercentOutput, turnOutput);
         }
         
         public static SwerveModuleState optimize(

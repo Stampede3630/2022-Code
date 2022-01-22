@@ -1,3 +1,4 @@
+
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -192,7 +193,7 @@ public class SwerveDrive implements Loggable {
     SDFieldRelative = _input;
   }
 
-  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = true, rowIndex = 0, columnIndex =0, height = 1, width = 2)
+  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = false, rowIndex = 0, columnIndex =0, height = 1, width = 2)
   public void setHoldAngleEnabled(boolean _boolean){
     holdRobotAngleEnabled = _boolean;
   }

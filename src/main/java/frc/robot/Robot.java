@@ -46,8 +46,8 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.init();
     SWERVEDRIVE.zeroSwerveDrive();
     //Intake method starts here
-    SLURPINTAKE = SlurpIntake.getInstance();
-    SLURPINTAKE.init();
+   //SLURPINTAKE = SlurpIntake.getInstance();
+    //SLURPINTAKE.init();
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
@@ -115,7 +115,7 @@ public class Robot extends TimedRobot {
       SWERVEDRIVE.getSDFieldRelative()
       );
       //intake code for teleop
-      SLURPINTAKE.spinIntake();
+      //SLURPINTAKE.spinIntake();
       
     
   }
