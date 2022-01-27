@@ -11,12 +11,9 @@ public class Intake {
         //Actually make the motors spin on button press
       if (Robot.xbox.getXButton() == true){
         spinMotor.set(ControlMode.PercentOutput, 1);
-      }else{
+      } else {
         spinMotor.set(ControlMode.PercentOutput, 0);  
       }
-
-
-       
     }
     
 }
