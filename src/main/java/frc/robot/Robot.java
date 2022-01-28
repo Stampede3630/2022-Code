@@ -26,8 +26,7 @@ public class Robot extends TimedRobot {
   public static final boolean CHARACTERIZE_ROBOT = true;
   public static final boolean RUN_TRAJECTORY = true;
   public static SwerveDrive SWERVEDRIVE;
-  public static SlurpIntake SLURPINTAKE;
-  public static AutoContainer AUTOCONTAINER;
+  public static Intake INTAKE;
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static XboxController xbox = new XboxController(0);
@@ -47,8 +46,8 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.init();
     SWERVEDRIVE.zeroSwerveDrive();
     //Intake method starts here
-   //SLURPINTAKE = SlurpIntake.getInstance();
-    //SLURPINTAKE.init();
+   INTAKE = Intake.getInstance();
+    INTAKE.init();
 
     // Auto Container method starts here
     AUTOCONTAINER = AutoContainer.getInstance();
@@ -119,7 +118,8 @@ public class Robot extends TimedRobot {
       SWERVEDRIVE.getSDFieldRelative()
       );
       //intake code for teleop
-      //SLURPINTAKE.spinIntake();
+      INTAKE.spinIntake();
+      INTAKE.intakePneumatics();
       
     
   }
