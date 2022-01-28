@@ -38,10 +38,12 @@ public class Intake {
 
     public void spinIntake() { 
         //Actually make the motors spin on button press
-      if (Robot.xbox.getXButton() == true){
-        intakeDrive.set(ControlMode.PercentOutput, 1);
+      if (Robot.xbox.getXButton()){
+        intakeDrive.set(ControlMode.PercentOutput, .5);
+      } else if(Robot.xbox.getYButton()) {
+        intakeDrive.set(ControlMode.PercentOutput, -.5);  
       } else {
-        intakeDrive.set(ControlMode.PercentOutput, 0);  
+        intakeDrive.set(ControlMode.PercentOutput, 0);
       }
     }
     

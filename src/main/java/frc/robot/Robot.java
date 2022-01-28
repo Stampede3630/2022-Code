@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
     INTAKE.init();
 
     // Auto Container method starts here
-    AUTOCONTAINER = AutoContainer.getInstance();
+    //AUTOCONTAINER = AutoContainer.getInstance();
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
