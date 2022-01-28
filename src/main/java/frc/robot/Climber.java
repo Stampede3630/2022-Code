@@ -24,10 +24,10 @@ public class Climber implements Loggable{
     public static enum ClimberState{ 
         
         STATE1(SINGLE_INSTANCE::turnBlinker1On, "STATE2"), 
-        STATE2(SINGLE_INSTANCE::turnBlinker1On, "STATE3"), 
-        STATE3(SINGLE_INSTANCE::turnBlinker1On, "STATE4"), 
-        STATE4(SINGLE_INSTANCE::turnBlinker1On, "STATE5"), 
-        STATE5(SINGLE_INSTANCE::turnBlinker1On, "DONE"), 
+        STATE2(SINGLE_INSTANCE::turnBlinker2On, "STATE3"), 
+        STATE3(SINGLE_INSTANCE::turnBlinker3On, "STATE4"), 
+        STATE4(SINGLE_INSTANCE::turnBlinker4On, "STATE5"), 
+        STATE5(SINGLE_INSTANCE::turnBlinker5On, "DONE"), 
         DONE(SINGLE_INSTANCE::DoneAction, "DONE");  
 
         private Runnable action;
