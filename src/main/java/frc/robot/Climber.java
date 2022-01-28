@@ -1,34 +1,52 @@
 package frc.robot;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
 public class Climber implements Loggable{
-    static boolean StateHasFinished;
-    static boolean StateHasInitialized;
+    @Log
+    boolean StateHasFinished;
+    @Log
+    Boolean StateHasInitialized;
+    @Log
+    String CurrentState = "";
+    boolean StartingStateOverride;
+
+    private static Climber SINGLE_INSTANCE = new Climber();
+    
     public static enum ClimberState{ 
-        STATE1(Climber::myFirstAction, "STATE2"), 
-        STATE2(Climber::mySecondAction, "STATE3"), 
-        STATE3(Climber::myThirdAction, "STATE4"), 
-        STATE4(Climber::myFourthAction, "NONE");  
+        
+        STATE1(SINGLE_INSTANCE::myFirstAction, "STATE2"), 
+        STATE2(SINGLE_INSTANCE::myFirstAction, "STATE3"), 
+        STATE3(SINGLE_INSTANCE::myFirstAction, "STATE4"), 
+        STATE4(SINGLE_INSTANCE::DoneAction, "DONE");  
 
         private Runnable action;
-        private String NextState;
+        private String nextState;
 
-        ClimberState(Runnable _Action, String nextState){
-            action = _Action;}
+        ClimberState(Runnable _action, String _nextState){
+            action = _action;
+            nextState = _nextState;
+        }
+
+        public Runnable getAction() {
+            return action;
+        }
+
+        public String getNextState() {
+            return nextState;
+        }
     }
 
-    public static void myFirstAction(){
+    public void myFirstAction(){
         if(!StateHasInitialized){
             //do things
+            
+            //These are required
+            StateHasFinished = false; 
             StateHasInitialized = true;
-        };
+        }
+        
         //do more things
 
         //exit conditions
@@ -36,6 +54,39 @@ public class Climber implements Loggable{
             StateHasFinished  = true;
         }
     }
+
+    public void DoneAction(){
+        if(!StateHasInitialized){
+            //do things
+            
+            //These are required
+        }
+        //do more things
+        //NO EXIT CONDITIONS PLEASE
+    }
+
+    public void climberRunner(String _startingState){
+        if (_startingState != "" || StartingStateOverride){
+            CurrentState = _startingState;
+            StartingStateOverride = false;
+        } 
+
+        if (CurrentState == "") {
+            CurrentState = ClimberState.values()[0].toString();
+        }
+
+        ClimberState.valueOf(CurrentState).getAction();
+
+        if (StateHasFinished){
+            CurrentState = ClimberState.valueOf(CurrentState).getNextState();
+            StateHasFinished = false; 
+            StateHasInitialized = true;
+        }
+    }
+
+
+
+    
 
     
 }
