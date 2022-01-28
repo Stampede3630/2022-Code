@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
   public static final boolean RUN_TRAJECTORY = true;
   public static SwerveDrive SWERVEDRIVE;
   public static SlurpIntake SLURPINTAKE;
+  public static AutoContainer AUTOCONTAINER;
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static XboxController xbox = new XboxController(0);
@@ -49,6 +50,9 @@ public class Robot extends TimedRobot {
    //SLURPINTAKE = SlurpIntake.getInstance();
     //SLURPINTAKE.init();
 
+    // Auto Container method starts here
+    AUTOCONTAINER = AutoContainer.getInstance();
+
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
       SWERVETRAJECTORY = SwerveTrajectory.getInstance();
@@ -69,8 +73,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    Logger.updateEntries();
     SWERVEDRIVE.updateOdometry();
+    Logger.updateEntries();
   }
 
   @Override
