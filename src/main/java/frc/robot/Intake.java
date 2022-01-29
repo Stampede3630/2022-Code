@@ -12,8 +12,8 @@ public class Intake {
   private static Intake SINGLE_INSTANCE = new Intake();
   
   private static WPI_TalonFX intakeDrive;
-  private static DoubleSolenoid leftIntakeSolenoid;
-  private static DoubleSolenoid rightIntakeSolenoid;
+  private static DoubleSolenoid intakeSolenoid;
+  // private static DoubleSolenoid rightIntakeSolenoid;
 
 
     public static Intake getInstance() {
@@ -21,18 +21,18 @@ public class Intake {
     }
 
     public void init(){
-      intakeDrive  = new WPI_TalonFX(12);
-      leftIntakeSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 2, 3);
-      rightIntakeSolenoid = new DoubleSolenoid(4, PneumaticsModuleType.REVPH, 5, 6);
+      intakeDrive  = new WPI_TalonFX(13);
+      //intakeSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 5, 7);
+      //rightIntakeSolenoid = new DoubleSolenoid(4, PneumaticsModuleType.REVPH, 5, 6);
     }
 
     public void intakePneumatics() {
       if (Robot.xbox.getXButton() == true){
-        leftIntakeSolenoid.set(Value.kForward);
-        rightIntakeSolenoid.set(Value.kForward);
+        intakeSolenoid.set(Value.kForward);
+        //rightIntakeSolenoid.set(Value.kForward);
       } else {
-        leftIntakeSolenoid.set(Value.kReverse);
-        rightIntakeSolenoid.set(Value.kReverse);
+        intakeSolenoid.set(Value.kReverse);
+       // rightIntakeSolenoid.set(Value.kReverse);
       }
     }
 
