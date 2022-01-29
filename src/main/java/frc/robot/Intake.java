@@ -13,7 +13,6 @@ public class Intake {
   
   private static WPI_TalonFX intakeDrive;
   private static DoubleSolenoid intakeSolenoid;
-  // private static DoubleSolenoid rightIntakeSolenoid;
 
 
     public static Intake getInstance() {
@@ -22,22 +21,19 @@ public class Intake {
 
     public void init(){
       intakeDrive  = new WPI_TalonFX(13);
-      //intakeSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 5, 7);
-      //rightIntakeSolenoid = new DoubleSolenoid(4, PneumaticsModuleType.REVPH, 5, 6);
+      intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 7);
     }
 
     public void intakePneumatics() {
       if (Robot.xbox.getXButton() == true){
         intakeSolenoid.set(Value.kForward);
-        //rightIntakeSolenoid.set(Value.kForward);
       } else {
         intakeSolenoid.set(Value.kReverse);
-       // rightIntakeSolenoid.set(Value.kReverse);
       }
     }
 
     public void spinIntake() { 
-        //Actually make the motors spin on button press
+        // Actually make the motors spin on button press
       if (Robot.xbox.getXButton()){
         intakeDrive.set(ControlMode.PercentOutput, .5);
       } else if(Robot.xbox.getYButton()) {
