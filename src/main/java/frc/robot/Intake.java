@@ -34,8 +34,8 @@ public class Intake implements Loggable {
 
       intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 7);
 
-      bottomLimitSwitch = new DigitalInput(1);
-      topLimitSwitch = new DigitalInput(0);
+      bottomLimitSwitch = new DigitalInput(0);
+      topLimitSwitch = new DigitalInput(1);
     }
 
     public void intakePneumatics() {
@@ -59,10 +59,11 @@ public class Intake implements Loggable {
 
     public void crapIndex() {
       if (Robot.xbox.getXButton()) {
-        indexLeft.set(ControlMode.PercentOutput, 0.5);
-        indexRight.set(ControlMode.PercentOutput, 0.5);
         if (topLimitSwitch.get()) {
           indexLeft.set(ControlMode.PercentOutput, 0);
+        } else {
+          indexLeft.set(ControlMode.PercentOutput, 0.5);
+          indexRight.set(ControlMode.PercentOutput, 0.5);
         }
         
       } else if (Robot.xbox.getYButton()) {
