@@ -14,7 +14,6 @@ public class Intake {
   private static WPI_TalonFX intakeDrive;
   private static DoubleSolenoid intakeSolenoid;
 
-
     public static Intake getInstance() {
         return SINGLE_INSTANCE;
     }
@@ -42,5 +41,6 @@ public class Intake {
         intakeDrive.set(ControlMode.PercentOutput, 0);
       }
     }
+    
     
 }
