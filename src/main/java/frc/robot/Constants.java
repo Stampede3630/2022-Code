@@ -22,17 +22,19 @@ public class Constants {
 	public static final double DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT = 0; 
 
     //Swerve Drive Motor IDs
-    public static final int FRDriveID = 1;//6
-    public static final int FLDriveID = 7;//10
-    public static final int BRDriveID = 3;//12
-    public static final int BLDriveID = 5;//8
+
+    public static final int FRDriveID = 8;
+    public static final int FLDriveID = 15;
+    public static final int BRDriveID = 10;
+    public static final int BLDriveID = 6;
 
     //Swerve Steer Motor IDs
-    public static final int FRSteerID = 2;//7
-    public static final int FLSteerID = 8;//11
-    public static final int BRSteerID = 4;//5
-    public static final int BLSteerID = 6;//9
+    public static final int FRSteerID = 9;
+    public static final int FLSteerID =5;
+    public static final int BRSteerID = 11;
+    public static final int BLSteerID = 7;
 
+ 
     //Swerve CANCoder Sensor IDs
     public static final int FRSensorID = 4;
     public static final int FLSensorID = 3;
@@ -43,10 +45,12 @@ public class Constants {
     //CHANGE TO 0 first, reset the sensor, 
     //PHYSICALLY zero out the motor 
     //place the OPPOSITE of the value
-    public static double FRSensorOffset = -44;
-    public static double FLSensorOffset = 70;
-    public static double BRSensorOffset = 27;
-    public static double BLSensorOffset = -81;
+
+    public static double FRSensorOffset = 59;
+    public static double FLSensorOffset = -46;
+    public static double BRSensorOffset = -29;
+    public static double BLSensorOffset = -57;
+
 
 
     //Give a positive input on the joystick or phoenix tuner
