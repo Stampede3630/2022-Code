@@ -1,3 +1,4 @@
+
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -10,6 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -74,6 +76,12 @@ public class SwerveDrive implements Loggable {
       SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
       SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
     }
+
+  public void offsetDrive() {
+    AHRS currentAngle = getGyro();
+    
+  }
+
   /**This ONLY saves speeds.  You must also call the drive method */  
   public void joystickDrive(){
     double x = -Robot.xbox.getLeftY();
@@ -86,11 +94,6 @@ public class SwerveDrive implements Loggable {
     //System.out.println(SDrotation);
     
   }
-
-  
-
-
-
   /**
    * MUST BE ADDED TO PERIODIC (NOT INIT METHODS)
    * sets all the talons (steer and drive motors) to coast.
@@ -192,7 +195,7 @@ public class SwerveDrive implements Loggable {
     SDFieldRelative = _input;
   }
 
-  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = true, rowIndex = 0, columnIndex =0, height = 1, width = 2)
+  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = false, rowIndex = 0, columnIndex =0, height = 1, width = 2)
   public void setHoldAngleEnabled(boolean _boolean){
     holdRobotAngleEnabled = _boolean;
   }

@@ -8,6 +8,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -25,7 +26,7 @@ public class Robot extends TimedRobot {
   public static final boolean CHARACTERIZE_ROBOT = true;
   public static final boolean RUN_TRAJECTORY = true;
   public static SwerveDrive SWERVEDRIVE;
-  public static SlurpIntake SLURPINTAKE;
+  public static Intake INTAKE;
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static XboxController xbox = new XboxController(0);
@@ -45,8 +46,11 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.init();
     SWERVEDRIVE.zeroSwerveDrive();
     //Intake method starts here
-    SLURPINTAKE = SlurpIntake.getInstance();
-    SLURPINTAKE.init();
+   INTAKE = Intake.getInstance();
+    INTAKE.init();
+
+    // Auto Container method starts here
+    //AUTOCONTAINER = AutoContainer.getInstance();
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
@@ -68,8 +72,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    Logger.updateEntries();
     SWERVEDRIVE.updateOdometry();
+    Logger.updateEntries();
   }
 
   @Override
@@ -114,7 +118,13 @@ public class Robot extends TimedRobot {
       SWERVEDRIVE.getSDFieldRelative()
       );
       //intake code for teleop
-      SLURPINTAKE.spinIntake();
+      INTAKE.spinIntake();
+      INTAKE.intakePneumatics();
+      INTAKE.crapIndex();
+
+      // just to make sure values are sent
+      INTAKE.getBottomLimitSwitch();
+      INTAKE.getTopLimitSwitch();
       
     
   }

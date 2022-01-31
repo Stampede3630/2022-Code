@@ -13,7 +13,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 
 public class TrajectoryContainer {
-    private static TrajectoryConfig  config = new TrajectoryConfig(Constants.MAX_SPEED_METERSperSECOND*Constants.SPEED_GOVERNOR, Constants.MAX_SPEED_METERSperSECOND);
+    private static TrajectoryConfig config = new TrajectoryConfig(Constants.MAX_SPEED_METERSperSECOND*Constants.SPEED_GOVERNOR, Constants.MAX_SPEED_METERSperSECOND);
 
 
         public static Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -30,7 +30,7 @@ public class TrajectoryContainer {
             config
         );
 
-        public static PathPlannerTrajectory heteroPath = PathPlanner.loadPath("autoTest 2022", 6, 2.5);
+        public static PathPlannerTrajectory heteroPath = PathPlanner.loadPath("FourBallAuto", 6, 2.5);
 
         public static Trajectory jonahTrajectory = TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction

@@ -7,14 +7,14 @@ public class Constants {
     
     //SWERVE MODULE CHARACTERISTICS
     public static final double WHEEL_RADIUS_METERS = .05138;
-    public static final double WHEEL_BASE_METERS = 22.5 * 2.54/100; //18 inch wheel base to meters track width is 24in and wheel base is 22.5 in
+    public static final double WHEEL_BASE_METERS = .5842; //18 inch wheel base to meters track width is 24in and wheel base is 22.5 in
     public static final double MAX_SPEED_TICKSper100MS = 21900;
     public static final double STEERING_MOTOR_GEARING = 12.8;
-    public static final double DRIVE_MOTOR_GEARING = 6.86;
+    public static final double DRIVE_MOTOR_GEARING = 6.92;
     public static final double SPEED_GOVERNOR =.11; //.11 is a good safe start. Unlock it to "1" when you're confident with the robot
-    public static final double TRACK_WIDE = 24 * 2.54/100;
+    public static final double TRACK_WIDE = .5842;
     
-    
+     
     //SWERVE Drive Default Values
     public static final double ROBOTHoldAngleKP = .7; //Start at .7 and see where you go from there
     public static final boolean DEFAULT_HOLD_ROBOT_ANGLE = false;
@@ -22,6 +22,7 @@ public class Constants {
 	public static final double DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT = 0; 
 
     //Swerve Drive Motor IDs
+
     public static final int FRDriveID = 8;
     public static final int FLDriveID = 15;
     public static final int BRDriveID = 10;
@@ -33,20 +34,23 @@ public class Constants {
     public static final int BRSteerID = 11;
     public static final int BLSteerID = 7;
 
+ 
     //Swerve CANCoder Sensor IDs
-    public static final int FRSensorID = 3;
-    public static final int FLSensorID = 1;
-    public static final int BRSensorID = 4;
-    public static final int BLSensorID = 2;
+    public static final int FRSensorID = 4;
+    public static final int FLSensorID = 3;
+    public static final int BRSensorID = 2;
+    public static final int BLSensorID = 1;
 
     //Swerve CANCoder Sensort offsets
     //CHANGE TO 0 first, reset the sensor, 
     //PHYSICALLY zero out the motor 
     //place the OPPOSITE of the value
+
     public static double FRSensorOffset = 59;
     public static double FLSensorOffset = -46;
     public static double BRSensorOffset = -29;
     public static double BLSensorOffset = -57;
+
 
 
     //Give a positive input on the joystick or phoenix tuner
@@ -58,10 +62,10 @@ public class Constants {
     public static TalonFXInvertType BLInvertType = TalonFXInvertType.CounterClockwise;
 
     //Swerve Steering PIDs (kP, kI, kD)
-    public static Gains FRSteerGains = new Gains(25, 0, 0);
-    public static Gains FLSteerGains = new Gains(25, 0, 0);
-    public static Gains BRSteerGains = new Gains(25, 0, 0);
-    public static Gains BLSteerGains = new Gains(25, 0, 0);
+    public static Gains FRSteerGains = new Gains(.01, 0, 0);
+    public static Gains FLSteerGains = new Gains(.02, 0, 0);
+    public static Gains BRSteerGains = new Gains(.02, 0, 0);
+    public static Gains BLSteerGains = new Gains(.005, 0, 0);
 
     //Swerve Driving PIDs (kP, kI, kD)
     //Once characterized the drive PIDs are meaningless
@@ -72,7 +76,7 @@ public class Constants {
     public static final double kS = 0.4438;//0.60968;
     public static final double kV = 2.337;//2.2691;
     public static final double kA = 0.29114;//0.19335;
-    public static final double kP = 3.325;
+    public static final double kP = 3.325; //Be careful!! this is big and currently UNTESTED
 
     //CTRE CAN-based constants (shouldn't need to change these)
     public static final int kDefaultPIDSlotID = 0;
