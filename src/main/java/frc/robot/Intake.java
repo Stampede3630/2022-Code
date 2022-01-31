@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.text.RuleBasedCollator;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
@@ -17,9 +19,10 @@ public class Intake implements Loggable {
   private static Intake SINGLE_INSTANCE = new Intake();
   
   private static WPI_TalonFX intakeDrive;
-  private static WPI_TalonFX indexLeft;
-  private static WPI_TalonFX indexRight;
+  private static WPI_TalonFX indexBottom;
+  private static WPI_TalonFX indexTop;
   private static DoubleSolenoid intakeSolenoid;
+  // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   private static DigitalInput bottomLimitSwitch;
   private static DigitalInput topLimitSwitch;
 
@@ -29,13 +32,13 @@ public class Intake implements Loggable {
 
     public void init(){
       intakeDrive  = new WPI_TalonFX(13);
-      indexLeft = new WPI_TalonFX(11);
-      indexRight = new WPI_TalonFX(12);
+      indexBottom = new WPI_TalonFX(11);
+      indexTop = new WPI_TalonFX(12);
 
       intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 7);
 
-      bottomLimitSwitch = new DigitalInput(0);
-      topLimitSwitch = new DigitalInput(1);
+      bottomLimitSwitch = new DigitalInput(1);
+      topLimitSwitch = new DigitalInput(0);
     }
 
     public void intakePneumatics() {
@@ -60,47 +63,57 @@ public class Intake implements Loggable {
     public void crapIndex() {
       if (Robot.xbox.getXButton()) {
         if (topLimitSwitch.get()) {
-          indexLeft.set(ControlMode.PercentOutput, 0);
+          indexBottom.set(ControlMode.PercentOutput, 0);
         } else {
-          indexLeft.set(ControlMode.PercentOutput, 0.5);
-          indexRight.set(ControlMode.PercentOutput, 0.5);
+          indexBottom.set(ControlMode.PercentOutput, 0.5);
+          indexTop.set(ControlMode.PercentOutput, 0.5);
         }
         
       } else if (Robot.xbox.getYButton()) {
-        indexLeft.set(ControlMode.PercentOutput, -0.5);
-        indexRight.set(ControlMode.PercentOutput, -0.5);
+        indexBottom.set(ControlMode.PercentOutput, -0.5);
+        indexTop.set(ControlMode.PercentOutput, -0.5);
       } else {
-        indexRight.set(ControlMode.PercentOutput, 0);
-        indexLeft.set(ControlMode.PercentOutput, 0);
+        indexTop.set(ControlMode.PercentOutput, 0);
+        indexBottom.set(ControlMode.PercentOutput, 0);
       }
     }
 
-    // public void indexerDrive() {
-    //   // put method in as key
-    //     switch (indexManager()) {
-    //       case 1:
-    //         indexLeft.set(ControlMode.PercentOutput, value);
+    // NOT ACTIVE CODE RIGHT NOW
+    public void indexerDrive() {
+      // put method in as key
+        switch (indexManager()) {
+          case 1:
+            indexBottom.set(ControlMode.PercentOutput, 0.5);
+            indexTop.set(ControlMode.PercentOutput, 0);
             
-    //         break;
-        
-    //       default:
-    //         break;
-    //     }
-    //   } 
+            break;
 
-    // public int indexManager() {
-    //   if (bottomLimitSwitch.get()){
-    //     return 1;
-    //   }
-    //   else if (topLimitSwitch.get()){
-    //     return 2;
-    //   }
-    //   else if (bottomLimitSwitch.get() && topLimitSwitch.get()){
-    //     return 3;
-    //   } else {
-    //     return 0;
-    //   }
-    // }
+           case 2:
+            indexBottom.set(ControlMode.PercentOutput, 0); 
+            indexTop.set(ControlMode.PercentOutput, 0);
+            break;
+
+          case 3:
+            indexTop.set(ControlMode.PercentOutput, 0.5);
+          default:
+            indexBottom.set(ControlMode.PercentOutput, 0.5);
+            indexTop.set(ControlMode.PercentOutput, 0);
+            break;
+        }
+      } 
+
+    public int indexManager() {
+      if (topLimitSwitch.get()){
+        return 1;
+      }
+      else if (bottomLimitSwitch.get() && topLimitSwitch.get()){
+        return 2;
+      } else if (bottomLimitSwitch.get()){
+        return 3;
+      } else {
+        return 0;
+      }
+    }
 
     @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
     public boolean getBottomLimitSwitch() {
