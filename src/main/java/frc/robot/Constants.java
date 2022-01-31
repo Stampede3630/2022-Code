@@ -36,10 +36,10 @@ public class Constants {
 
  
     //Swerve CANCoder Sensor IDs
-    public static final int FRSensorID = 4;
-    public static final int FLSensorID = 3;
-    public static final int BRSensorID = 2;
-    public static final int BLSensorID = 1;
+    public static final int FRSensorID = 2;
+    public static final int FLSensorID = 4;
+    public static final int BRSensorID = 1;
+    public static final int BLSensorID = 3;
 
     //Swerve CANCoder Sensort offsets
     //CHANGE TO 0 first, reset the sensor, 
@@ -62,10 +62,10 @@ public class Constants {
     public static TalonFXInvertType BLInvertType = TalonFXInvertType.CounterClockwise;
 
     //Swerve Steering PIDs (kP, kI, kD)
-    public static Gains FRSteerGains = new Gains(.01, 0, 0);
-    public static Gains FLSteerGains = new Gains(.02, 0, 0);
-    public static Gains BRSteerGains = new Gains(.02, 0, 0);
-    public static Gains BLSteerGains = new Gains(.005, 0, 0);
+    public static Gains FRSteerGains = new Gains(25, 0, 0);
+    public static Gains FLSteerGains = new Gains(25, 0, 0);
+    public static Gains BRSteerGains = new Gains(25, 0, 0);
+    public static Gains BLSteerGains = new Gains(25, 0, 0);
 
     //Swerve Driving PIDs (kP, kI, kD)
     //Once characterized the drive PIDs are meaningless
