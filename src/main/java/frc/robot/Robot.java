@@ -26,7 +26,9 @@ public class Robot extends TimedRobot {
   public static final boolean CHARACTERIZE_ROBOT = true;
   public static final boolean RUN_TRAJECTORY = true;
   public static SwerveDrive SWERVEDRIVE;
+
   public static Intake INTAKE;
+
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static XboxController xbox = new XboxController(0);
@@ -51,6 +53,9 @@ public class Robot extends TimedRobot {
 
     // Auto Container method starts here
     //AUTOCONTAINER = AutoContainer.getInstance();
+
+    //test climber method starts here
+    CLIMBER = Climber.getInstance();
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
@@ -149,7 +154,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    CLIMBER.climberRunner("STATE1");
+  }
 
 
 }
