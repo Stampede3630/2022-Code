@@ -74,12 +74,11 @@ public class Intake implements Loggable {
       } else if (Robot.xbox.getRightTriggerAxis() > 0) {
         indexBottom.set(ControlMode.PercentOutput, 0.5);
         indexTop.set(ControlMode.PercentOutput, 0.5);
-        indexShooter.set(ControlMode.PercentOutput, .4);
+        indexShooter.set(ControlMode.PercentOutput, 0.6);
       } else {
         indexTop.set(ControlMode.PercentOutput, 0);
         indexBottom.set(ControlMode.PercentOutput, 0);
-        indexShooter.set(ControlMode.PercentOutput, 0
-        );
+        indexShooter.set(ControlMode.PercentOutput, 0);
       }
     }
 
