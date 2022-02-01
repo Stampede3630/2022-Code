@@ -21,6 +21,7 @@ public class Intake implements Loggable {
   private static WPI_TalonFX intakeDrive;
   private static WPI_TalonFX indexBottom;
   private static WPI_TalonFX indexTop;
+  private static WPI_TalonFX indexShooter;
   private static DoubleSolenoid intakeSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   private static DigitalInput bottomLimitSwitch;
@@ -32,8 +33,9 @@ public class Intake implements Loggable {
 
     public void init(){
       intakeDrive  = new WPI_TalonFX(13);
-      indexBottom = new WPI_TalonFX(11);
+      indexBottom = new WPI_TalonFX(16);
       indexTop = new WPI_TalonFX(12);
+      indexShooter = new WPI_TalonFX(0);
 
       intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 7);
 
@@ -51,7 +53,7 @@ public class Intake implements Loggable {
 
     public void spinIntake() { 
         // Actually make the motors spin on button press
-      if (Robot.xbox.getXButton()){
+      if (Robot.xbox.getRightTriggerAxis() > 0){
         intakeDrive.set(ControlMode.PercentOutput, .5);
       } else if(Robot.xbox.getYButton()) {
         intakeDrive.set(ControlMode.PercentOutput, -.5);  
@@ -61,7 +63,7 @@ public class Intake implements Loggable {
     }
 
     public void crapIndex() {
-      if (Robot.xbox.getXButton()) {
+      if (Robot.xbox.getLeftTriggerAxis() > 0) {
         if (topLimitSwitch.get()) {
           indexBottom.set(ControlMode.PercentOutput, 0);
         } else {
@@ -69,12 +71,15 @@ public class Intake implements Loggable {
           indexTop.set(ControlMode.PercentOutput, 0.5);
         }
         
-      } else if (Robot.xbox.getYButton()) {
-        indexBottom.set(ControlMode.PercentOutput, -0.5);
-        indexTop.set(ControlMode.PercentOutput, -0.5);
+      } else if (Robot.xbox.getRightTriggerAxis() > 0) {
+        indexBottom.set(ControlMode.PercentOutput, 0.5);
+        indexTop.set(ControlMode.PercentOutput, 0.5);
+        indexShooter.set(ControlMode.PercentOutput, .4);
       } else {
         indexTop.set(ControlMode.PercentOutput, 0);
         indexBottom.set(ControlMode.PercentOutput, 0);
+        indexShooter.set(ControlMode.PercentOutput, 0
+        );
       }
     }
 
