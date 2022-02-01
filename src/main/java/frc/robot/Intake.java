@@ -44,7 +44,7 @@ public class Intake implements Loggable {
     }
 
     public void intakePneumatics() {
-      if (Robot.xbox.getXButton() == true){
+      if (Robot.xbox.getRightTriggerAxis() > 0){
         intakeSolenoid.set(Value.kReverse);
       } else {
         intakeSolenoid.set(Value.kForward);
@@ -74,7 +74,7 @@ public class Intake implements Loggable {
       } else if (Robot.xbox.getRightTriggerAxis() > 0) {
         indexBottom.set(ControlMode.PercentOutput, 0.5);
         indexTop.set(ControlMode.PercentOutput, 0.5);
-        indexShooter.set(ControlMode.PercentOutput, .4);
+        indexShooter.set(ControlMode.PercentOutput, .9);
       } else {
         indexTop.set(ControlMode.PercentOutput, 0);
         indexBottom.set(ControlMode.PercentOutput, 0);
