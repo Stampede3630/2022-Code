@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
   public static final boolean RUN_TRAJECTORY = true;
   public static SwerveDrive SWERVEDRIVE;
   public static Intake INTAKE;
+  public static Shooter SHOOTER;
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static XboxController xbox = new XboxController(0);
@@ -51,6 +52,10 @@ public class Robot extends TimedRobot {
 
     // Auto Container method starts here
     //AUTOCONTAINER = AutoContainer.getInstance();
+
+    // Shooter method starts here
+    SHOOTER = Shooter.getInstance();
+    SHOOTER.init();
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
@@ -125,6 +130,8 @@ public class Robot extends TimedRobot {
       // just to make sure values are sent
       INTAKE.getBottomLimitSwitch();
       INTAKE.getTopLimitSwitch();
+
+      SHOOTER.control();
       
     
   }

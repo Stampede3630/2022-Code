@@ -26,6 +26,7 @@ public class Intake implements Loggable {
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   private static DigitalInput bottomLimitSwitch;
   private static DigitalInput topLimitSwitch;
+  private static Shooter shooter; // finish this later
 
     public static Intake getInstance() {
         return SINGLE_INSTANCE;
@@ -41,6 +42,8 @@ public class Intake implements Loggable {
 
       bottomLimitSwitch = new DigitalInput(1);
       topLimitSwitch = new DigitalInput(0);
+
+      shooter = Shooter.getInstance();
     }
 
     public void intakePneumatics() {
@@ -63,23 +66,23 @@ public class Intake implements Loggable {
     }
 
     public void crapIndex() {
-      if (Robot.xbox.getLeftTriggerAxis() > 0) {
-        if (topLimitSwitch.get()) {
-          indexBottom.set(ControlMode.PercentOutput, 0);
-        } else {
-          indexBottom.set(ControlMode.PercentOutput, 0.5);
-          indexTop.set(ControlMode.PercentOutput, 0.5);
-        }
+      if ( 0 == 1) {
+        // if (topLimitSwitch.get()) {
+        //   indexBottom.set(ControlMode.PercentOutput, 0.5);
+        // } else {
+        //   indexBottom.set(ControlMode.PercentOutput, 0.5);
+        //   indexTop.set(ControlMode.PercentOutput, 0.5);
+        // }
         
       } else if (Robot.xbox.getRightTriggerAxis() > 0) {
         indexBottom.set(ControlMode.PercentOutput, 0.5);
         indexTop.set(ControlMode.PercentOutput, 0.5);
-        indexShooter.set(ControlMode.PercentOutput, .9);
+        //indexShooter.set(ControlMode.PercentOutput, .9);
       } else {
         indexTop.set(ControlMode.PercentOutput, 0);
         indexBottom.set(ControlMode.PercentOutput, 0);
-        indexShooter.set(ControlMode.PercentOutput, 0
-        );
+        // indexShooter.set(ControlMode.PercentOutput, 0
+        // );
       }
     }
 
