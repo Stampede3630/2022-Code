@@ -24,6 +24,7 @@ public class Intake implements Loggable {
   private static WPI_TalonFX indexShooter;
   private static DoubleSolenoid intakeSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
+  // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
   private static DigitalInput bottomLimitSwitch;
   private static DigitalInput topLimitSwitch;
   private static Shooter shooter; // finish this later
@@ -56,7 +57,7 @@ public class Intake implements Loggable {
 
     // public void spinIntake() { 
     //     // Actually make the motors spin on button press
-    //   if (Robot.xbox.getRightTriggerAxis() > 0){
+    //   if (Robot.xbox. > 0){
     //     intakeDrive.set(ControlMode.PercentOutput, .5);
     //   } else if(Robot.xbox.getYButton()) {
     //     intakeDrive.set(ControlMode.PercentOutput, -.5);  
@@ -68,41 +69,46 @@ public class Intake implements Loggable {
     public void enableIndexing()  {
       if (Robot.xbox.getRightTriggerAxis() > 0) {
         indexerDrive();
+      // } else {
+      //   indexerDrive("Don't Index");
       }
     }
 
     // NOT ACTIVE CODE RIGHT NOW
     public void indexerDrive() {
       // put method in as key
+      // if (indexManager() != null) {
+      //   key = indexManager();
+      // }
         switch (indexManager()) {
           case "Spin Bottom":
-            indexBottom.set(ControlMode.PercentOutput, 0.5);
+            indexBottom.set(ControlMode.PercentOutput, 0.2);
             indexTop.set(ControlMode.PercentOutput, 0);
             break;
 
-           case "Stop Indexing":
+           case "Don't Index":
             indexBottom.set(ControlMode.PercentOutput, 0); 
             indexTop.set(ControlMode.PercentOutput, 0);
             break;
 
           case "Spin Top":
-            indexTop.set(ControlMode.PercentOutput, 0.5);
+            indexTop.set(ControlMode.PercentOutput, 0.2);
+            indexBottom.set(ControlMode.PercentOutput, 0.0);
             break;
 
           default:
-            indexBottom.set(ControlMode.PercentOutput, 0.5);
-            indexTop.set(ControlMode.PercentOutput, 0);
+            indexBottom.set(ControlMode.PercentOutput, 0.2);
+            indexTop.set(ControlMode.PercentOutput, 0.2);
             break;
         }
       } 
-
+//Try swapping ! around
     public String indexManager() {
-      if (topLimitSwitch.get()){
+      if (!topLimitSwitch.get()){
         return "Spin Bottom";
-      }
-      else if (bottomLimitSwitch.get() && topLimitSwitch.get()){
-        return "Stop Indexing";
-      } else if (bottomLimitSwitch.get()){
+      } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()){
+        return "Don't Index";
+      } else if (!bottomLimitSwitch.get()){
         return "Spin Top";
       } else {
         return "default";

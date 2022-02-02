@@ -34,7 +34,7 @@ public class Shooter implements Loggable {
             0.05686333, 20);
     }
 
-    public void control() {
+    public void shoot() {
         double targetVelocity_UnitsPer100ms = shooterSpeed;
 
         if (Robot.xbox.getLeftTriggerAxis() > 0 ) {

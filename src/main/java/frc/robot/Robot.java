@@ -123,11 +123,11 @@ public class Robot extends TimedRobot {
       SWERVEDRIVE.getSDFieldRelative()
       );
       //intake code for teleop
-      INTAKE.spinIntake();
+      // INTAKE.spinIntake();
       INTAKE.intakePneumatics();
       INTAKE.enableIndexing();
 
-      SHOOTER.control();
+      SHOOTER.shoot();
       
     
   }
