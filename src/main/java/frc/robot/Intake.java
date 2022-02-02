@@ -54,17 +54,72 @@ public class Intake implements Loggable {
       }
     }
 
-    public void spinIntake() { 
-        // Actually make the motors spin on button press
-      if (Robot.xbox.getRightTriggerAxis() > 0){
-        intakeDrive.set(ControlMode.PercentOutput, .5);
-      } else if(Robot.xbox.getYButton()) {
-        intakeDrive.set(ControlMode.PercentOutput, -.5);  
-      } else {
-        intakeDrive.set(ControlMode.PercentOutput, 0);
+    // public void spinIntake() { 
+    //     // Actually make the motors spin on button press
+    //   if (Robot.xbox.getRightTriggerAxis() > 0){
+    //     intakeDrive.set(ControlMode.PercentOutput, .5);
+    //   } else if(Robot.xbox.getYButton()) {
+    //     intakeDrive.set(ControlMode.PercentOutput, -.5);  
+    //   } else {
+    //     intakeDrive.set(ControlMode.PercentOutput, 0);
+    //   }
+    // }
+
+    public void enableIndexing()  {
+      if (Robot.xbox.getRightTriggerAxis() > 0) {
+        indexerDrive();
       }
     }
 
+    // NOT ACTIVE CODE RIGHT NOW
+    public void indexerDrive() {
+      // put method in as key
+        switch (indexManager()) {
+          case "Spin Bottom":
+            indexBottom.set(ControlMode.PercentOutput, 0.5);
+            indexTop.set(ControlMode.PercentOutput, 0);
+            break;
+
+           case "Stop Indexing":
+            indexBottom.set(ControlMode.PercentOutput, 0); 
+            indexTop.set(ControlMode.PercentOutput, 0);
+            break;
+
+          case "Spin Top":
+            indexTop.set(ControlMode.PercentOutput, 0.5);
+            break;
+
+          default:
+            indexBottom.set(ControlMode.PercentOutput, 0.5);
+            indexTop.set(ControlMode.PercentOutput, 0);
+            break;
+        }
+      } 
+
+    public String indexManager() {
+      if (topLimitSwitch.get()){
+        return "Spin Bottom";
+      }
+      else if (bottomLimitSwitch.get() && topLimitSwitch.get()){
+        return "Stop Indexing";
+      } else if (bottomLimitSwitch.get()){
+        return "Spin Top";
+      } else {
+        return "default";
+      }
+    }
+
+    @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
+    public boolean getBottomLimitSwitch() {
+      return bottomLimitSwitch.get();
+    }
+
+    @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
+    public boolean getTopLimitSwitch() {
+      return topLimitSwitch.get();
+    }
+    
+    // OLD AND BAD CODE
     public void crapIndex() {
       if ( 0 == 1) {
         // if (topLimitSwitch.get()) {
@@ -85,53 +140,5 @@ public class Intake implements Loggable {
         // );
       }
     }
-
-    // NOT ACTIVE CODE RIGHT NOW
-    public void indexerDrive() {
-      // put method in as key
-        switch (indexManager()) {
-          case 1:
-            indexBottom.set(ControlMode.PercentOutput, 0.5);
-            indexTop.set(ControlMode.PercentOutput, 0);
-            
-            break;
-
-           case 2:
-            indexBottom.set(ControlMode.PercentOutput, 0); 
-            indexTop.set(ControlMode.PercentOutput, 0);
-            break;
-
-          case 3:
-            indexTop.set(ControlMode.PercentOutput, 0.5);
-          default:
-            indexBottom.set(ControlMode.PercentOutput, 0.5);
-            indexTop.set(ControlMode.PercentOutput, 0);
-            break;
-        }
-      } 
-
-    public int indexManager() {
-      if (topLimitSwitch.get()){
-        return 1;
-      }
-      else if (bottomLimitSwitch.get() && topLimitSwitch.get()){
-        return 2;
-      } else if (bottomLimitSwitch.get()){
-        return 3;
-      } else {
-        return 0;
-      }
-    }
-
-    @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
-    public boolean getBottomLimitSwitch() {
-      return bottomLimitSwitch.get();
-    }
-
-    @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
-    public boolean getTopLimitSwitch() {
-      return topLimitSwitch.get();
-    }
-    
     
 }

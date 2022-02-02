@@ -125,11 +125,7 @@ public class Robot extends TimedRobot {
       //intake code for teleop
       INTAKE.spinIntake();
       INTAKE.intakePneumatics();
-      INTAKE.crapIndex();
-
-      // just to make sure values are sent
-      INTAKE.getBottomLimitSwitch();
-      INTAKE.getTopLimitSwitch();
+      INTAKE.enableIndexing();
 
       SHOOTER.control();
       
