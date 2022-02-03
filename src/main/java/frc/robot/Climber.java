@@ -60,55 +60,56 @@ public class Climber implements Loggable{
         runClimberSolenoid();
         runClimberMotor();
     }
-    // public static enum ClimberState{ 
+    /*
+    public static enum ClimberState{ 
         
         
-    //     STATE1(SINGLE_INSTANCE::turnBlinker1On, "STATE2"), 
-    //     STATE2(SINGLE_INSTANCE::turnBlinker2On, "STATE3"), 
-    //     STATE3(SINGLE_INSTANCE::turnBlinker3On, "STATE4"), 
-    //     STATE4(SINGLE_INSTANCE::turnBlinker4On, "STATE5"), 
-    //     STATE5(SINGLE_INSTANCE::turnBlinker5On, "DONE"), 
-    //     DONE(SINGLE_INSTANCE::DoneAction, "DONE");  
+        STATE1(SINGLE_INSTANCE::turnBlinker1On, "STATE2"), 
+        STATE2(SINGLE_INSTANCE::turnBlinker2On, "STATE3"), 
+        STATE3(SINGLE_INSTANCE::turnBlinker3On, "STATE4"), 
+        STATE4(SINGLE_INSTANCE::turnBlinker4On, "STATE5"), 
+        STATE5(SINGLE_INSTANCE::turnBlinker5On, "DONE"), 
+        DONE(SINGLE_INSTANCE::DoneAction, "DONE");  
 
-    //     private Runnable action;
-    //     private String nextState;
+        private Runnable action;
+        private String nextState;
 
-    //     ClimberState(Runnable _action, String _nextState){
-    //         action = _action;
-    //         nextState = _nextState;
-    //     }
+        ClimberState(Runnable _action, String _nextState){
+            action = _action;
+            nextState = _nextState;
+        }
 
-    //     public Runnable getAction() {
-    //         return action;
-    //     }
+        public Runnable getAction() {
+            return action;
+        }
 
-    //     public String getNextState() {
-    //         return nextState;
-    //     }
-    // }
+        public String getNextState() {
+            return nextState;
+        }
+    }
 
-    // public void climberRunner(String _startingState){
-    //     if (_startingState != "" || StartingStateOverride){
-    //         CurrentState = _startingState;
-    //         StartingStateOverride = false;
-    //     } 
+    public void climberRunner(String _startingState){
+        if (_startingState != "" || StartingStateOverride){
+            CurrentState = _startingState;
+            StartingStateOverride = false;
+        } 
        
-    //     if (CurrentState == "") {
-    //         CurrentState = ClimberState.values()[0].toString();
-    //     }
+        if (CurrentState == "") {
+            CurrentState = ClimberState.values()[0].toString();
+        }
 
-    //     ClimberState.valueOf(CurrentState).getAction();
+        ClimberState.valueOf(CurrentState).getAction();
 
-    //     //if we made one round with the state, we have successfully initialized
-    //     if (!StateHasInitialized) {StateHasInitialized = true;}
+        //if we made one round with the state, we have successfully initialized
+        if (!StateHasInitialized) {StateHasInitialized = true;}
 
-    //     if (StateHasFinished){
-    //         CurrentState = ClimberState.valueOf(CurrentState).getNextState();
-    //         StateHasFinished = false; 
-    //         StateHasInitialized = false;
-    //     }
-    // }
-
+        if (StateHasFinished){
+            CurrentState = ClimberState.valueOf(CurrentState).getNextState();
+            StateHasFinished = false; 
+            StateHasInitialized = false;
+        }
+    }
+    */
     @Log
     Boolean blinker1 = false;
     @Log
@@ -119,42 +120,42 @@ public class Climber implements Loggable{
     Boolean blinker4 = false;
     @Log
     Boolean blinker5 = false;
+/*
+    public void //raise arm by 28"(){
+        if(!//arm is not yet raised by 28"){
+            //operate talon;
+        }
 
-    // public void //raise arm by 28"(){
-    //     if(!//arm is not yet raised by 28"){
-    //         //operate talon;
-    //     }
+        if(//stop when {
+            //arm is raised 28 inches
+            StateHasFinished  = true;
+        }
+    }
 
-    //     if(//stop when {
-    //         //arm is raised 28 inches
-    //         StateHasFinished  = true;
-    //     }
-    // }
-
-    // public void //lower arm by 28"(){
-    //     if(!arm is currently extened by 28"){
-    //         //operate talon ;
-    //     }
+    public void //lower arm by 28"(){
+        if(!arm is currently extened by 28"){
+            //operate talon ;
+        }
         
-    //     if(stop when{
-    //         arm has been lowered by 28"
-    //         StateHasFinished = true;
-    //     }
+        if(stop when{
+            arm has been lowered by 28"
+            StateHasFinished = true;
+        }
         
-    // }
+    }
 
-    // public void //raise arm by 14"(){
-    //     if(!if arm has yet to extend 14"){
-    //         operate talon ;
-    //     }
+    public void //raise arm by 14"(){
+        if(!if arm has yet to extend 14"){
+            operate talon ;
+        }
 
-    //     if(stop when{
-    //         arm has been raised by 14"
-    //         StateHasFinished =true; 
-    //     }
+        if(stop when{
+            arm has been raised by 14"
+            StateHasFinished =true; 
+        }
         
-    // }
-
+    }
+*/
     
     public void turnBlinker4On(){
         if(!StateHasInitialized){
