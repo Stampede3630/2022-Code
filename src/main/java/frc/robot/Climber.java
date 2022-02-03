@@ -19,8 +19,7 @@ public class Climber implements Loggable{
     String CurrentState = "";
     WPI_TalonFX climberTalon;
     DoubleSolenoid climberSolenoid;
-    @Log
-    Timer climbTimer = new Timer();
+    
     boolean StartingStateOverride;
 
     private static Climber SINGLE_INSTANCE = new Climber();
@@ -157,29 +156,7 @@ public class Climber implements Loggable{
     }
 */
     
-    public void turnBlinker4On(){
-        if(!StateHasInitialized){
-            climbTimer.start();
-        }
-        blinker4 = true;
-        if(climbTimer.hasElapsed(5)) {
-            climbTimer.stop();
-            climbTimer.reset();
-            StateHasFinished  = true;
-        }
-    }
-
-    public void turnBlinker5On(){
-        if(!StateHasInitialized){
-            climbTimer.start();
-        }
-        blinker5 = true;
-        if(climbTimer.hasElapsed(5)) {
-            climbTimer.stop();
-            climbTimer.reset();
-            StateHasFinished  = true;
-        }
-    }
+    
 
 
     /* public void myFirstAction(){
@@ -197,17 +174,15 @@ public class Climber implements Loggable{
 
     public void DoneAction() {
         if(!StateHasInitialized){
-            climbTimer.start();
+           
         }
-        if (climbTimer.hasElapsed(5)) {
+        if (true) {
             blinker1 = !blinker1;
             blinker2 = !blinker2;
             blinker3 = !blinker3;
             blinker4 = !blinker4;
             blinker5 = !blinker5;
-            climbTimer.stop();
-            climbTimer.reset();
-            climbTimer.start();
+           
         }
         
 

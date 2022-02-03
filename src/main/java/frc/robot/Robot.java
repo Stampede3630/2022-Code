@@ -51,6 +51,7 @@ public class Robot extends TimedRobot {
 
     //test climber method starts here
     CLIMBER = Climber.getInstance();
+    CLIMBER.init();
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
