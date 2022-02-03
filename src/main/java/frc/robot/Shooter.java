@@ -28,7 +28,7 @@ public class Shooter implements Loggable {
         LEFT_SHOOTER_FALCON.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
 
         LEFT_SHOOTER_FALCON.config_kF(0,
-            1023/18000, 20);
+            1023*0.75/18000, 20);
 
         LEFT_SHOOTER_FALCON.config_kP(0,
             0.05686333, 20);
@@ -46,11 +46,8 @@ public class Shooter implements Loggable {
         }
     }
 
-    public static double rpmToRotatPer100Mili(double rpm) {
-        return rpm / 600;
-    }
 
-    @Config.NumberSlider(name="Set Shooter Speed", min = 0, max = 18000, blockIncrement = 1000, columnIndex = 0, height = 5, width = 5)
+    @Config.NumberSlider(name="Set Shooter Speed", min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 5, width = 5)
     public void setShooterSpeed(double targetVelocity) {
         shooterSpeed = targetVelocity;
        

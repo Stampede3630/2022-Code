@@ -35,8 +35,8 @@ public class Intake implements Loggable {
 
     public void init(){
       intakeDrive  = new WPI_TalonFX(13);
-      indexBottom = new WPI_TalonFX(16);
-      indexTop = new WPI_TalonFX(12);
+      indexBottom = new WPI_TalonFX(12);
+      indexTop = new WPI_TalonFX(16);
       indexShooter = new WPI_TalonFX(0);
 
       intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 7);
@@ -81,17 +81,17 @@ public class Intake implements Loggable {
       //   key = indexManager();
       // }
         switch (indexManager()) {
-          case "Spin Bottom":
-            indexBottom.set(ControlMode.PercentOutput, 0.2);
+          case "1 Ball":
+            indexBottom.set(ControlMode.PercentOutput, 0.1);
             indexTop.set(ControlMode.PercentOutput, 0);
             break;
 
-           case "Don't Index":
+           case "2 Balls":
             indexBottom.set(ControlMode.PercentOutput, 0); 
             indexTop.set(ControlMode.PercentOutput, 0);
             break;
 
-          case "Spin Top":
+          case "Cargo in Transit":
             indexTop.set(ControlMode.PercentOutput, 0.2);
             indexBottom.set(ControlMode.PercentOutput, 0.0);
             break;
@@ -102,14 +102,14 @@ public class Intake implements Loggable {
             break;
         }
       } 
-//Try swapping ! around
+//Try swapping around
     public String indexManager() {
-      if (!topLimitSwitch.get()){
-        return "Spin Bottom";
-      } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()){
-        return "Don't Index";
-      } else if (!bottomLimitSwitch.get()){
-        return "Spin Top";
+      if (!bottomLimitSwitch.get() && !topLimitSwitch.get()){
+        return "2 Balls";
+      } else if(!bottomLimitSwitch.get()) {
+        return "Cargo in Transit";
+      } else if (!topLimitSwitch.get()) {
+        return "1 Ball";
       } else {
         return "default";
       }
