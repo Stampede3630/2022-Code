@@ -119,7 +119,7 @@ public class Robot extends TimedRobot {
       );
       //intake code for teleop
       SLURPINTAKE.spinIntake();
-      
+      CLIMBER.periodic();
     
   }
 
@@ -144,7 +144,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    CLIMBER.climberRunner("STATE1");
   }
 
 
