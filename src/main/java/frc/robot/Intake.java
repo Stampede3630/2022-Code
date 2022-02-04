@@ -48,6 +48,15 @@ public class Intake implements Loggable {
     }
 
     public void intakePneumatics() {
+
+      if (Robot.xbox.getBButton() == true){   //will move this to a better spot later! -evan
+        indexBottom.set(ControlMode.PercentOutput, -0.2);
+        indexTop.set(ControlMode.PercentOutput, -0.2);
+      } else {
+        indexBottom.set(ControlMode.PercentOutput, 0);
+        indexTop.set(ControlMode.PercentOutput, 0);
+      }
+
       if (Robot.xbox.getRightTriggerAxis() > 0){
         intakeSolenoid.set(Value.kReverse);
       } else {
@@ -84,29 +93,41 @@ public class Intake implements Loggable {
           case "1 Ball":
             indexBottom.set(ControlMode.PercentOutput, 0.1);
             indexTop.set(ControlMode.PercentOutput, 0);
+            intakeDrive.set(ControlMode.PercentOutput, 0.2);
             break;
 
            case "2 Balls":
             indexBottom.set(ControlMode.PercentOutput, 0); 
             indexTop.set(ControlMode.PercentOutput, 0);
+            intakeDrive.set(ControlMode.PercentOutput, 0);
             break;
 
           case "Cargo in Transit":
             indexTop.set(ControlMode.PercentOutput, 0.2);
-            indexBottom.set(ControlMode.PercentOutput, 0.0);
+            indexBottom.set(ControlMode.PercentOutput, 0.2);
+            intakeDrive.set(ControlMode.PercentOutput, 0);
+            break;
+
+          case "shoot":
+            indexTop.set(ControlMode.PercentOutput, 0.2);
+            indexBottom.set(ControlMode.PercentOutput, 0.2);
+            intakeDrive.set(ControlMode.PercentOutput, 0);
             break;
 
           default:
             indexBottom.set(ControlMode.PercentOutput, 0.2);
             indexTop.set(ControlMode.PercentOutput, 0.2);
+            intakeDrive.set(ControlMode.PercentOutput, 0.2);
             break;
         }
       } 
 //Try swapping around
     public String indexManager() {
-      if (!bottomLimitSwitch.get() && !topLimitSwitch.get()){
+      if (Robot.xbox.getLeftBumper() == true) {
+        return "shoot";
+      } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) {
         return "2 Balls";
-      } else if(!bottomLimitSwitch.get()) {
+      } else if (!bottomLimitSwitch.get()) {
         return "Cargo in Transit";
       } else if (!topLimitSwitch.get()) {
         return "1 Ball";
