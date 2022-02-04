@@ -24,8 +24,10 @@ public class Intake implements Loggable {
   private static WPI_TalonFX indexShooter;
   private static DoubleSolenoid intakeSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
+  // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
   private static DigitalInput bottomLimitSwitch;
   private static DigitalInput topLimitSwitch;
+  private static Shooter shooter; // finish this later
 
     public static Intake getInstance() {
         return SINGLE_INSTANCE;
@@ -33,89 +35,106 @@ public class Intake implements Loggable {
 
     public void init(){
       intakeDrive  = new WPI_TalonFX(13);
-      indexBottom = new WPI_TalonFX(16);
-      indexTop = new WPI_TalonFX(12);
+      indexBottom = new WPI_TalonFX(12);
+      indexTop = new WPI_TalonFX(16);
       indexShooter = new WPI_TalonFX(0);
 
       intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 7);
 
       bottomLimitSwitch = new DigitalInput(1);
       topLimitSwitch = new DigitalInput(0);
+
+      shooter = Shooter.getInstance();
     }
 
     public void intakePneumatics() {
-      if (Robot.xbox.getXButton() == true){
+
+      if (Robot.xbox.getBButton() == true){   //will move this to a better spot later! -evan
+        indexBottom.set(ControlMode.PercentOutput, -0.2);
+        indexTop.set(ControlMode.PercentOutput, -0.2);
+      } else {
+        indexBottom.set(ControlMode.PercentOutput, 0);
+        indexTop.set(ControlMode.PercentOutput, 0);
+      }
+
+      if (Robot.xbox.getRightTriggerAxis() > 0){
         intakeSolenoid.set(Value.kReverse);
       } else {
         intakeSolenoid.set(Value.kForward);
       }
     }
 
-    public void spinIntake() { 
-        // Actually make the motors spin on button press
-      if (Robot.xbox.getRightTriggerAxis() > 0){
-        intakeDrive.set(ControlMode.PercentOutput, .5);
-      } else if(Robot.xbox.getYButton()) {
-        intakeDrive.set(ControlMode.PercentOutput, -.5);  
-      } else {
-        intakeDrive.set(ControlMode.PercentOutput, 0);
-      }
-    }
 
-    public void crapIndex() {
-      if (Robot.xbox.getLeftTriggerAxis() > 0) {
-        if (topLimitSwitch.get()) {
-          indexBottom.set(ControlMode.PercentOutput, 0);
-        } else {
-          indexBottom.set(ControlMode.PercentOutput, 0.5);
-          indexTop.set(ControlMode.PercentOutput, 0.5);
-        }
-        
-      } else if (Robot.xbox.getRightTriggerAxis() > 0) {
-        indexBottom.set(ControlMode.PercentOutput, 0.5);
-        indexTop.set(ControlMode.PercentOutput, 0.5);
-        indexShooter.set(ControlMode.PercentOutput, 0.6);
-      } else {
-        indexTop.set(ControlMode.PercentOutput, 0);
-        indexBottom.set(ControlMode.PercentOutput, 0);
-        indexShooter.set(ControlMode.PercentOutput, 0);
+    // public void spinIntake() { 
+    //     // Actually make the motors spin on button press
+    //   if (Robot.xbox. > 0){
+    //     intakeDrive.set(ControlMode.PercentOutput, .5);
+    //   } else if(Robot.xbox.getYButton()) {
+    //     intakeDrive.set(ControlMode.PercentOutput, -.5);  
+    //   } else {
+    //     intakeDrive.set(ControlMode.PercentOutput, 0);
+    //   }
+    // }
+
+    public void enableIndexing()  {
+      if (Robot.xbox.getRightTriggerAxis() > 0) {
+        indexerDrive();
+      // } else {
+      //   indexerDrive("Don't Index");
+
       }
     }
 
     // NOT ACTIVE CODE RIGHT NOW
     public void indexerDrive() {
       // put method in as key
+      // if (indexManager() != null) {
+      //   key = indexManager();
+      // }
         switch (indexManager()) {
-          case 1:
-            indexBottom.set(ControlMode.PercentOutput, 0.5);
+          case "1 Ball":
+            indexBottom.set(ControlMode.PercentOutput, 0.1);
             indexTop.set(ControlMode.PercentOutput, 0);
-            
+            intakeDrive.set(ControlMode.PercentOutput, 0.2);
             break;
 
-           case 2:
+           case "2 Balls":
             indexBottom.set(ControlMode.PercentOutput, 0); 
             indexTop.set(ControlMode.PercentOutput, 0);
+            intakeDrive.set(ControlMode.PercentOutput, 0);
             break;
 
-          case 3:
-            indexTop.set(ControlMode.PercentOutput, 0.5);
+          case "Cargo in Transit":
+            indexTop.set(ControlMode.PercentOutput, 0.2);
+            indexBottom.set(ControlMode.PercentOutput, 0.2);
+            intakeDrive.set(ControlMode.PercentOutput, 0);
+            break;
+
+          case "shoot":
+            indexTop.set(ControlMode.PercentOutput, 0.2);
+            indexBottom.set(ControlMode.PercentOutput, 0.2);
+            intakeDrive.set(ControlMode.PercentOutput, 0);
+            break;
+
           default:
-            indexBottom.set(ControlMode.PercentOutput, 0.5);
-            indexTop.set(ControlMode.PercentOutput, 0);
+            indexBottom.set(ControlMode.PercentOutput, 0.2);
+            indexTop.set(ControlMode.PercentOutput, 0.2);
+            intakeDrive.set(ControlMode.PercentOutput, 0.2);
             break;
         }
       } 
-
-    public int indexManager() {
-      if (topLimitSwitch.get()){
-        return 1;
-      }
-      else if (bottomLimitSwitch.get() && topLimitSwitch.get()){
-        return 2;
-      } else if (bottomLimitSwitch.get()){
-        return 3;
+//Try swapping around
+    public String indexManager() {
+      if (Robot.xbox.getLeftBumper() == true) {
+        return "shoot";
+      } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) {
+        return "2 Balls";
+      } else if (!bottomLimitSwitch.get()) {
+        return "Cargo in Transit";
+      } else if (!topLimitSwitch.get()) {
+        return "1 Ball";
       } else {
-        return 0;
+        return "default";
       }
     }
 
@@ -129,5 +148,26 @@ public class Intake implements Loggable {
       return topLimitSwitch.get();
     }
     
+    // OLD AND BAD CODE
+    public void crapIndex() {
+      if ( 0 == 1) {
+        // if (topLimitSwitch.get()) {
+        //   indexBottom.set(ControlMode.PercentOutput, 0.5);
+        // } else {
+        //   indexBottom.set(ControlMode.PercentOutput, 0.5);
+        //   indexTop.set(ControlMode.PercentOutput, 0.5);
+        // }
+        
+      } else if (Robot.xbox.getRightTriggerAxis() > 0) {
+        indexBottom.set(ControlMode.PercentOutput, 0.5);
+        indexTop.set(ControlMode.PercentOutput, 0.5);
+        //indexShooter.set(ControlMode.PercentOutput, .9);
+      } else {
+        indexTop.set(ControlMode.PercentOutput, 0);
+        indexBottom.set(ControlMode.PercentOutput, 0);
+        // indexShooter.set(ControlMode.PercentOutput, 0
+        // );
+      }
+    }
     
 }

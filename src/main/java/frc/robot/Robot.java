@@ -8,7 +8,6 @@ import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -29,6 +28,8 @@ public class Robot extends TimedRobot {
 
   public static Intake INTAKE;
 
+  public static Shooter SHOOTER;
+
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static XboxController xbox = new XboxController(0);
@@ -43,20 +44,26 @@ public class Robot extends TimedRobot {
     SwerveMap.driveRobotInit();
     SwerveMap.GYRO.reset();
     //we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
-    //Swerve method starts here
+    //*Swerve method starts here*
     SWERVEDRIVE = SwerveDrive.getInstance();
     SWERVEDRIVE.init();
     SWERVEDRIVE.zeroSwerveDrive();
-    //Intake method starts here
+    //**Intake method starts here**
    INTAKE = Intake.getInstance();
     INTAKE.init();
 
-    // Auto Container method starts here
+    //*** Auto Container method starts here***
     //AUTOCONTAINER = AutoContainer.getInstance();
+
+
+    // ****Shooter method starts here****
+    SHOOTER = Shooter.getInstance();
+    SHOOTER.init();
 
     //test climber method starts here
     CLIMBER = Climber.getInstance();
     CLIMBER.init();
+
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
@@ -121,19 +128,20 @@ public class Robot extends TimedRobot {
       SWERVEDRIVE.getSDxSpeed(), 
       SWERVEDRIVE.getSDySpeed(), 
       SWERVEDRIVE.getSDRotation(), 
-      SWERVEDRIVE.getSDFieldRelative()
-      );
+      SWERVEDRIVE.getSDFieldRelative());
       //intake code for teleop
+
+      // INTAKE.spinIntake();
+
 
       CLIMBER.periodic();
 
       INTAKE.spinIntake();
-      INTAKE.intakePneumatics();
-      INTAKE.crapIndex();
 
-      // just to make sure values are sent
-      INTAKE.getBottomLimitSwitch();
-      INTAKE.getTopLimitSwitch();
+      INTAKE.intakePneumatics();
+      INTAKE.enableIndexing();
+      //SHOOTER INSTANCE LOOP
+      SHOOTER.shoot();
       
 
     
