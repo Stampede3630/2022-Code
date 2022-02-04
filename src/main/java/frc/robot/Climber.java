@@ -1,6 +1,12 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -11,9 +17,9 @@ public class Climber implements Loggable{
     Boolean StateHasInitialized = false;
     @Log
     String CurrentState = "";
-
-    @Log
-    Timer climbTimer = new Timer();
+    WPI_TalonFX climberTalon;
+    DoubleSolenoid climberSolenoid;
+    
     boolean StartingStateOverride;
 
     private static Climber SINGLE_INSTANCE = new Climber();
@@ -21,7 +27,41 @@ public class Climber implements Loggable{
         return SINGLE_INSTANCE;
     }
     
+
+    public void init(){
+        climberTalon = new WPI_TalonFX(14);
+        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 6);
+    }
+
+    public void runClimberMotor(){
+        if (Robot.xbox.getPOV()==0){
+            climberTalon.set(ControlMode.PercentOutput, 0.1);
+        }
+        else if (Robot.xbox.getPOV()==180){
+            climberTalon.set(ControlMode.PercentOutput, -0.1);
+        }
+        else {
+            climberTalon.set(ControlMode.PercentOutput, 0);
+        }
+        }
+    
+
+    public void runClimberSolenoid(){
+        if (Robot.xbox.getPOV()==90){
+            climberSolenoid.set(Value.kForward);
+        } else if (Robot.xbox.getPOV()==270){
+            climberSolenoid.set(Value.kReverse);
+        }
+
+    }
+
+    public void periodic() {
+        runClimberSolenoid();
+        runClimberMotor();
+    }
+    /*
     public static enum ClimberState{ 
+        
         
         STATE1(SINGLE_INSTANCE::turnBlinker1On, "STATE2"), 
         STATE2(SINGLE_INSTANCE::turnBlinker2On, "STATE3"), 
@@ -52,7 +92,7 @@ public class Climber implements Loggable{
             CurrentState = _startingState;
             StartingStateOverride = false;
         } 
-
+       
         if (CurrentState == "") {
             CurrentState = ClimberState.values()[0].toString();
         }
@@ -68,7 +108,7 @@ public class Climber implements Loggable{
             StateHasInitialized = false;
         }
     }
-
+    */
     @Log
     Boolean blinker1 = false;
     @Log
@@ -79,67 +119,44 @@ public class Climber implements Loggable{
     Boolean blinker4 = false;
     @Log
     Boolean blinker5 = false;
-
-    public void turnBlinker1On(){
-        if(!StateHasInitialized){
-            climbTimer.start();
+/*
+    public void //raise arm by 28"(){
+        if(!//arm is not yet raised by 28"){
+            //operate talon;
         }
-        blinker1 = true;
-        if(climbTimer.hasElapsed(5)) {
-            climbTimer.stop();
-            climbTimer.reset();
+
+        if(//stop when {
+            //arm is raised 28 inches
             StateHasFinished  = true;
         }
     }
 
-    public void turnBlinker2On(){
-        if(!StateHasInitialized){
-            climbTimer.start();
+    public void //lower arm by 28"(){
+        if(!arm is currently extened by 28"){
+            //operate talon ;
         }
-        blinker2 = true;
-        if(climbTimer.hasElapsed(5)) {
-            climbTimer.stop();
-            climbTimer.reset();
-            StateHasFinished  = true;
+        
+        if(stop when{
+            arm has been lowered by 28"
+            StateHasFinished = true;
         }
+        
     }
 
-    public void turnBlinker3On(){
-        if(!StateHasInitialized){
-            climbTimer.start();
+    public void //raise arm by 14"(){
+        if(!if arm has yet to extend 14"){
+            operate talon ;
         }
-        blinker3= true;
-        if(climbTimer.hasElapsed(5)) {
-            climbTimer.stop();
-            climbTimer.reset();
-            StateHasFinished  = true;
-        }
-    }
 
+        if(stop when{
+            arm has been raised by 14"
+            StateHasFinished =true; 
+        }
+        
+    }
+*/
     
-    public void turnBlinker4On(){
-        if(!StateHasInitialized){
-            climbTimer.start();
-        }
-        blinker4 = true;
-        if(climbTimer.hasElapsed(5)) {
-            climbTimer.stop();
-            climbTimer.reset();
-            StateHasFinished  = true;
-        }
-    }
-
-    public void turnBlinker5On(){
-        if(!StateHasInitialized){
-            climbTimer.start();
-        }
-        blinker5 = true;
-        if(climbTimer.hasElapsed(5)) {
-            climbTimer.stop();
-            climbTimer.reset();
-            StateHasFinished  = true;
-        }
-    }
+    
 
 
     /* public void myFirstAction(){
@@ -157,17 +174,15 @@ public class Climber implements Loggable{
 
     public void DoneAction() {
         if(!StateHasInitialized){
-            climbTimer.start();
+           
         }
-        if (climbTimer.hasElapsed(5)) {
+        if (true) {
             blinker1 = !blinker1;
             blinker2 = !blinker2;
             blinker3 = !blinker3;
             blinker4 = !blinker4;
             blinker5 = !blinker5;
-            climbTimer.stop();
-            climbTimer.reset();
-            climbTimer.start();
+           
         }
         
 

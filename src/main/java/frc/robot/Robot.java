@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
 
     //test climber method starts here
     CLIMBER = Climber.getInstance();
+    CLIMBER.init();
 
     if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
     if(RUN_TRAJECTORY) {
@@ -123,6 +124,9 @@ public class Robot extends TimedRobot {
       SWERVEDRIVE.getSDFieldRelative()
       );
       //intake code for teleop
+
+      CLIMBER.periodic();
+
       INTAKE.spinIntake();
       INTAKE.intakePneumatics();
       INTAKE.crapIndex();
@@ -131,6 +135,7 @@ public class Robot extends TimedRobot {
       INTAKE.getBottomLimitSwitch();
       INTAKE.getTopLimitSwitch();
       
+
     
   }
 
@@ -155,7 +160,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    CLIMBER.climberRunner("STATE1");
   }
 
 
