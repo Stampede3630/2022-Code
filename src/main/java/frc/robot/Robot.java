@@ -27,8 +27,8 @@ public class Robot extends TimedRobot {
   public static SwerveDrive SWERVEDRIVE;
 
   public static Intake INTAKE;
-
   public static Shooter SHOOTER;
+  public static Climber CLIMBER;
 
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
@@ -131,12 +131,12 @@ public class Robot extends TimedRobot {
       SWERVEDRIVE.getSDFieldRelative());
       //intake code for teleop
 
-      // INTAKE.spinIntake();
+     
 
 
       CLIMBER.periodic();
 
-      INTAKE.spinIntake();
+     
 
       INTAKE.intakePneumatics();
       INTAKE.enableIndexing();
