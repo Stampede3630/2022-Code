@@ -64,6 +64,7 @@ public class Intake implements Loggable {
       }
     }
 
+
     // public void spinIntake() { 
     //     // Actually make the motors spin on button press
     //   if (Robot.xbox. > 0){
@@ -80,6 +81,7 @@ public class Intake implements Loggable {
         indexerDrive();
       // } else {
       //   indexerDrive("Don't Index");
+
       }
     }
 
