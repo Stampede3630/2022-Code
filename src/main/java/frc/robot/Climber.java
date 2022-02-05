@@ -1,12 +1,14 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -19,8 +21,13 @@ public class Climber implements Loggable{
     String CurrentState = "";
     WPI_TalonFX climberTalon;
     DoubleSolenoid climberSolenoid;
-    
+    @Log
+    Timer climbTimer = new Timer();
     boolean StartingStateOverride;
+    double TICKSPERREVOLUTION=2048;
+    double TICKSATTOP=12000;
+    double INCHESATTOP=28;
+    double TICKSPERINCH=TICKSATTOP/INCHESATTOP;
 
     private static Climber SINGLE_INSTANCE = new Climber();
     public static Climber getInstance() {
@@ -30,7 +37,9 @@ public class Climber implements Loggable{
 
     public void init(){
         climberTalon = new WPI_TalonFX(14);
-        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 7);
+        climberTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
+        climberTalon.configSelectedFeedbackCoefficient(TICKSPERINCH, 0, 20);
+        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 6);
     }
 
     public void runClimberMotor(){
@@ -44,7 +53,7 @@ public class Climber implements Loggable{
             climberTalon.set(ControlMode.PercentOutput, 0);
         }
         }
-    
+
 
     public void runClimberSolenoid(){
         if (Robot.xbox.getPOV()==90){
@@ -59,16 +68,33 @@ public class Climber implements Loggable{
         runClimberSolenoid();
         runClimberMotor();
     }
-    /*
-    public static enum ClimberState{ 
+    
+    public static enum ClimberState{
         
-        
-        STATE1(SINGLE_INSTANCE::turnBlinker1On, "STATE2"), 
-        STATE2(SINGLE_INSTANCE::turnBlinker2On, "STATE3"), 
-        STATE3(SINGLE_INSTANCE::turnBlinker3On, "STATE4"), 
-        STATE4(SINGLE_INSTANCE::turnBlinker4On, "STATE5"), 
-        STATE5(SINGLE_INSTANCE::turnBlinker5On, "DONE"), 
-        DONE(SINGLE_INSTANCE::DoneAction, "DONE");  
+        STATE1RAISEARM28(SINGLE_INSTANCE::raiseArm28, "STATE1USERINPUT"), 
+        STATE1USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1LOWERARM28"), 
+        STATE1LOWERARM28(SINGLE_INSTANCE::lowerArm28, "STATE2USERINPUT"), 
+        STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEARM14"), 
+        STATE1RAISEARM14(SINGLE_INSTANCE::raiseArm14, "STATE3USERINPUT"), 
+        STATE3USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1OPENSOLENOID"),
+        STATE1OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE4USERINPUT"),
+        STATE4USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2RAISEARM14"), 
+        STATE2RAISEARM14(SINGLE_INSTANCE::raiseArm14, "STATE5USERINPUT"),
+        STATE5USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1CLOSESOLENOID"),
+        STATE1CLOSESOLENOID(SINGLE_INSTANCE::closeSolenoid, "STATE6USERINPUT"),
+        STATE6USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2LOWERARM28"),
+        STATE2LOWERARM28(SINGLE_INSTANCE::lowerArm28, "STATE7USERINPUT"),
+        STATE7USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3RAISEARM14"), 
+        STATE3RAISEARM14(SINGLE_INSTANCE::raiseArm14, "STATE8USERINPUT"), 
+        STATE8USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2OPENSOLENOID"),
+        STATE2OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE9USERINPUT"),
+        STATE9USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE4RAISEARM14"), 
+        STATE4RAISEARM14(SINGLE_INSTANCE::raiseArm14, "STATE10USERINPUT"),
+        STATE10USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2CLOSESOLENOID"),
+        STATE2CLOSESOLENOID(SINGLE_INSTANCE::closeSolenoid, "STATE11USERINPUT"),
+        STATE11USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3LOWERARM28"),
+        STATE3LOWERARM28(SINGLE_INSTANCE::lowerArm28, "DONE"),
+        DONE(SINGLE_INSTANCE::DoneAction, "DONE");
 
         private Runnable action;
         private String nextState;
@@ -108,7 +134,7 @@ public class Climber implements Loggable{
             StateHasInitialized = false;
         }
     }
-    */
+
     @Log
     Boolean blinker1 = false;
     @Log
@@ -119,44 +145,72 @@ public class Climber implements Loggable{
     Boolean blinker4 = false;
     @Log
     Boolean blinker5 = false;
-/*
-    public void //raise arm by 28"(){
-        if(!//arm is not yet raised by 28"){
-            //operate talon;
-        }
 
-        if(//stop when {
-            //arm is raised 28 inches
+    public void raiseArm28(){
+        climberTalon.set(ControlMode.Position, 28);
+
+        if(climberTalon.getSelectedSensorPosition(0)>=28){
             StateHasFinished  = true;
         }
     }
 
-    public void //lower arm by 28"(){
-        if(!arm is currently extened by 28"){
-            //operate talon ;
-        }
+    public void lowerArm28(){
+        climberTalon.set(ControlMode.Position, 0);
         
-        if(stop when{
-            arm has been lowered by 28"
+        if(climberTalon.getSelectedSensorPosition(0)<=0){
             StateHasFinished = true;
         }
-        
     }
 
-    public void //raise arm by 14"(){
-        if(!if arm has yet to extend 14"){
-            operate talon ;
-        }
+    public void raiseArm14(){
+        climberTalon.set(ControlMode.Position, 14);
 
-        if(stop when{
-            arm has been raised by 14"
-            StateHasFinished =true; 
+        if(climberTalon.getSelectedSensorPosition(0)>=14){
+            StateHasFinished =true;
         }
-        
     }
-*/
+
+    public void openSolenoid(){
+        climberSolenoid.set(Value.kForward);
+        StateHasFinished =true;
+    }
     
+    public void closeSolenoid(){
+        climberSolenoid.set(Value.kReverse);
+        StateHasFinished =true;
+    }
+
+    public void getUserInput(){
+        if(Robot.xbox.getAButton()){
+            StateHasFinished =true;
+        }
+    }
+ 
+ 
     
+  /*  public void turnBlinker4On(){
+        if(!StateHasInitialized){
+            climbTimer.start()
+        }
+        blinker4 = true;
+        if(climbTimer.hasElapsed(5)) {
+            climbTimer.stop();
+            climbTimer.reset();
+            StateHasFinished  = true;
+        }
+    }
+
+    public void turnBlinker5On(){
+        if(!StateHasInitialized){
+            climbTimer.start();
+        }
+        blinker5 = true;
+        if(climbTimer.hasElapsed(5)) {
+            climbTimer.stop();
+            climbTimer.reset();
+            StateHasFinished  = true;
+        }
+    }
 
 
     /* public void myFirstAction(){
@@ -173,19 +227,6 @@ public class Climber implements Loggable{
     }*/
 
     public void DoneAction() {
-        if(!StateHasInitialized){
-           
-        }
-        if (true) {
-            blinker1 = !blinker1;
-            blinker2 = !blinker2;
-            blinker3 = !blinker3;
-            blinker4 = !blinker4;
-            blinker5 = !blinker5;
-           
-        }
-        
-
     } 
 
 
