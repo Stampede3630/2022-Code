@@ -21,12 +21,11 @@ public class Climber implements Loggable{
     String CurrentState = "";
     WPI_TalonFX climberTalon;
     DoubleSolenoid climberSolenoid;
-    @Log
-    Timer climbTimer = new Timer();
+ 
     boolean StartingStateOverride;
     final double TICKSPERREVOLUTION=2048;
-    final double TICKSATTOP=265943;
-    final double INCHESATTOP=27.25;
+    final double TICKSATTOP=239200;
+    final double INCHESATTOP=27;
     final double TICKSPERINCH=TICKSATTOP/INCHESATTOP;
 
     private static Climber SINGLE_INSTANCE = new Climber();
@@ -38,9 +37,10 @@ public class Climber implements Loggable{
     public void init(){
         climberTalon = new WPI_TalonFX(14);
         climberTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
+        climberTalon.setSelectedSensorPosition(-1,0,20);
         climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
-        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 6);
-        climberTalon.config_kP(0, 1023, 20);
+        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 7);
+        climberTalon.config_kP(0, 250, 20);
     }
 
     public void runClimberMotor(){
