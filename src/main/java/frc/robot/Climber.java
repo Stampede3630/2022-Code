@@ -227,7 +227,10 @@ public class Climber implements Loggable{
     public void DoneAction() {
     } 
 
-
+    public void ReZero(){
+        climberTalon.set(ControlMode.Position, 5);
+        
+    }
     
 
     
