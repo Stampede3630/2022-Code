@@ -39,7 +39,7 @@ public class Intake implements Loggable {
       indexTop = new WPI_TalonFX(16);
       indexShooter = new WPI_TalonFX(0);
 
-      intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 7);
+      intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 6);
 
       bottomLimitSwitch = new DigitalInput(1);
       topLimitSwitch = new DigitalInput(0);
