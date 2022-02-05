@@ -24,10 +24,10 @@ public class Climber implements Loggable{
     @Log
     Timer climbTimer = new Timer();
     boolean StartingStateOverride;
-    double TICKSPERREVOLUTION=2048;
-    double TICKSATTOP=12000;
-    double INCHESATTOP=28;
-    double TICKSPERINCH=TICKSATTOP/INCHESATTOP;
+    final double TICKSPERREVOLUTION=2048;
+    final double TICKSATTOP=265943;
+    final double INCHESATTOP=27.25;
+    final double TICKSPERINCH=TICKSATTOP/INCHESATTOP;
 
     private static Climber SINGLE_INSTANCE = new Climber();
     public static Climber getInstance() {
