@@ -38,28 +38,26 @@ public class Climber implements Loggable{
     public void init(){
         climberTalon = new WPI_TalonFX(14);
         climberTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
-        climberTalon.configSelectedFeedbackCoefficient(TICKSPERINCH, 0, 20);
+        climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
         climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 6);
+        climberTalon.config_kP(0, 1023, 20);
     }
 
     public void runClimberMotor(){
         if (Robot.xbox.getPOV()==0){
-            climberTalon.set(ControlMode.PercentOutput, 0.1);
+            raiseArm28();
         }
         else if (Robot.xbox.getPOV()==180){
-            climberTalon.set(ControlMode.PercentOutput, -0.1);
-        }
-        else {
-            climberTalon.set(ControlMode.PercentOutput, 0);
+            lowerArm28();
         }
         }
 
 
     public void runClimberSolenoid(){
         if (Robot.xbox.getPOV()==90){
-            climberSolenoid.set(Value.kForward);
+            openSolenoid();
         } else if (Robot.xbox.getPOV()==270){
-            climberSolenoid.set(Value.kReverse);
+            closeSolenoid();
         }
 
     }
