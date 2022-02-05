@@ -30,7 +30,7 @@ public class Climber implements Loggable{
 
     public void init(){
         climberTalon = new WPI_TalonFX(14);
-        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 6);
+        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 7);
     }
 
     public void runClimberMotor(){
