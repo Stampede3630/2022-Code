@@ -23,6 +23,7 @@ public class Climber implements Loggable{
     DoubleSolenoid climberSolenoid;
  
     boolean StartingStateOverride;
+    boolean atOrigin;
     final double TICKSPERREVOLUTION=2048;
     final double TICKSATTOP=239200;
     final double INCHESATTOP=27;
@@ -33,7 +34,6 @@ public class Climber implements Loggable{
         return SINGLE_INSTANCE;
     }
     
-
     public void init(){
         climberTalon = new WPI_TalonFX(14);
         climberTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
@@ -41,6 +41,12 @@ public class Climber implements Loggable{
         climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
         climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 7);
         climberTalon.config_kP(0, 250, 20);
+        atOrigin = false;
+    }
+
+    public void periodic() {
+        runClimberSolenoid();
+        runClimberMotor();
     }
 
     public void runClimberMotor(){
@@ -60,11 +66,6 @@ public class Climber implements Loggable{
             closeSolenoid();
         }
 
-    }
-
-    public void periodic() {
-        runClimberSolenoid();
-        runClimberMotor();
     }
     
     public static enum ClimberState{
@@ -227,11 +228,14 @@ public class Climber implements Loggable{
     public void DoneAction() {
     } 
 
-    public void ReZero(){
+    public void ReZero() {
         climberTalon.set(ControlMode.Position, 5);
-        
+        if (climberTalon.getSelectedSensorPosition(0) == 5) {
+            climberTalon.set(ControlMode.PercentOutput, -0.1);  
+            if (climberTalon.getSelectedSensorPosition(0) == 0) {
+                atOrigin = true;    
+                climberTalon.set(ControlMode.PercentOutput, 0);
+            }
+        }
     }
-    
-
-    
 }
