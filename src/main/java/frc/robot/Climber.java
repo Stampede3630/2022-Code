@@ -24,6 +24,7 @@ public class Climber implements Loggable{
  
     boolean StartingStateOverride;
     boolean atOrigin;
+    boolean upFive;
     final double TICKSPERREVOLUTION=2048;
     final double TICKSATTOP=239200;
     final double INCHESATTOP=27;
@@ -42,6 +43,7 @@ public class Climber implements Loggable{
         climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 7);
         climberTalon.config_kP(0, 250, 20);
         atOrigin = false;
+        upFive = false;
     }
 
     public void periodic() {
@@ -228,14 +230,16 @@ public class Climber implements Loggable{
     public void DoneAction() {
     } 
 
-    public void ReZero() {
-        climberTalon.set(ControlMode.Position, 5);
-        if (climberTalon.getSelectedSensorPosition(0) == 5) {
+    public void ReZero() {      //WIP***
+        if (climberTalon.getSelectedSensorPosition(0) == 5 && atOrigin == false && upFive == true) {
             climberTalon.set(ControlMode.PercentOutput, -0.1);  
-            if (climberTalon.getSelectedSensorPosition(0) == 0) {
+            upFive = true;
+            if (climberTalon.getSelectedSensorVelocity(0) > -0.5 && climberTalon.getSelectedSensorPosition(0) < 2) {
                 atOrigin = true;    
                 climberTalon.set(ControlMode.PercentOutput, 0);
             }
+        } else {
+            climberTalon.set(ControlMode.Position, 5);
         }
     }
 }

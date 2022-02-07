@@ -135,6 +135,7 @@ public class Robot extends TimedRobot {
 
 
       CLIMBER.periodic();
+      CLIMBER.ReZero();
 
      
 
