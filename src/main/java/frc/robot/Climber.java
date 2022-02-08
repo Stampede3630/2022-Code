@@ -29,6 +29,9 @@ public class Climber implements Loggable{
     final double TICKSATTOP=239200;
     final double INCHESATTOP=27;
     final double TICKSPERINCH=TICKSATTOP/INCHESATTOP;
+    final int FULLEXTEND = 27;
+    final int HALFEXTEND = 12;
+    final int CLICKARMS = 5; // <-- place holder value, position to move climber arms down (in inches)
 
     private static Climber SINGLE_INSTANCE = new Climber();
     public static Climber getInstance() {
@@ -146,6 +149,19 @@ public class Climber implements Loggable{
     Boolean blinker4 = false;
     @Log
     Boolean blinker5 = false;
+
+    public void raiseAndExtend() {
+        climberTalon.set(ControlMode.Position, 12);
+
+        if (climberTalon.getSelectedSensorPosition(0) >= 12) {
+            climberSolenoid.set(Value.kForward);
+            climberTalon.set(ControlMode.Position, 15);
+
+            if (climberTalon.getSelectedSensorPosition(0) >= 27) {
+                StateHasFinished = true;
+            }
+        }
+    }
 
     public void raiseArm28(){
         climberTalon.set(ControlMode.Position, 28);
