@@ -243,6 +243,7 @@ public class Climber implements Loggable{
             if (climberTalon.getSelectedSensorVelocity(0) > -0.5 && climberTalon.getSelectedSensorPosition(0) < 2) {
                 atOrigin = true;
                 climberTalon.set(ControlMode.PercentOutput, 0);
+                climberTalon.setSelectedSensorPosition(14, 0, 20);
             }
         } 
 
