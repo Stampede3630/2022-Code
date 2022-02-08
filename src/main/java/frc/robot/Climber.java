@@ -52,11 +52,18 @@ public class Climber implements Loggable{
     public void periodic() {
         runClimberSolenoid();
         runClimberMotor();
+        if(atOrigin){
+            climberRunner("STATESTART");
+
+        } else{
+            reZero();
+        }
+        
     }
 
     public void runClimberMotor(){
         if (Robot.xbox.getPOV()==0){
-            raiseArm28();
+            raiseAndExtend();
         }
         else if (Robot.xbox.getPOV()==180){
             lowerArm28();
@@ -74,28 +81,26 @@ public class Climber implements Loggable{
     }
     
     public static enum ClimberState{
-        
+        STATESTART(SINGLE_INSTANCE::getUserInput, "STATE1RAISEARM28"),
         STATE1RAISEARM28(SINGLE_INSTANCE::raiseArm28, "STATE1USERINPUT"), 
         STATE1USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1LOWERARM28"), 
         STATE1LOWERARM28(SINGLE_INSTANCE::lowerArm28, "STATE2USERINPUT"), 
-        STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEARM14"), 
-        STATE1RAISEARM14(SINGLE_INSTANCE::raiseArm14, "STATE3USERINPUT"), 
+        STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEANDEXTEND"), 
+        STATE1RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE3USERINPUT"), 
         STATE3USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1OPENSOLENOID"),
         STATE1OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE4USERINPUT"),
-        STATE4USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2RAISEARM14"), 
-        STATE2RAISEARM14(SINGLE_INSTANCE::raiseArm14, "STATE5USERINPUT"),
-        STATE5USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1CLOSESOLENOID"),
-        STATE1CLOSESOLENOID(SINGLE_INSTANCE::closeSolenoid, "STATE6USERINPUT"),
+        STATE4USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2RAISEANDEXTEND"), 
+        STATE2RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE5USERINPUT"),
+        STATE5USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE6USERINPUT"),
         STATE6USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2LOWERARM28"),
         STATE2LOWERARM28(SINGLE_INSTANCE::lowerArm28, "STATE7USERINPUT"),
-        STATE7USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3RAISEARM14"), 
-        STATE3RAISEARM14(SINGLE_INSTANCE::raiseArm14, "STATE8USERINPUT"), 
+        STATE7USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3RAISEANDEXTEND"), 
+        STATE3RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE8USERINPUT"), 
         STATE8USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2OPENSOLENOID"),
         STATE2OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE9USERINPUT"),
-        STATE9USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE4RAISEARM14"), 
-        STATE4RAISEARM14(SINGLE_INSTANCE::raiseArm14, "STATE10USERINPUT"),
-        STATE10USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2CLOSESOLENOID"),
-        STATE2CLOSESOLENOID(SINGLE_INSTANCE::closeSolenoid, "STATE11USERINPUT"),
+        STATE9USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE4RAISEANDEXTEND"), 
+        STATE4RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE10USERINPUT"),
+        STATE10USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE11USERINPUT"),
         STATE11USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3LOWERARM28"),
         STATE3LOWERARM28(SINGLE_INSTANCE::lowerArm28, "DONE"),
         DONE(SINGLE_INSTANCE::DoneAction, "DONE");
@@ -151,12 +156,12 @@ public class Climber implements Loggable{
     Boolean blinker5 = false;
 
     public void raiseAndExtend() {
-        climberTalon.set(ControlMode.Position, 12);
-
-        if (climberTalon.getSelectedSensorPosition(0) >= 12) {
-            climberSolenoid.set(Value.kForward);
-            climberTalon.set(ControlMode.Position, 15);
-
+        if (climberTalon.getSelectedSensorPosition(0) < 24) {
+            climberTalon.set(ControlMode.Position, 26);
+        } else if (climberTalon.getSelectedSensorPosition(0) >= 24) {
+            closeSolenoid();
+            climberTalon.set(ControlMode.Position, 27);
+            
             if (climberTalon.getSelectedSensorPosition(0) >= 27) {
                 StateHasFinished = true;
             }
@@ -172,7 +177,7 @@ public class Climber implements Loggable{
     }
 
     public void lowerArm28(){
-        climberTalon.set(ControlMode.Position, 0);
+        climberTalon.set(ControlMode.Position, 1);
         
         if(climberTalon.getSelectedSensorPosition(0)<=0){
             StateHasFinished = true;
@@ -246,7 +251,7 @@ public class Climber implements Loggable{
     public void DoneAction() {
     } 
 
-    public void ReZero() {  
+    public void reZero() {  
             //WIP***
 
         if (atOrigin == false && upFive == false) {
@@ -259,7 +264,7 @@ public class Climber implements Loggable{
             if (climberTalon.getSelectedSensorVelocity(0) > -0.5 && climberTalon.getSelectedSensorPosition(0) < 2) {
                 atOrigin = true;
                 climberTalon.set(ControlMode.PercentOutput, 0);
-                climberTalon.setSelectedSensorPosition(14, 0, 20);
+                climberTalon.setSelectedSensorPosition(0, 0, 20);
             }
         } 
 
