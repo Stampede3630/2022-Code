@@ -230,16 +230,31 @@ public class Climber implements Loggable{
     public void DoneAction() {
     } 
 
-    public void ReZero() {      //WIP***
-        if (climberTalon.getSelectedSensorPosition(0) == 5 && atOrigin == false && upFive == true) {
-            climberTalon.set(ControlMode.PercentOutput, -0.1);  
-            upFive = true;
+    public void ReZero() {  
+            //WIP***
+
+        if (atOrigin == false && upFive == false) {
+            climberTalon.set(ControlMode.Position, 5);
+            if (climberTalon.getSelectedSensorPosition(0) == 5) {
+                upFive = true;
+            }
+        } else if (atOrigin == false && upFive == true) {
+            climberTalon.set(ControlMode.PercentOutput, -0.1);
             if (climberTalon.getSelectedSensorVelocity(0) > -0.5 && climberTalon.getSelectedSensorPosition(0) < 2) {
-                atOrigin = true;    
+                atOrigin = true;
                 climberTalon.set(ControlMode.PercentOutput, 0);
             }
-        } else {
-            climberTalon.set(ControlMode.Position, 5);
-        }
+        } 
+
+    //     if (climberTalon.getSelectedSensorPosition(0) == 5 && atOrigin == false && upFive == true) {
+    //         climberTalon.set(ControlMode.PercentOutput, -0.1);  
+    //         upFive = true;
+    //         if (climberTalon.getSelectedSensorVelocity(0) > -0.5 && climberTalon.getSelectedSensorPosition(0) < 2) {
+    //             atOrigin = true;    
+    //             climberTalon.set(ControlMode.PercentOutput, 0);
+    //         }
+    //     } else {
+    //         climberTalon.set(ControlMode.Position, 5);
+    //     }
     }
 }
