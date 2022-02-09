@@ -14,7 +14,7 @@ import io.github.oblarg.oblog.annotations.Log;
 
 public class Climber implements Loggable{
     @Log
-    boolean StateHasFinished;
+    boolean StateHasFinished = false;
     @Log
     Boolean StateHasInitialized = false;
     @Log
@@ -32,6 +32,8 @@ public class Climber implements Loggable{
     final int FULLEXTEND = 27;
     final int HALFEXTEND = 12;
     final int CLICKARMS = 5; // <-- place holder value, position to move climber arms down (in inches)
+
+    static Thread t1;
 
     private static Climber SINGLE_INSTANCE = new Climber();
     public static Climber getInstance() {
@@ -53,13 +55,15 @@ public class Climber implements Loggable{
         runClimberSolenoid();
         runClimberMotor();
         if(atOrigin){
-            climberRunner("STATESTART");
+            climberRunner("");
 
         } else{
             reZero();
         }
         
     }
+
+    
 
     public void runClimberMotor(){
         if (Robot.xbox.getPOV()==0){
@@ -130,15 +134,19 @@ public class Climber implements Loggable{
        
         if (CurrentState == "") {
             CurrentState = ClimberState.values()[0].toString();
+            t1 = new Thread(ClimberState.valueOf(CurrentState).getAction());
+            t1.start();
         }
 
-        ClimberState.valueOf(CurrentState).getAction();
 
         //if we made one round with the state, we have successfully initialized
         if (!StateHasInitialized) {StateHasInitialized = true;}
 
         if (StateHasFinished){
             CurrentState = ClimberState.valueOf(CurrentState).getNextState();
+            t1.stop();
+            t1 = new Thread(ClimberState.valueOf(CurrentState).getAction());
+            t1.start();
             StateHasFinished = false; 
             StateHasInitialized = false;
         }
@@ -155,7 +163,7 @@ public class Climber implements Loggable{
     @Log
     Boolean blinker5 = false;
 
-    public void raiseAndExtend() {
+    public void raiseAndExtend()  {
         if (climberTalon.getSelectedSensorPosition(0) < 24) {
             climberTalon.set(ControlMode.Position, 26);
         } else if (climberTalon.getSelectedSensorPosition(0) >= 24) {
