@@ -52,11 +52,10 @@ public class Climber implements Loggable{
     }
 
     public void periodic() {
-        runClimberSolenoid();
-        runClimberMotor();
+        manualClimberSolenoid();
+        manualClimberMotor();
         if(atOrigin){
             climberRunner("");
-
         } else{
             reZero();
         }
@@ -65,7 +64,7 @@ public class Climber implements Loggable{
 
     
 
-    public void runClimberMotor(){
+    public void manualClimberMotor(){
         if (Robot.xbox.getPOV()==0){
             raiseAndExtend();
         }
@@ -75,7 +74,7 @@ public class Climber implements Loggable{
         }
 
 
-    public void runClimberSolenoid(){
+    public void manualClimberSolenoid(){
         if (Robot.xbox.getPOV()==90){
             openSolenoid();
         } else if (Robot.xbox.getPOV()==270){
@@ -127,26 +126,21 @@ public class Climber implements Loggable{
     }
 
     public void climberRunner(String _startingState){
-        if (_startingState != "" || StartingStateOverride){
+        if (_startingState != "" && StartingStateOverride){
             CurrentState = _startingState;
             StartingStateOverride = false;
         } 
        
         if (CurrentState == "") {
             CurrentState = ClimberState.values()[0].toString();
-            t1 = new Thread(ClimberState.valueOf(CurrentState).getAction());
-            t1.start();
         }
 
 
         //if we made one round with the state, we have successfully initialized
         if (!StateHasInitialized) {StateHasInitialized = true;}
-
+        ClimberState.valueOf(CurrentState).getAction().run();
         if (StateHasFinished){
             CurrentState = ClimberState.valueOf(CurrentState).getNextState();
-            t1.stop();
-            t1 = new Thread(ClimberState.valueOf(CurrentState).getAction());
-            t1.start();
             StateHasFinished = false; 
             StateHasInitialized = false;
         }
