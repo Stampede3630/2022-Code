@@ -33,8 +33,6 @@ public class Climber implements Loggable{
     final int HALFEXTEND = 12;
     final int CLICKARMS = 5; // <-- place holder value, position to move climber arms down (in inches)
 
-    static Thread t1;
-
     private static Climber SINGLE_INSTANCE = new Climber();
     public static Climber getInstance() {
         return SINGLE_INSTANCE;
@@ -43,7 +41,7 @@ public class Climber implements Loggable{
     public void init(){
         climberTalon = new WPI_TalonFX(14);
         climberTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
-        climberTalon.setSelectedSensorPosition(-1,0,20);
+        climberTalon.setSelectedSensorPosition(0,0,20);
         climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
         climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 7);
         climberTalon.config_kP(0, 250, 20);
@@ -82,8 +80,8 @@ public class Climber implements Loggable{
         }
 
     }
-    
-    public static enum ClimberState{
+    //I took this off static, because it wasn't necessary.
+    public enum ClimberState{
         STATESTART(SINGLE_INSTANCE::getUserInput, "STATE1RAISEARM28"),
         STATE1RAISEARM28(SINGLE_INSTANCE::raiseArm28, "STATE1USERINPUT"), 
         STATE1USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1LOWERARM28"), 
@@ -146,16 +144,22 @@ public class Climber implements Loggable{
         }
     }
 
-    @Log
-    Boolean blinker1 = false;
-    @Log
-    Boolean blinker2 = false;
-    @Log
-    Boolean blinker3 = false;
-    @Log
-    Boolean blinker4 = false;
-    @Log
-    Boolean blinker5 = false;
+    public void reZero() { 
+
+    if (atOrigin == false && upFive == false) {
+        climberTalon.set(ControlMode.Position, 5);
+        if (climberTalon.getSelectedSensorPosition(0) == 5) {
+            upFive = true;
+        }
+    } else if (atOrigin == false && upFive == true) {
+        climberTalon.set(ControlMode.PercentOutput, -0.1);
+        if (climberTalon.getSelectedSensorVelocity(0) > -0.5 && climberTalon.getSelectedSensorPosition(0) < 2) {
+            atOrigin = true;
+            climberTalon.set(ControlMode.PercentOutput, 0);
+            climberTalon.setSelectedSensorPosition(0, 0, 20);
+        }
+    } 
+}
 
     public void raiseAndExtend()  {
         if (climberTalon.getSelectedSensorPosition(0) < 24) {
@@ -212,73 +216,8 @@ public class Climber implements Loggable{
  
  
     
-  /*  public void turnBlinker4On(){
-        if(!StateHasInitialized){
-            climbTimer.start()
-        }
-        blinker4 = true;
-        if(climbTimer.hasElapsed(5)) {
-            climbTimer.stop();
-            climbTimer.reset();
-            StateHasFinished  = true;
-        }
-    }
-
-    public void turnBlinker5On(){
-        if(!StateHasInitialized){
-            climbTimer.start();
-        }
-        blinker5 = true;
-        if(climbTimer.hasElapsed(5)) {
-            climbTimer.stop();
-            climbTimer.reset();
-            StateHasFinished  = true;
-        }
-    }
-
-
-    /* public void myFirstAction(){
-        if(!StateHasInitialized){
-
-        }
-        
-        //do more things
-
-        //exit conditions
-        if(true) {
-            StateHasFinished  = true;
-        }
-    }*/
-
     public void DoneAction() {
     } 
 
-    public void reZero() {  
-            //WIP***
-
-        if (atOrigin == false && upFive == false) {
-            climberTalon.set(ControlMode.Position, 5);
-            if (climberTalon.getSelectedSensorPosition(0) == 5) {
-                upFive = true;
-            }
-        } else if (atOrigin == false && upFive == true) {
-            climberTalon.set(ControlMode.PercentOutput, -0.1);
-            if (climberTalon.getSelectedSensorVelocity(0) > -0.5 && climberTalon.getSelectedSensorPosition(0) < 2) {
-                atOrigin = true;
-                climberTalon.set(ControlMode.PercentOutput, 0);
-                climberTalon.setSelectedSensorPosition(0, 0, 20);
-            }
-        } 
-
-    //     if (climberTalon.getSelectedSensorPosition(0) == 5 && atOrigin == false && upFive == true) {
-    //         climberTalon.set(ControlMode.PercentOutput, -0.1);  
-    //         upFive = true;
-    //         if (climberTalon.getSelectedSensorVelocity(0) > -0.5 && climberTalon.getSelectedSensorPosition(0) < 2) {
-    //             atOrigin = true;    
-    //             climberTalon.set(ControlMode.PercentOutput, 0);
-    //         }
-    //     } else {
-    //         climberTalon.set(ControlMode.Position, 5);
-    //     }
-    }
+    
 }
