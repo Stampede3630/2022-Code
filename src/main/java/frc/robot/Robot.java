@@ -33,46 +33,48 @@ public class Robot extends TimedRobot {
   public static SwerveCharacterization SWERVERCHARACTERIZATION;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static XboxController xbox = new XboxController(0);
-  public static PathPlannerTrajectory examplePath; 
+  // public static PathPlannerTrajectory examplePath; 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-    SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
-    SwerveMap.driveRobotInit();
-    SwerveMap.GYRO.reset();
-    //we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
+    // SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+    // SwerveMap.driveRobotInit();
+    // SwerveMap.GYRO.reset();
+    // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
+
     //*Swerve method starts here*
-    SWERVEDRIVE = SwerveDrive.getInstance();
-    SWERVEDRIVE.init();
-    SWERVEDRIVE.zeroSwerveDrive();
+    // SWERVEDRIVE = SwerveDrive.getInstance();
+    // SWERVEDRIVE.init();
+    // SWERVEDRIVE.zeroSwerveDrive();
+
     //**Intake method starts here**
-   INTAKE = Intake.getInstance();
-    INTAKE.init();
+    // INTAKE = Intake.getInstance();
+    // INTAKE.init();
 
     //*** Auto Container method starts here***
     //AUTOCONTAINER = AutoContainer.getInstance();
 
 
     // ****Shooter method starts here****
-    SHOOTER = Shooter.getInstance();
-    SHOOTER.init();
+    // SHOOTER = Shooter.getInstance();
+    // SHOOTER.init();
 
-    //test climber method starts here
+    // *****test climber method starts here*****
     CLIMBER = Climber.getInstance();
     CLIMBER.init();
 
 
-    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
-    if(RUN_TRAJECTORY) {
-      SWERVETRAJECTORY = SwerveTrajectory.getInstance();
-      examplePath = PathPlanner.loadPath("New Path", 1, .8);
-    }
-    //keep this statement on the BOTTOM of your robotInit
-    //It's responsible for all the shuffleboard outputs.  
-    //It's a lot easier to use than standard shuffleboard syntax
+    // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
+    // if(RUN_TRAJECTORY) {
+      // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
+      // examplePath = PathPlanner.loadPath("New Path", 1, .8);
+    // }
+    // Keep this statement on the BOTTOM of your robotInit
+    // It's responsible for all the shuffleboard outputs.  
+    // It's a lot easier to use than standard shuffleboard syntax
     Logger.configureLoggingAndConfig(this, false);
   }
 
@@ -85,50 +87,50 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SWERVEDRIVE.updateOdometry();
+    // SWERVEDRIVE.updateOdometry();
     Logger.updateEntries();
   }
 
   @Override
   public void autonomousInit() {
-    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
-    SWERVEDRIVE.setToBrake();
+    // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
+    // SWERVEDRIVE.setToBrake();
 
-    //For Trajectory instructions go to SwerverTrajectory.java
-    if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
+    // For Trajectory instructions go to SwerverTrajectory.java
+    // if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
 
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.periodic();}
+    // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.periodic();}
     
     
-    if(RUN_TRAJECTORY){
-    //SwerveTrajectory.trajectoryRunner(TrajectoryContainer.jonahTrajectory, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
-    SwerveTrajectory.PathPlannerRunner(TrajectoryContainer.heteroPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
-    }
+    // if(RUN_TRAJECTORY){
+    // //SwerveTrajectory.trajectoryRunner(TrajectoryContainer.jonahTrajectory, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    // SwerveTrajectory.PathPlannerRunner(TrajectoryContainer.heteroPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    // }
   }
 
   /** This function is called once when teleop is enabled. */
-  @Override
-  public void teleopInit() {
-    SWERVEDRIVE.setToBrake();
-    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
-  }
+  // @Override
+  // public void teleopInit() {
+  //   SWERVEDRIVE.setToBrake();
+  //   if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
+  // }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //Joystick Drives stores values in X,Y,Z rotation
-    //Drive actually sends those values to the swerve modules
-    SWERVEDRIVE.joystickDrive();
-    SWERVEDRIVE.drive(
-      SWERVEDRIVE.getSDxSpeed(), 
-      SWERVEDRIVE.getSDySpeed(), 
-      SWERVEDRIVE.getSDRotation(), 
-      SWERVEDRIVE.getSDFieldRelative());
+    // Joystick Drives stores values in X,Y,Z rotation
+    // Drive actually sends those values to the swerve modules
+    // SWERVEDRIVE.joystickDrive();
+    // SWERVEDRIVE.drive(
+    //   SWERVEDRIVE.getSDxSpeed(), 
+    //   SWERVEDRIVE.getSDySpeed(), 
+    //   SWERVEDRIVE.getSDRotation(), 
+    //   SWERVEDRIVE.getSDFieldRelative());
       //intake code for teleop
 
      
@@ -137,11 +139,11 @@ public class Robot extends TimedRobot {
     CLIMBER.periodic();
 
      
-    INTAKE.intakePeriodic();
+    // INTAKE.intakePeriodic();
      // INTAKE.intakePneumatics();
      // INTAKE.shootIndexManager();
     //SHOOTER INSTANCE LOOP
-    SHOOTER.shoot();
+    // SHOOTER.shoot();
     //INTAKE.spinIntake();
       
 
@@ -151,15 +153,15 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.disabled(false);}
+    // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.disabled(false);}
       //SwerveCharacterization.init();
-    SWERVEDRIVE.zeroSwerveDrive();
+    // SWERVEDRIVE.zeroSwerveDrive();
   }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    SWERVEDRIVE.setToCoast();
+    // SWERVEDRIVE.setToCoast();
   }
 
   /** This function is called once when test mode is enabled. */

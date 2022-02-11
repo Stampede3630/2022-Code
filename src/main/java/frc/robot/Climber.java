@@ -25,6 +25,7 @@ public class Climber implements Loggable{
     boolean StartingStateOverride;
     boolean atOrigin;
     boolean upFive;
+    boolean tiltArms = false;
     final double TICKSPERREVOLUTION=2048;
     final double TICKSATTOP=239200;
     final double INCHESATTOP=27;
@@ -52,6 +53,7 @@ public class Climber implements Loggable{
     public void periodic() {
         manualClimberSolenoid();
         manualClimberMotor();
+        solenoidController();
         if(atOrigin){
             climberRunner("");
         } else{
@@ -60,8 +62,6 @@ public class Climber implements Loggable{
         
     }
 
-    
-
     public void manualClimberMotor(){
         if (Robot.xbox.getPOV()==0){
             raiseAndExtend();
@@ -69,24 +69,30 @@ public class Climber implements Loggable{
         else if (Robot.xbox.getPOV()==180){
             lowerArm28();
         }
-        }
-
-
-    public void manualClimberSolenoid(){
-        if (Robot.xbox.getPOV()==90){
-            openSolenoid();
-        } else if (Robot.xbox.getPOV()==270){ 
-            closeSolenoid();
-        }
-
     }
-    //I took this off static, because it wasn't necessary.
+    
+    public void manualClimberSolenoid(){
+        if (Robot.xbox.getPOV()==90 ){ 
+           tiltArms = false;
+        } else if (Robot.xbox.getPOV()==270 ){ 
+           tiltArms = true;
+        }
+    }
+
+    public void solenoidController() {
+        if (tiltArms) {
+            closeSolenoid();
+        } else {
+            openSolenoid();
+        }
+    }
+
     public enum ClimberState{
         STATESTART(SINGLE_INSTANCE::getUserInput, "STATE1RAISEARM28"),
-        STATE1RAISEARM28(SINGLE_INSTANCE::closeSolenoid, "STATE1USERINPUT"), // change back to raise28 when done | no
+        STATE1RAISEARM28(SINGLE_INSTANCE::closeSolenoid, "STATE1USERINPUT"), // change back to raise28 when done 
         STATE1USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1LOWERARM28"), 
         STATE1LOWERARM28(SINGLE_INSTANCE::openSolenoid, "STATE2USERINPUT"), // change back to lower28 when done (hasn't been tested yet)
-        STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEANDEXTEND"), 
+        STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEANDEXTEND"),
         STATE1RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE3USERINPUT"), 
         STATE3USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1OPENSOLENOID"),
         STATE1OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE4USERINPUT"),
@@ -174,48 +180,49 @@ public class Climber implements Loggable{
         }
     }
 
-    public void raiseArm28(){
+    public void raiseArm28() {
         climberTalon.set(ControlMode.Position, 28);
 
-        if(climberTalon.getSelectedSensorPosition(0)>=28){
+        if (climberTalon.getSelectedSensorPosition(0)>=28) {
             StateHasFinished  = true;
         }
     }
 
-    public void lowerArm28(){
+    public void lowerArm28() {
         climberTalon.set(ControlMode.Position, 1);
         
-        if(climberTalon.getSelectedSensorPosition(0)<=2){
+        if (climberTalon.getSelectedSensorPosition(0)<=2) {
             StateHasFinished = true;
         }
     }
 
-    public void raiseArm14(){
+    public void raiseArm14() {
         climberTalon.set(ControlMode.Position, 14);
 
-        if(climberTalon.getSelectedSensorPosition(0)>=14){
+        if (climberTalon.getSelectedSensorPosition(0)>=14) {
             StateHasFinished =true;
         }
     }
 
-    public void openSolenoid(){
+    public void openSolenoid() {
         climberSolenoid.set(Value.kForward);
-        StateHasFinished =true;
+        tiltArms = true;
+        StateHasFinished = true;
     }
     
-    public void closeSolenoid(){
+    public void closeSolenoid() {
         climberSolenoid.set(Value.kReverse);
-        StateHasFinished =true;
+        tiltArms = false;
+        StateHasFinished = true;
+
     }
 
-    public void getUserInput(){
+    public void getUserInput() {
         if(Robot.xbox.getAButton()){
             StateHasFinished =true;
         }
     }
- 
- 
-    
+
     public void DoneAction() {
     } 
 
