@@ -75,7 +75,7 @@ public class Climber implements Loggable{
     public void manualClimberSolenoid(){
         if (Robot.xbox.getPOV()==90){
             openSolenoid();
-        } else if (Robot.xbox.getPOV()==270){
+        } else if (Robot.xbox.getPOV()==270){ 
             closeSolenoid();
         }
 
@@ -83,9 +83,9 @@ public class Climber implements Loggable{
     //I took this off static, because it wasn't necessary.
     public enum ClimberState{
         STATESTART(SINGLE_INSTANCE::getUserInput, "STATE1RAISEARM28"),
-        STATE1RAISEARM28(SINGLE_INSTANCE::raiseArm28, "STATE1USERINPUT"), 
+        STATE1RAISEARM28(SINGLE_INSTANCE::closeSolenoid, "STATE1USERINPUT"), // change back to raise28 when done | no
         STATE1USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1LOWERARM28"), 
-        STATE1LOWERARM28(SINGLE_INSTANCE::lowerArm28, "STATE2USERINPUT"), 
+        STATE1LOWERARM28(SINGLE_INSTANCE::openSolenoid, "STATE2USERINPUT"), // change back to lower28 when done (hasn't been tested yet)
         STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEANDEXTEND"), 
         STATE1RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE3USERINPUT"), 
         STATE3USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1OPENSOLENOID"),
@@ -191,7 +191,7 @@ public class Climber implements Loggable{
     }
 
     public void raiseArm14(){
-        climberTalon.set(ControlMode.Position, 14); // updates?, theyre still fixing the solenoids, somethings wrong with their wiring
+        climberTalon.set(ControlMode.Position, 14);
 
         if(climberTalon.getSelectedSensorPosition(0)>=14){
             StateHasFinished =true;
