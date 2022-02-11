@@ -134,15 +134,15 @@ public class Robot extends TimedRobot {
      
 
 
-      CLIMBER.periodic();
-      
+    CLIMBER.periodic();
 
      
-
-      INTAKE.intakePneumatics();
-      INTAKE.enableIndexing();
-      //SHOOTER INSTANCE LOOP
-      SHOOTER.shoot();
+    INTAKE.intakePeriodic();
+     // INTAKE.intakePneumatics();
+     // INTAKE.shootIndexManager();
+    //SHOOTER INSTANCE LOOP
+    SHOOTER.shoot();
+    //INTAKE.spinIntake();
       
 
     

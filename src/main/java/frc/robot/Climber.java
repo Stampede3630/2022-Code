@@ -43,7 +43,7 @@ public class Climber implements Loggable{
         climberTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
         climberTalon.setSelectedSensorPosition(0,0,20);
         climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
-        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 7);
+        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
         climberTalon.config_kP(0, 250, 20);
         atOrigin = false;
         upFive = false;
@@ -185,13 +185,13 @@ public class Climber implements Loggable{
     public void lowerArm28(){
         climberTalon.set(ControlMode.Position, 1);
         
-        if(climberTalon.getSelectedSensorPosition(0)<=0){
+        if(climberTalon.getSelectedSensorPosition(0)<=2){
             StateHasFinished = true;
         }
     }
 
     public void raiseArm14(){
-        climberTalon.set(ControlMode.Position, 14);
+        climberTalon.set(ControlMode.Position, 14); // updates?, theyre still fixing the solenoids, somethings wrong with their wiring
 
         if(climberTalon.getSelectedSensorPosition(0)>=14){
             StateHasFinished =true;
