@@ -11,6 +11,16 @@ public class AutoContainer implements Loggable {
         return SINGLE_INSTANCE;
     }
 
+    // waypoint 1: x = 
+    // waypoint 2:
+    // waypoint 3:
+    // waypoint 4:
+    // waypoint 5:
+    // waypoint 6:
+    public enum AutoState {
+        
+    }
+
     @Config.ToggleButton(name="Field Position 1", defaultValue = false, rowIndex = 1, columnIndex = 1, height = 1, width = 2)
     private static void fieldPosition1(boolean pos1) {
         if (pos1) { setAuto(1); }

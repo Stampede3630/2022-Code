@@ -53,7 +53,7 @@ public class Climber implements Loggable{
     public void periodic() {
         manualClimberSolenoid();
         manualClimberMotor();
-        solenoidController();
+        // solenoidController();
         if(atOrigin){
             climberRunner("");
         } else{
@@ -79,30 +79,31 @@ public class Climber implements Loggable{
         }
     }
 
-    public void solenoidController() {
-        if (tiltArms) {
-            closeSolenoid();
-        } else {
-            openSolenoid();
-        }
-    }
+    //// public void solenoidController() {
+    //     if (tiltArms) {
+    //         closeSolenoid();
+    //     } else {
+    //         openSolenoid();
+    //     }
+    // }
 
     public enum ClimberState{
         STATESTART(SINGLE_INSTANCE::getUserInput, "STATE1RAISEARM28"),
-        STATE1RAISEARM28(SINGLE_INSTANCE::closeSolenoid, "STATE1USERINPUT"), // change back to raise28 when done 
+        STATE1RAISEARM28(SINGLE_INSTANCE::openSolenoid, "STATECRINGERAISEARM28"), // change back to raise28 when done 
+        STATECRINGERAISEARM28(SINGLE_INSTANCE::raiseArm28, "STATE1USERINPUT"),
         STATE1USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1LOWERARM28"), 
-        STATE1LOWERARM28(SINGLE_INSTANCE::openSolenoid, "STATE2USERINPUT"), // change back to lower28 when done (hasn't been tested yet)
-        STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEANDEXTEND"),
+        STATE1LOWERARM28(SINGLE_INSTANCE::lowerArm28, "STATE2USERINPUT"), // change back to lower28 when done (hasn't been tested yet)
+        STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEANDEXTEND"), // EVAN IT WORKS EVAN EVAN TEST B RO okike dokie
         STATE1RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE3USERINPUT"), 
         STATE3USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1OPENSOLENOID"),
         STATE1OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE4USERINPUT"),
         STATE4USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2RAISEANDEXTEND"), 
-        STATE2RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE5USERINPUT"),
+        STATE2RAISEANDEXTEND(SINGLE_INSTANCE::lowerArm28, "STATE5USERINPUT"),
         STATE5USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE6USERINPUT"),
         STATE6USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2LOWERARM28"),
-        STATE2LOWERARM28(SINGLE_INSTANCE::lowerArm28, "STATE7USERINPUT"),
+        STATE2LOWERARM28(SINGLE_INSTANCE::raiseAndExtend, "STATE7USERINPUT"),
         STATE7USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3RAISEANDEXTEND"), 
-        STATE3RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE8USERINPUT"), 
+        STATE3RAISEANDEXTEND(SINGLE_INSTANCE::lowerArm28, "STATE8USERINPUT"), 
         STATE8USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2OPENSOLENOID"),
         STATE2OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE9USERINPUT"),
         STATE9USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE4RAISEANDEXTEND"), 

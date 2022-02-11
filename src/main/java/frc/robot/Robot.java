@@ -114,11 +114,11 @@ public class Robot extends TimedRobot {
   }
 
   /** This function is called once when teleop is enabled. */
-  // @Override
-  // public void teleopInit() {
+  @Override
+  public void teleopInit() {
   //   SWERVEDRIVE.setToBrake();
   //   if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
-  // }
+  }
 
   /** This function is called periodically during operator control. */
   @Override
