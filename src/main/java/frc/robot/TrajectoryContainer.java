@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,6 +32,9 @@ public class TrajectoryContainer {
         );
 
         public static PathPlannerTrajectory heteroPath = PathPlanner.loadPath("FourBallAuto", 6, 2.5);
+        
+
+        double thing = heteroPath.getState(1).positionMeters;
 
         public static Trajectory jonahTrajectory = TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction

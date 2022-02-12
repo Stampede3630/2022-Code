@@ -1,74 +1,117 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
 public class Climber implements Loggable{
     @Log
-    boolean StateHasFinished;
+    boolean StateHasFinished = false;
     @Log
     Boolean StateHasInitialized = false;
     @Log
     String CurrentState = "";
     WPI_TalonFX climberTalon;
     DoubleSolenoid climberSolenoid;
-    
+ 
     boolean StartingStateOverride;
+    boolean atOrigin;
+    boolean upFive;
+    boolean tiltArms = false;
+    final double TICKSPERREVOLUTION=2048;
+    final double TICKSATTOP=239200;
+    final double INCHESATTOP=27;
+    final double TICKSPERINCH=TICKSATTOP/INCHESATTOP;
+    final int FULLEXTEND = 27;
+    final int HALFEXTEND = 12;
+    final int CLICKARMS = 5; // <-- place holder value, position to move climber arms down (in inches)
 
     private static Climber SINGLE_INSTANCE = new Climber();
     public static Climber getInstance() {
         return SINGLE_INSTANCE;
     }
     
-
     public void init(){
         climberTalon = new WPI_TalonFX(14);
-        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 6);
-    }
-
-    public void runClimberMotor(){
-        if (Robot.xbox.getPOV()==0){
-            climberTalon.set(ControlMode.PercentOutput, 0.1);
-        }
-        else if (Robot.xbox.getPOV()==180){
-            climberTalon.set(ControlMode.PercentOutput, -0.1);
-        }
-        else {
-            climberTalon.set(ControlMode.PercentOutput, 0);
-        }
-        }
-    
-
-    public void runClimberSolenoid(){
-        if (Robot.xbox.getPOV()==90){
-            climberSolenoid.set(Value.kForward);
-        } else if (Robot.xbox.getPOV()==270){
-            climberSolenoid.set(Value.kReverse);
-        }
-
+        climberTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
+        climberTalon.setSelectedSensorPosition(0,0,20);
+        climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
+        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
+        climberTalon.config_kP(0, 250, 20);
+        atOrigin = false;
+        upFive = false;
     }
 
     public void periodic() {
-        runClimberSolenoid();
-        runClimberMotor();
+        manualClimberSolenoid();
+        manualClimberMotor();
+        // solenoidController();
+        if(atOrigin){
+            climberRunner("");
+        } else{
+            reZero();
+        }
+        
     }
-    /*
-    public static enum ClimberState{ 
-        
-        
-        STATE1(SINGLE_INSTANCE::turnBlinker1On, "STATE2"), 
-        STATE2(SINGLE_INSTANCE::turnBlinker2On, "STATE3"), 
-        STATE3(SINGLE_INSTANCE::turnBlinker3On, "STATE4"), 
-        STATE4(SINGLE_INSTANCE::turnBlinker4On, "STATE5"), 
-        STATE5(SINGLE_INSTANCE::turnBlinker5On, "DONE"), 
-        DONE(SINGLE_INSTANCE::DoneAction, "DONE");  
+
+    public void manualClimberMotor(){
+        if (Robot.xbox.getPOV()==0){
+            raiseAndExtend();
+        }
+        else if (Robot.xbox.getPOV()==180){
+            lowerArm28();
+        }
+    }
+    
+    public void manualClimberSolenoid(){
+        if (Robot.xbox.getPOV()==90 ){ 
+           openSolenoid();
+        } else if (Robot.xbox.getPOV()==270 ){ 
+           closeSolenoid();
+        }
+    }
+
+    //// public void solenoidController() {
+    //     if (tiltArms) {
+    //         closeSolenoid();
+    //     } else {
+    //         openSolenoid();
+    //     }
+    // }
+
+    public enum ClimberState{
+        STATESTART(SINGLE_INSTANCE::getUserInput, "STATE1RAISEARM28"),
+        STATE1RAISEARM28(SINGLE_INSTANCE::openSolenoid, "STATECRINGERAISEARM28"), // change back to raise28 when done 
+        STATECRINGERAISEARM28(SINGLE_INSTANCE::raiseArm28, "STATE1USERINPUT"),
+        STATE1USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1LOWERARM28"), 
+        STATE1LOWERARM28(SINGLE_INSTANCE::lowerArm28, "STATE2USERINPUT"), // change back to lower28 when done (hasn't been tested yet)
+        STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEANDEXTEND"), // EVAN IT WORKS EVAN EVAN TEST B RO okike dokie
+        STATE1RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE3USERINPUT"), 
+        STATE3USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1OPENSOLENOID"),
+        STATE1OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE4USERINPUT"),
+        STATE4USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2RAISEANDEXTEND"), 
+        STATE2RAISEANDEXTEND(SINGLE_INSTANCE::lowerArm28, "STATE5USERINPUT"),
+        STATE5USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE6USERINPUT"),
+        STATE6USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2LOWERARM28"),
+        STATE2LOWERARM28(SINGLE_INSTANCE::raiseAndExtend, "STATE7USERINPUT"),
+        STATE7USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3RAISEANDEXTEND"), 
+        STATE3RAISEANDEXTEND(SINGLE_INSTANCE::openSolenoid, "STATE8USERINPUT"), 
+        STATE8USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2OPENSOLENOID"),
+        STATE2OPENSOLENOID(SINGLE_INSTANCE::lowerArm28, "STATE9USERINPUT"),
+        STATE9USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE4RAISEANDEXTEND"), 
+        STATE4RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE10USERINPUT"),
+        STATE10USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE11USERINPUT"),
+        STATE11USERINPUT(SINGLE_INSTANCE::openSolenoid, "STATE3LOWERARM28"),
+        STATE3LOWERARM28(SINGLE_INSTANCE::lowerArm28, "DONE"),
+        DONE(SINGLE_INSTANCE::DoneAction, "DONE");
 
         private Runnable action;
         private String nextState;
@@ -88,7 +131,7 @@ public class Climber implements Loggable{
     }
 
     public void climberRunner(String _startingState){
-        if (_startingState != "" || StartingStateOverride){
+        if (_startingState != "" && StartingStateOverride){
             CurrentState = _startingState;
             StartingStateOverride = false;
         } 
@@ -97,99 +140,92 @@ public class Climber implements Loggable{
             CurrentState = ClimberState.values()[0].toString();
         }
 
-        ClimberState.valueOf(CurrentState).getAction();
 
         //if we made one round with the state, we have successfully initialized
         if (!StateHasInitialized) {StateHasInitialized = true;}
-
+        ClimberState.valueOf(CurrentState).getAction().run();
         if (StateHasFinished){
             CurrentState = ClimberState.valueOf(CurrentState).getNextState();
             StateHasFinished = false; 
             StateHasInitialized = false;
         }
     }
-    */
-    @Log
-    Boolean blinker1 = false;
-    @Log
-    Boolean blinker2 = false;
-    @Log
-    Boolean blinker3 = false;
-    @Log
-    Boolean blinker4 = false;
-    @Log
-    Boolean blinker5 = false;
-/*
-    public void //raise arm by 28"(){
-        if(!//arm is not yet raised by 28"){
-            //operate talon;
-        }
 
-        if(//stop when {
-            //arm is raised 28 inches
+    public void reZero() { 
+
+    if (atOrigin == false && upFive == false) {
+        climberTalon.set(ControlMode.Position, 5);
+        if (climberTalon.getSelectedSensorPosition(0) == 5) {
+            upFive = true;
+        }
+    } else if (atOrigin == false && upFive == true) {
+        climberTalon.set(ControlMode.PercentOutput, -0.1);
+        if (climberTalon.getSelectedSensorVelocity(0) > -0.5 && climberTalon.getSelectedSensorPosition(0) < 2) {
+            atOrigin = true;
+            climberTalon.set(ControlMode.PercentOutput, 0);
+            climberTalon.setSelectedSensorPosition(0, 0, 20);
+        }
+    } 
+}
+
+    public void raiseAndExtend()  {
+        if (climberTalon.getSelectedSensorPosition(0) < 24) {
+            climberTalon.set(ControlMode.Position, 26);
+        } else if (climberTalon.getSelectedSensorPosition(0) >= 24) {
+            closeSolenoid();
+            climberTalon.set(ControlMode.Position, 27);
+            
+            if (climberTalon.getSelectedSensorPosition(0) >= 27) {
+                StateHasFinished = true;
+            }
+        }
+    }
+
+    public void raiseArm28() {
+        climberTalon.set(ControlMode.Position, 28);
+
+        if (climberTalon.getSelectedSensorPosition(0)>=28) {
             StateHasFinished  = true;
         }
     }
 
-    public void //lower arm by 28"(){
-        if(!arm is currently extened by 28"){
-            //operate talon ;
-        }
+    public void lowerArm28() {
+        climberTalon.set(ControlMode.Position, 1);
         
-        if(stop when{
-            arm has been lowered by 28"
+        if (climberTalon.getSelectedSensorPosition(0)<=2) {
             StateHasFinished = true;
         }
-        
     }
 
-    public void //raise arm by 14"(){
-        if(!if arm has yet to extend 14"){
-            operate talon ;
-        }
+    public void raiseArm14() {
+        climberTalon.set(ControlMode.Position, 14);
 
-        if(stop when{
-            arm has been raised by 14"
-            StateHasFinished =true; 
+        if (climberTalon.getSelectedSensorPosition(0)>=14) {
+            StateHasFinished =true;
         }
-        
     }
-*/
+
+    public void openSolenoid() {
+        climberSolenoid.set(Value.kForward);
+        tiltArms = true;
+        StateHasFinished = true;
+    }
     
-    
+    public void closeSolenoid() {
+        climberSolenoid.set(Value.kReverse);
+        tiltArms = false;
+        StateHasFinished = true;
 
+    }
 
-    /* public void myFirstAction(){
-        if(!StateHasInitialized){
-
+    public void getUserInput() {
+        if(Robot.xbox.getAButton()){
+            StateHasFinished =true;
         }
-        
-        //do more things
-
-        //exit conditions
-        if(true) {
-            StateHasFinished  = true;
-        }
-    }*/
+    }
 
     public void DoneAction() {
-        if(!StateHasInitialized){
-           
-        }
-        if (true) {
-            blinker1 = !blinker1;
-            blinker2 = !blinker2;
-            blinker3 = !blinker3;
-            blinker4 = !blinker4;
-            blinker5 = !blinker5;
-           
-        }
-        
-
     } 
-
-
-    
 
     
 }

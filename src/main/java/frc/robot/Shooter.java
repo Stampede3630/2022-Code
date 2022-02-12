@@ -9,7 +9,7 @@ import io.github.oblarg.oblog.annotations.Config;
 
 public class Shooter implements Loggable {
     private static Shooter instance;
-    private static double shooterSpeed = 20000;
+    private static double shooterSpeed = 5000;
     private static WPI_TalonFX shooterDrive;
 
     static {
@@ -25,17 +25,25 @@ public class Shooter implements Loggable {
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
 
         shooterDrive.config_kF(0,
-            1023*0.75/18000, 20);
+            1023*0.94/18000, 20);
 
         shooterDrive.config_kP(0,
-            0.05686333, 20);
+            0.075, 20);
+    }
+
+    public boolean shooterAtSpeed(){
+        if (shooterDrive.getSelectedSensorVelocity(0) >= shooterSpeed){ //checks if the shooter is spinning fast enough to shoot *see intake file*
+            return true;
+        } else {
+            return false;
+        }
+        
     }
 
     public void shoot() {
-        double targetVelocity_UnitsPer100ms = shooterSpeed;
 
         if (Robot.xbox.getLeftTriggerAxis() > 0) {
-            shooterDrive.set(ControlMode.Velocity, targetVelocity_UnitsPer100ms);
+            shooterDrive.set(ControlMode.Velocity, shooterSpeed);
 
         } else {
             shooterDrive.set(0);
