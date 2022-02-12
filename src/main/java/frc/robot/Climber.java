@@ -73,9 +73,9 @@ public class Climber implements Loggable{
     
     public void manualClimberSolenoid(){
         if (Robot.xbox.getPOV()==90 ){ 
-           tiltArms = false;
+           openSolenoid();
         } else if (Robot.xbox.getPOV()==270 ){ 
-           tiltArms = true;
+           closeSolenoid();
         }
     }
 
@@ -103,13 +103,13 @@ public class Climber implements Loggable{
         STATE6USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2LOWERARM28"),
         STATE2LOWERARM28(SINGLE_INSTANCE::raiseAndExtend, "STATE7USERINPUT"),
         STATE7USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3RAISEANDEXTEND"), 
-        STATE3RAISEANDEXTEND(SINGLE_INSTANCE::lowerArm28, "STATE8USERINPUT"), 
+        STATE3RAISEANDEXTEND(SINGLE_INSTANCE::openSolenoid, "STATE8USERINPUT"), 
         STATE8USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2OPENSOLENOID"),
-        STATE2OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE9USERINPUT"),
+        STATE2OPENSOLENOID(SINGLE_INSTANCE::lowerArm28, "STATE9USERINPUT"),
         STATE9USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE4RAISEANDEXTEND"), 
         STATE4RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE10USERINPUT"),
         STATE10USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE11USERINPUT"),
-        STATE11USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3LOWERARM28"),
+        STATE11USERINPUT(SINGLE_INSTANCE::openSolenoid, "STATE3LOWERARM28"),
         STATE3LOWERARM28(SINGLE_INSTANCE::lowerArm28, "DONE"),
         DONE(SINGLE_INSTANCE::DoneAction, "DONE");
 

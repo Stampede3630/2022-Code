@@ -1,24 +1,85 @@
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
+import io.github.oblarg.oblog.annotations.Log;
+
+
 
 public class AutoContainer implements Loggable {
-    
+    @Log
+    boolean StateHasFinished = false;
+    @Log
+    Boolean StateHasInitialized = false;
+    @Log
+    String CurrentState = "";
+    boolean StartingStateOverride;
+    SwerveDriveOdometry a_odometry;
+
     private static AutoContainer SINGLE_INSTANCE = new AutoContainer();
 
     public static AutoContainer getInstance() {
         return SINGLE_INSTANCE;
     }
 
-    // waypoint 1: x = 
-    // waypoint 2:
-    // waypoint 3:
-    // waypoint 4:
-    // waypoint 5:
-    // waypoint 6:
+    // waypoint 1: x = 8.37, y = 5.43
+    // waypoint 2: x = 8.89, y = 7.79
+    // waypoint 3: x = 8.81, y = 5.32
+    // waypoint 4: x = 11.23, y = 6.18
+    // waypoint 5: x = 15.11, y = 6.97
+    // waypoint 6: x = 9.16, y = 5.23
+
+
     public enum AutoState {
+        STATEAUTOSTART(SINGLE_INSTANCE::bruh, "gruh"),
+        gruh(SINGLE_INSTANCE::bruh, "gruh");
         
+        private Runnable action;
+        private String nextState;
+
+        AutoState(Runnable _action, String _nextState){
+            action = _action;
+            nextState = _nextState;
+        }
+
+        public Runnable getAction() {
+            return action;
+        }
+
+        public String getNextState() {
+            return nextState;
+        }
+    }
+
+    public void autoRunner(String _startingState){
+        if (_startingState != "" && StartingStateOverride){
+            CurrentState = _startingState;
+            StartingStateOverride = false;
+        } 
+       
+        if (CurrentState == "") {
+            CurrentState = AutoState.values()[0].toString();
+        }
+
+
+        //if we made one round with the state, we have successfully initialized
+        if (!StateHasInitialized) {StateHasInitialized = true;}
+        AutoState.valueOf(CurrentState).getAction().run();
+        if (StateHasFinished){
+            CurrentState = AutoState.valueOf(CurrentState).getNextState();
+            StateHasFinished = false; 
+            StateHasInitialized = false;
+        }
+    }
+
+    public void bruh() {
+        
+    }
+
+    private void intake() {
+        
+        //x = 8.89, y = 7.79
     }
 
     @Config.ToggleButton(name="Field Position 1", defaultValue = false, rowIndex = 1, columnIndex = 1, height = 1, width = 2)
