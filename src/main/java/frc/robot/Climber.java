@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -37,6 +38,7 @@ public class Climber implements Loggable{
 
     public static DigitalInput climberHomeLeft;
     public static DigitalInput climberHomeRight;
+    
 
     private static Climber SINGLE_INSTANCE = new Climber();
     public static Climber getInstance() {
@@ -51,7 +53,7 @@ public class Climber implements Loggable{
         climberTalon.setSelectedSensorPosition(0,0,20);
         climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
         climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
-        climberTalon.config_kP(0, 250, 20);
+        climberTalon.config_kP(0, 500, 20);
         atOrigin = false;
         upOne = false;
 
@@ -67,16 +69,21 @@ public class Climber implements Loggable{
             climberRunner("");
         } else{
             reZero();
+           
         }
         
     }
 
     public void manualClimberMotor(){
         if (Robot.xbox.getPOV()==0){
-            raiseAndExtend();
+            //raiseAndExtend();
+            climberTalon.set(ControlMode.PercentOutput, 0.3);
         }
         else if (Robot.xbox.getPOV()==180){
-            lowerArm28();
+            //lowerArm28();
+            climberTalon.set(ControlMode.PercentOutput, -0.3);
+        } else {
+            climberTalon.set(ControlMode.PercentOutput, 0);
         }
     }
     
@@ -179,7 +186,7 @@ public class Climber implements Loggable{
     public void raiseAndExtend()  {
         if (climberTalon.getSelectedSensorPosition(0) < 8) {
             climberTalon.set(ControlMode.Position, 10);
-            closeSolenoid();
+            climberSolenoid.set(Value.kReverse);
         } else if (climberTalon.getSelectedSensorPosition(0) >= 8) {
             climberTalon.set(ControlMode.Position, 27);
             
@@ -247,4 +254,8 @@ public class Climber implements Loggable{
     public boolean getClimberHomeRight() {
       return climberHomeRight.get();
     }
+    @Log
+    public double getClimberTalonPosition() {
+      return climberTalon.getSelectedSensorPosition();
+}
 }
