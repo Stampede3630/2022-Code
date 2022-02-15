@@ -23,6 +23,8 @@ public class Intake implements Loggable {
   private static DigitalInput bottomLimitSwitch;
   private static DigitalInput topLimitSwitch;
   private static boolean cargoInTransit = false;
+  public static boolean intakeNow = false;
+  public static boolean shootNow = false;
 
   public static Intake getInstance() {
       return SINGLE_INSTANCE;
@@ -44,7 +46,7 @@ public class Intake implements Loggable {
   }
 
   private void intake() {
-    if (Robot.xbox.getRightTriggerAxis() > 0) {   //right trigger held --> intake goes down and spins intake motor
+    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {   //right trigger held --> intake goes down and spins intake motor
       intakeSolenoid.set(Value.kReverse);
       intakeDrive.set(ControlMode.PercentOutput, .3);
 
@@ -55,8 +57,8 @@ public class Intake implements Loggable {
   }
 
   private void shootIndexManager() {
-    if (Robot.SHOOTER.shooterAtSpeed() && Robot.xbox.getLeftTriggerAxis() > 0) {  //once shooter gets up to speed AND left trigger held, balls fed to shooter
-      if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) {
+    if ((Robot.SHOOTER.shooterAtSpeed() && Robot.xbox.getLeftTriggerAxis() > 0) || shootNow) {  //once shooter gets up to speed AND left trigger held, balls fed to shooter
+      if ((!bottomLimitSwitch.get() && !topLimitSwitch.get()) || shootNow) {
         indexTop.set(ControlMode.PercentOutput, 0.2); //if there's only one ball being shot
       } else {
         indexTop.set(ControlMode.PercentOutput, 0.2); //if two balls are being shot

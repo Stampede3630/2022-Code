@@ -31,10 +31,8 @@ public class TrajectoryContainer {
             config
         );
 
-        public static PathPlannerTrajectory heteroPath = PathPlanner.loadPath("FourBallAuto", 6, 2.5);
+        public static PathPlannerTrajectory heteroPath = PathPlanner.loadPath("blueAutoTest", 1.5, 2.5);
         
-
-        double thing = heteroPath.getState(1).positionMeters;
 
         public static Trajectory jonahTrajectory = TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction

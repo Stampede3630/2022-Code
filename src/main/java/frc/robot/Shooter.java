@@ -42,7 +42,7 @@ public class Shooter implements Loggable {
 
     public void shoot() {
 
-        if (Robot.xbox.getLeftTriggerAxis() > 0) {
+        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed);
 
         } else {

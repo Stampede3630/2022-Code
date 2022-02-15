@@ -11,7 +11,7 @@ public class Constants {
     public static final double MAX_SPEED_TICKSper100MS = 21900;
     public static final double STEERING_MOTOR_GEARING = 12.8;
     public static final double DRIVE_MOTOR_GEARING = 6.86;
-    public static final double SPEED_GOVERNOR =.11; //.11 is a good safe start. Unlock it to "1" when you're confident with the robot
+    public static final double SPEED_GOVERNOR =.51; //.11 is a good safe start. Unlock it to "1" when you're confident with the robot
     public static final double TRACK_WIDE = 24 * 2.54/100;
     
     
@@ -28,10 +28,10 @@ public class Constants {
     public static final int BLDriveID = 6;
 
     //Swerve Steer Motor IDs
-    public static final int FRSteerID = 9;
-    public static final int FLSteerID =5;
-    public static final int BRSteerID = 11;
-    public static final int BLSteerID = 7;
+    public static final int FRSteerID = 7;
+    public static final int FLSteerID = 5;
+    public static final int BRSteerID = 9;
+    public static final int BLSteerID = 11;
 
     //Swerve CANCoder Sensor IDs
     public static final int FRSensorID = 2;
@@ -43,10 +43,10 @@ public class Constants {
     //CHANGE TO 0 first, reset the sensor, 
     //PHYSICALLY zero out the motor 
     //place the OPPOSITE of the value
-    public static double FRSensorOffset = -66.182;
-    public static double FLSensorOffset = -37.002;
-    public static double BRSensorOffset = -67.236;
-    public static double BLSensorOffset = 37.266;
+    public static double FRSensorOffset = -72.598;
+    public static double FLSensorOffset = -36.035;
+    public static double BRSensorOffset = -66.533;
+    public static double BLSensorOffset = 37.529;
 
 
     //Give a positive input on the joystick or phoenix tuner
