@@ -52,8 +52,8 @@ public class Robot extends TimedRobot {
      SWERVEDRIVE.zeroSwerveDrive();
 
     //**Intake method starts here**
-    INTAKE = Intake.getInstance();
-    INTAKE.init();
+    // INTAKE = Intake.getInstance();
+    // INTAKE.init();
 
     //*** Auto Container method starts here***
     AUTOCONTAINER = AutoContainer.getInstance();
@@ -63,9 +63,9 @@ public class Robot extends TimedRobot {
     SHOOTER = Shooter.getInstance();
     SHOOTER.init();
 
-    // *****test climber method starts here*****
-    CLIMBER = Climber.getInstance();
-    CLIMBER.init();
+    // // *****test climber method starts here*****
+    // CLIMBER = Climber.getInstance();
+    // CLIMBER.init();
 
 
     // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
@@ -140,7 +140,7 @@ public class Robot extends TimedRobot {
     //CLIMBER.periodic();
 
      
-    INTAKE.intakePeriodic();
+    // INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
     SHOOTER.shoot();
       
