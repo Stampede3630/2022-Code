@@ -1,10 +1,14 @@
 package frc.robot;
 
+import javax.lang.model.element.VariableElement;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
+import io.github.oblarg.oblog.annotations.Config.ToggleButton;
 
 public class AutoWaypoints implements Loggable {
 
@@ -31,6 +35,53 @@ public class AutoWaypoints implements Loggable {
     String CurrentState = "";
     boolean StartingStateOverride;
     SwerveDriveOdometry a_odometry;
+
+    String _startPoint;
+    String CurrentStartPoint;
+
+
+    public enum AutoPoses {
+        STARTINGPOINTFBA(7.80, 1.68, 0.00, "STARTINGPOINTFBA");
+
+
+        private double thisX;
+        private double thisY;
+        private double thisRot;
+        private String thisStartPoint;
+
+        AutoPoses(double _x, double _y, double _rot, String _startPoint){
+            thisX = _x;
+            thisY = _y;
+            thisRot = _rot;
+            thisStartPoint = _startPoint;
+        }
+
+        public double getThisX(){
+            return thisX;
+        }
+
+        public double getThisY(){
+            return thisY;
+        }
+        public double getThisRot(){
+            return thisRot;
+        }
+
+        public String getStartPoint(){
+            return thisStartPoint;
+        }
+
+    }
+
+    public void startPointRunner(String _startPoint){
+        if(_startPoint != ""){
+            CurrentStartPoint = _startPoint;
+        }
+        if (CurrentStartPoint == "") {
+            CurrentStartPoint = AutoPoses.values()[0].toString();
+        }
+
+    }
 
     public enum AutoState {
         STARTSTATE(SINGLE_INSTANCE::amritUwU, "BALL1TRANSITION"),
@@ -136,5 +187,16 @@ public class AutoWaypoints implements Loggable {
         double distance = Math.sqrt(Math.pow((newX - currentX), 2) + Math.pow((newY - currentY), 2));
         return distance;
     }
+ 
     
+    @Config.ToggleButton(name = "Four Ball Auto", defaultValue = false)
+    public void fbaStartButton(boolean _input, double thisX, double thisY, double thisRot){
+        if(_input){
+            _startPoint = "STARTINGPOINTFBA";
+            Robot.SWERVEDRIVE.holdRobotAngleSetpoint = thisRot;
+            currentX = thisX;
+            currentY = thisY;
+            _input = false;
+        }
+    }
 }
