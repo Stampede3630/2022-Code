@@ -8,16 +8,13 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 
 public class Shooter implements Loggable {
-    private static Shooter instance;
-    private static double shooterSpeed = 5000;
-    private static WPI_TalonFX shooterDrive;
+    private static Shooter SINGLE_INSTANCE = new Shooter();
+    private double shooterSpeed = 5000;
+    private WPI_TalonFX shooterDrive;
 
-    static {
-        instance = new Shooter();
-    }
 
     public static Shooter getInstance() {
-        return instance;
+        return SINGLE_INSTANCE;
     }
 
     public void init() {  //TEST!!!!!
@@ -41,10 +38,8 @@ public class Shooter implements Loggable {
     }
 
     public void shoot() {
-
         if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed);
-
         } else {
             shooterDrive.set(0);
         }

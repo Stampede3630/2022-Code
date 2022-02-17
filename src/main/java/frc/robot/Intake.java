@@ -14,17 +14,17 @@ public class Intake implements Loggable {
   
   private static Intake SINGLE_INSTANCE = new Intake();
   
-  private static WPI_TalonFX intakeDrive;
-  private static WPI_TalonFX indexBottom;
-  private static WPI_TalonFX indexTop;
-  private static DoubleSolenoid intakeSolenoid;
+  private WPI_TalonFX intakeDrive;
+  private WPI_TalonFX indexBottom;
+  private WPI_TalonFX indexTop;
+  private DoubleSolenoid intakeSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
-  private static DigitalInput bottomLimitSwitch;
-  private static DigitalInput topLimitSwitch;
-  private static boolean cargoInTransit = false;
-  public static boolean intakeNow = false;
-  public static boolean shootNow = false;
+  private DigitalInput bottomLimitSwitch;
+  private DigitalInput topLimitSwitch;
+  private boolean cargoInTransit = false;
+  public boolean intakeNow = false;
+  public boolean shootNow = false;
 
   public static Intake getInstance() {
       return SINGLE_INSTANCE;
@@ -74,13 +74,11 @@ public class Intake implements Loggable {
         case "1 Ball": //hold the ball at the top of tower
           indexBottom.set(ControlMode.PercentOutput, 0.1);
           indexTop.set(ControlMode.PercentOutput, 0);
-          // shootIndexManager();
           break;
 
         case "2 Balls": //indexer full
           indexBottom.set(ControlMode.PercentOutput, 0); 
           indexTop.set(ControlMode.PercentOutput, 0);
-          // shootIndexManager();
           break;
 
         case "Cargo in Transit":  //bring ball from intake to top of tower

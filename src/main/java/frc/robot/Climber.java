@@ -36,8 +36,8 @@ public class Climber implements Loggable{
     final int HALFEXTEND = 12;
     final int CLICKARMS = 5; // <-- place holder value, position to move climber arms down (in inches)
 
-    public static DigitalInput climberHomeLeft;
-    public static DigitalInput climberHomeRight;
+    public DigitalInput climberHomeLeft;
+    public DigitalInput climberHomeRight;
     
 
     private static Climber SINGLE_INSTANCE = new Climber();
@@ -74,20 +74,18 @@ public class Climber implements Loggable{
         
     }
 
-    public void manualClimberMotor(){
+    private void manualClimberMotor(){
         if (Robot.xbox.getPOV()==0){
-            //raiseAndExtend();
             climberTalon.set(ControlMode.PercentOutput, 0.3);
         }
         else if (Robot.xbox.getPOV()==180){
-            //lowerArm28();
             climberTalon.set(ControlMode.PercentOutput, -0.3);
         } else {
             climberTalon.set(ControlMode.PercentOutput, 0);
         }
     }
     
-    public void manualClimberSolenoid(){
+    private void manualClimberSolenoid(){
         if (Robot.xbox.getPOV()==90 ){ 
            openSolenoid();
         } else if (Robot.xbox.getPOV()==270 ){ 
@@ -95,38 +93,30 @@ public class Climber implements Loggable{
         }
     }
 
-    //// public void solenoidController() {
-    //     if (tiltArms) {
-    //         closeSolenoid();
-    //     } else {
-    //         openSolenoid();
-    //     }
-    // }
-
     public enum ClimberState{
-        STATESTART(SINGLE_INSTANCE::getUserInput, "STATE1RAISEARM28"),
-        STATE1RAISEARM28(SINGLE_INSTANCE::openSolenoid, "STATECRINGERAISEARM28"), // change back to raise28 when done 
-        STATECRINGERAISEARM28(SINGLE_INSTANCE::raiseArm28, "STATE1USERINPUT"),
-        STATE1USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1LOWERARM28"), 
-        STATE1LOWERARM28(SINGLE_INSTANCE::lowerArm28, "STATE2USERINPUT"), // change back to lower28 when done (hasn't been tested yet)
-        STATE2USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1RAISEANDEXTEND"), // EVAN IT WORKS EVAN EVAN TEST B RO okike dokie
-        STATE1RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE3USERINPUT"), 
-        STATE3USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE1OPENSOLENOID"),
-        STATE1OPENSOLENOID(SINGLE_INSTANCE::openSolenoid, "STATE4USERINPUT"),
-        STATE4USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2RAISEANDEXTEND"), 
-        STATE2RAISEANDEXTEND(SINGLE_INSTANCE::lowerArm28, "STATE5USERINPUT"),
-        STATE5USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE6USERINPUT"),
-        STATE6USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2LOWERARM28"),
-        STATE2LOWERARM28(SINGLE_INSTANCE::raiseAndExtend, "STATE7USERINPUT"),
-        STATE7USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE3RAISEANDEXTEND"), 
-        STATE3RAISEANDEXTEND(SINGLE_INSTANCE::openSolenoid, "STATE8USERINPUT"), 
-        STATE8USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE2OPENSOLENOID"),
-        STATE2OPENSOLENOID(SINGLE_INSTANCE::lowerArm28, "STATE9USERINPUT"),
-        STATE9USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE4RAISEANDEXTEND"), 
-        STATE4RAISEANDEXTEND(SINGLE_INSTANCE::raiseAndExtend, "STATE10USERINPUT"),
-        STATE10USERINPUT(SINGLE_INSTANCE::getUserInput, "STATE11USERINPUT"),
-        STATE11USERINPUT(SINGLE_INSTANCE::openSolenoid, "STATE3LOWERARM28"),
-        STATE3LOWERARM28(SINGLE_INSTANCE::lowerArm28, "DONE"),
+        START(SINGLE_INSTANCE::getUserInput, "OPENSOLENOID1"),
+        OPENSOLENOID1(SINGLE_INSTANCE::openSolenoid, "RAISEARM1"), // change back to raise28 when done 
+        RAISEARM1(SINGLE_INSTANCE::raiseArm28, "USERINPUT1"),
+        USERINPUT1(SINGLE_INSTANCE::getUserInput, "LOWERARM1"), 
+        LOWERARM1(SINGLE_INSTANCE::lowerArm28, "USERINPUT2"), // change back to lower28 when done (hasn't been tested yet)
+        USERINPUT2(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND1"), 
+        RAISEANDEXTEND1(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT3"), 
+        USERINPUT3(SINGLE_INSTANCE::getUserInput, "OPENSOLENOID2"),
+        OPENSOLENOID2(SINGLE_INSTANCE::openSolenoid, "USERINPUT4"),
+        USERINPUT4(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND2"), 
+        RAISEANDEXTEND2(SINGLE_INSTANCE::lowerArm28, "USERINPUT5"),
+        USERINPUT5(SINGLE_INSTANCE::getUserInput, "USERINPUT6"),
+        USERINPUT6(SINGLE_INSTANCE::getUserInput, "LOWERARM2"),
+        LOWERARM2(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT7"),
+        USERINPUT7(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND3"), 
+        RAISEANDEXTEND3(SINGLE_INSTANCE::openSolenoid, "USERINPUT8"), 
+        USERINPUT8(SINGLE_INSTANCE::getUserInput, "OPENSOLENOID3"),
+        OPENSOLENOID3(SINGLE_INSTANCE::lowerArm28, "USERINPUT9"),
+        USERINPUT9(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND4"), 
+        RAISEANDEXTEND4(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT10"),
+        USERINPUT10(SINGLE_INSTANCE::getUserInput, "USERINPUT11"),
+        USERINPUT11(SINGLE_INSTANCE::openSolenoid, "LOWERARM3"),
+        LOWERARM3(SINGLE_INSTANCE::lowerArm28, "DONE"),
         DONE(SINGLE_INSTANCE::DoneAction, "DONE");
 
         private Runnable action;
