@@ -14,15 +14,17 @@ public class Intake implements Loggable {
   
   private static Intake SINGLE_INSTANCE = new Intake();
   
-  private static WPI_TalonFX intakeDrive;
-  private static WPI_TalonFX indexBottom;
-  private static WPI_TalonFX indexTop;
-  private static DoubleSolenoid intakeSolenoid;
+  private WPI_TalonFX intakeDrive;
+  private WPI_TalonFX indexBottom;
+  private WPI_TalonFX indexTop;
+  private DoubleSolenoid intakeSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
-  private static DigitalInput bottomLimitSwitch;
-  private static DigitalInput topLimitSwitch;
-  private static boolean cargoInTransit = false;
+  private DigitalInput bottomLimitSwitch;
+  private DigitalInput topLimitSwitch;
+  private boolean cargoInTransit = false;
+  public boolean intakeNow = false;
+  public boolean shootNow = false;
 
   public static Intake getInstance() {
       return SINGLE_INSTANCE;
@@ -44,7 +46,7 @@ public class Intake implements Loggable {
   }
 
   private void intake() {
-    if (Robot.xbox.getRightTriggerAxis() > 0) {   //right trigger held --> intake goes down and spins intake motor
+    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {   //right trigger held --> intake goes down and spins intake motor
       intakeSolenoid.set(Value.kReverse);
       intakeDrive.set(ControlMode.PercentOutput, .3);
 
@@ -55,8 +57,8 @@ public class Intake implements Loggable {
   }
 
   private void shootIndexManager() {
-    if (Robot.SHOOTER.shooterAtSpeed() && Robot.xbox.getLeftTriggerAxis() > 0) {  //once shooter gets up to speed AND left trigger held, balls fed to shooter
-      if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) {
+    if ((Robot.SHOOTER.shooterAtSpeed() && Robot.xbox.getLeftTriggerAxis() > 0) || shootNow) {  //once shooter gets up to speed AND left trigger held, balls fed to shooter
+      if ((!bottomLimitSwitch.get() && !topLimitSwitch.get()) || shootNow) {
         indexTop.set(ControlMode.PercentOutput, 0.2); //if there's only one ball being shot
       } else {
         indexTop.set(ControlMode.PercentOutput, 0.2); //if two balls are being shot
@@ -72,13 +74,11 @@ public class Intake implements Loggable {
         case "1 Ball": //hold the ball at the top of tower
           indexBottom.set(ControlMode.PercentOutput, 0.1);
           indexTop.set(ControlMode.PercentOutput, 0);
-          // shootIndexManager();
           break;
 
         case "2 Balls": //indexer full
           indexBottom.set(ControlMode.PercentOutput, 0); 
           indexTop.set(ControlMode.PercentOutput, 0);
-          // shootIndexManager();
           break;
 
         case "Cargo in Transit":  //bring ball from intake to top of tower

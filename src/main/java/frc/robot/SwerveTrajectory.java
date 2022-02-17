@@ -24,6 +24,8 @@ public class SwerveTrajectory implements Loggable {
     private static String trajectoryStatus="";
     private static SwerveTrajectory SINGLE_INSTANCE = new SwerveTrajectory();    
 
+    public static double elapsedTime;
+
     public static SwerveTrajectory getInstance(){
         return SINGLE_INSTANCE;
     }
@@ -39,34 +41,7 @@ public class SwerveTrajectory implements Loggable {
      * @param _odometry Pass in the robots odometry from SwerveDrive.java
      * @param _rotation2d Pass in the current angle of the robot
      */
-    public static void trajectoryRunner(Trajectory _trajectory, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
-        double elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
-        switch (trajectoryStatus) {
-            case "setup":
-                Robot.SWERVEDRIVE.resetGyroAndOdometry(true); 
-                timetrajectoryStarted = Timer.getFPGATimestamp();
-                trajectoryStatus = "execute";
-                break;
-            case "execute":
-                if (elapsedTime <_trajectory.getTotalTimeSeconds()){
-                    ChassisSpeeds _speeds = HDC.calculate(
-                        _odometry.getPoseMeters(), 
-                        _trajectory.sample(elapsedTime),_rotation2d);
-                    Robot.SWERVEDRIVE.drive(_speeds.vxMetersPerSecond,
-                    _speeds.vyMetersPerSecond, 
-                    _speeds.omegaRadiansPerSecond,false);
-                    
-                } else {
-                    Robot.SWERVEDRIVE.drive(0,0,0,false);
-                    trajectoryStatus = "done";
 
-                }
-                break;
-            default:
-                Robot.SWERVEDRIVE.drive(0,0,0,false);
-                break;
-        }
-    }
 
 
     //Overload this method to accomdate different starting points, this can be useful when playing with multiple paths
@@ -77,7 +52,7 @@ public class SwerveTrajectory implements Loggable {
      * @param _rotation2d Pass in the current angle of the robot
      */
     public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
-        double elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
+        elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
         switch (trajectoryStatus) {
             case "setup":
                 Robot.SWERVEDRIVE.resetOdometry(((PathPlannerState) _pathTraj.getInitialState()).poseMeters, ((PathPlannerState) _pathTraj.getInitialState()).poseMeters.getRotation()); 

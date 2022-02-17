@@ -19,6 +19,8 @@ public class AutoContainer implements Loggable {
 
     private static AutoContainer SINGLE_INSTANCE = new AutoContainer();
 
+    private double stateStartTime;
+
     public static AutoContainer getInstance() {
         return SINGLE_INSTANCE;
     }
@@ -32,8 +34,17 @@ public class AutoContainer implements Loggable {
 
 
     public enum AutoState {
-        STATEAUTOSTART(SINGLE_INSTANCE::bruh, "gruh"),
-        gruh(SINGLE_INSTANCE::bruh, "gruh");
+        STATEAUTOSTART(SINGLE_INSTANCE::bruh, "TIMETOBALL1"),
+        TIMETOBALL1(SINGLE_INSTANCE::bruh, "INTAKEBALL1"),
+        INTAKEBALL1(SINGLE_INSTANCE::intake, "TIMEBACKTOHUB1"),
+        TIMEBACKTOHUB1(SINGLE_INSTANCE::bruh, "SHOOT1"),
+        SHOOT1(SINGLE_INSTANCE::shoot, "TIMETOBALL3"),
+        TIMETOBALL3(SINGLE_INSTANCE::bruh, "INTAKEBALL3"),
+        INTAKEBALL3(SINGLE_INSTANCE::intake, "TIMETOBALL4"),
+        TIMETOBALL4(SINGLE_INSTANCE::bruh, "INTAKEBALL4"),
+        INTAKEBALL4(SINGLE_INSTANCE::intake, "TIMEBACKTOHUB2"),
+        TIMEBACKTOHUB2(SINGLE_INSTANCE::bruh, "SHOOT2"),
+        SHOOT2(SINGLE_INSTANCE::shoot, "SHOOT2");
         
         private Runnable action;
         private String nextState;
@@ -64,8 +75,8 @@ public class AutoContainer implements Loggable {
 
 
         //if we made one round with the state, we have successfully initialized
-        if (!StateHasInitialized) {StateHasInitialized = true;}
         AutoState.valueOf(CurrentState).getAction().run();
+        if (!StateHasInitialized) {StateHasInitialized = true;}
         if (StateHasFinished){
             CurrentState = AutoState.valueOf(CurrentState).getNextState();
             StateHasFinished = false; 
@@ -74,13 +85,43 @@ public class AutoContainer implements Loggable {
     }
 
     public void bruh() {
-        
+        if(!StateHasInitialized){
+            stateStartTime = Robot.SWERVETRAJECTORY.elapsedTime;
+
+        }
+        if(Robot.SWERVETRAJECTORY.elapsedTime - stateStartTime > 2){
+            StateHasFinished = true;
+        }
+    }
+    @Log
+    private double autoElapsedTime(){
+        return Robot.SWERVETRAJECTORY.elapsedTime;
     }
 
     private void intake() {
-        
-        //x = 8.89, y = 7.79
+        if(!StateHasInitialized){
+            stateStartTime = Robot.SWERVETRAJECTORY.elapsedTime;
+            Robot.INTAKE.intakeNow = true;
+
+        }
+        if(Robot.SWERVETRAJECTORY.elapsedTime - stateStartTime > 2){
+            StateHasFinished = true;
+            Robot.INTAKE.intakeNow = false;
+        }
     }
+
+    private void shoot(){
+        if(!StateHasInitialized){
+            stateStartTime = Robot.SWERVETRAJECTORY.elapsedTime;
+            Robot.INTAKE.shootNow = true;
+
+        }
+        if(Robot.SWERVETRAJECTORY.elapsedTime - stateStartTime > 2){
+            StateHasFinished = true;
+            Robot.INTAKE.shootNow = false;
+        }
+    }
+
 
     @Config.ToggleButton(name="Field Position 1", defaultValue = false, rowIndex = 1, columnIndex = 1, height = 1, width = 2)
     private static void fieldPosition1(boolean pos1) {

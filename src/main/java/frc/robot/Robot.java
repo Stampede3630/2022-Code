@@ -24,16 +24,17 @@ import io.github.oblarg.oblog.Logger;
 public class Robot extends TimedRobot {
   public static final boolean CHARACTERIZE_ROBOT = true;
   public static final boolean RUN_TRAJECTORY = true;
-  public static SwerveDrive SWERVEDRIVE;
 
+  public static SwerveDrive SWERVEDRIVE;
   public static AutoContainer AUTOCONTAINER;
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
-
-  public static SwerveCharacterization SWERVERCHARACTERIZATION;
+  public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
+
   public static XboxController xbox = new XboxController(0);
+
   // public static PathPlannerTrajectory examplePath; 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -41,19 +42,19 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
-    SwerveMap.driveRobotInit();
-    SwerveMap.GYRO.reset();
+     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+     SwerveMap.driveRobotInit();
+     SwerveMap.GYRO.reset();
     // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
 
     //*Swerve method starts here*
-    SWERVEDRIVE = SwerveDrive.getInstance();
-    SWERVEDRIVE.init();
-    SWERVEDRIVE.zeroSwerveDrive();
+     SWERVEDRIVE = SwerveDrive.getInstance();
+     SWERVEDRIVE.init();
+     SWERVEDRIVE.zeroSwerveDrive();
 
     //**Intake method starts here**
-    INTAKE = Intake.getInstance();
-    INTAKE.init();
+    // INTAKE = Intake.getInstance();
+    // INTAKE.init();
 
     //*** Auto Container method starts here***
     AUTOCONTAINER = AutoContainer.getInstance();
@@ -63,12 +64,12 @@ public class Robot extends TimedRobot {
     SHOOTER = Shooter.getInstance();
     SHOOTER.init();
 
-    // *****test climber method starts here*****
-    CLIMBER = Climber.getInstance();
-    CLIMBER.init();
+    // // *****test climber method starts here*****
+    // CLIMBER = Climber.getInstance();
+    // CLIMBER.init();
 
 
-    // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
+
     // if(RUN_TRAJECTORY) {
       // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
       // examplePath = PathPlanner.loadPath("New Path", 1, .8);
@@ -88,29 +89,26 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    // SWERVEDRIVE.updateOdometry();
+     SWERVEDRIVE.updateOdometry();
     Logger.updateEntries();
   }
 
   @Override
   public void autonomousInit() {
-    // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
-    // SWERVEDRIVE.setToBrake();
+     SWERVEDRIVE.setToBrake();
 
     // For Trajectory instructions go to SwerverTrajectory.java
-    // if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
+     if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
 
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.periodic();}
     
-    
+    AUTOCONTAINER.autoRunner("");
     if(RUN_TRAJECTORY){
-    SwerveTrajectory.trajectoryRunner(TrajectoryContainer.jonahTrajectory, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
-    SwerveTrajectory.PathPlannerRunner(TrajectoryContainer.heteroPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     }
   }
 
@@ -118,7 +116,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     SWERVEDRIVE.setToBrake();
-    if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
   }
 
   /** This function is called periodically during operator control. */
@@ -126,26 +123,14 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Joystick Drives stores values in X,Y,Z rotation
     // Drive actually sends those values to the swerve modules
-    SWERVEDRIVE.joystickDrive();
-    SWERVEDRIVE.drive(
-      SWERVEDRIVE.getSDxSpeed(), 
-      SWERVEDRIVE.getSDySpeed(), 
-      SWERVEDRIVE.getSDRotation(), 
-      SWERVEDRIVE.getSDFieldRelative());
+    SWERVEDRIVE.swervePeriodic();
       //intake code for teleop
-
-     
-
 
     CLIMBER.periodic();
 
-     
     INTAKE.intakePeriodic();
-    //SHOOTER INSTANCE LOOP
+    // SHOOTER INSTANCE LOOP
     SHOOTER.shoot();
-      
-
-    
   }
 
   /** This function is called once when the robot is disabled. */

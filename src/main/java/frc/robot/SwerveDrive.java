@@ -47,6 +47,14 @@ public class SwerveDrive implements Loggable {
     holdRobotAngleController.setTolerance(Math.toRadians(2));
   }
   
+  public void swervePeriodic() {
+    joystickDrive();
+    drive(
+      getSDxSpeed(), 
+      getSDySpeed(), 
+      getSDRotation(), 
+      getSDFieldRelative());
+  }
   /**
   * Method to drive the robot using the following params
   *
@@ -267,7 +275,7 @@ public class SwerveDrive implements Loggable {
   public boolean getGyroInterference(){
     return SwerveMap.GYRO.isMagneticDisturbance();
   }
-  @Config.NumberSlider(name="Governor", defaultValue = .11, min = 0, max = 1, rowIndex = 2, columnIndex = 0, height = 1, width = 2)
+  @Config.NumberSlider(name="Governor", defaultValue = .51, min = 0, max = 1, rowIndex = 2, columnIndex = 0, height = 1, width = 2)
   public void setJoystickGovernor(double _input){
     joystickDriveGovernor = _input;
   }
