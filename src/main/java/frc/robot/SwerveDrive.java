@@ -47,6 +47,14 @@ public class SwerveDrive implements Loggable {
     holdRobotAngleController.setTolerance(Math.toRadians(2));
   }
   
+  public void swervePeriodic() {
+    joystickDrive();
+    drive(
+      getSDxSpeed(), 
+      getSDySpeed(), 
+      getSDRotation(), 
+      getSDFieldRelative());
+  }
   /**
   * Method to drive the robot using the following params
   *

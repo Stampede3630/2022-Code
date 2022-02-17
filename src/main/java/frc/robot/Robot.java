@@ -123,21 +123,12 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Joystick Drives stores values in X,Y,Z rotation
     // Drive actually sends those values to the swerve modules
-    SWERVEDRIVE.joystickDrive();
-    SWERVEDRIVE.drive(
-      SWERVEDRIVE.getSDxSpeed(), 
-      SWERVEDRIVE.getSDySpeed(), 
-      SWERVEDRIVE.getSDRotation(), 
-      SWERVEDRIVE.getSDFieldRelative());
+    SWERVEDRIVE.swervePeriodic();
       //intake code for teleop
 
-     
+    CLIMBER.periodic();
 
-
-    //CLIMBER.periodic();
-
-     
-    // INTAKE.intakePeriodic();
+    INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
     SHOOTER.shoot();
   }
