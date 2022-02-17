@@ -24,16 +24,17 @@ import io.github.oblarg.oblog.Logger;
 public class Robot extends TimedRobot {
   public static final boolean CHARACTERIZE_ROBOT = true;
   public static final boolean RUN_TRAJECTORY = true;
-  public static SwerveDrive SWERVEDRIVE;
 
+  public static SwerveDrive SWERVEDRIVE;
   public static AutoContainer AUTOCONTAINER;
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
-
-  public static SwerveCharacterization SWERVERCHARACTERIZATION;
+  public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
+
   public static XboxController xbox = new XboxController(0);
+
   // public static PathPlannerTrajectory examplePath; 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -68,7 +69,7 @@ public class Robot extends TimedRobot {
     // CLIMBER.init();
 
 
-    // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION = SwerveCharacterization.getInstance();}
+
     // if(RUN_TRAJECTORY) {
       // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
       // examplePath = PathPlanner.loadPath("New Path", 1, .8);
@@ -94,7 +95,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
      SWERVEDRIVE.setToBrake();
 
     // For Trajectory instructions go to SwerverTrajectory.java
@@ -105,12 +105,10 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    // if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.periodic();}
     
     AUTOCONTAINER.autoRunner("");
     if(RUN_TRAJECTORY){
-    // SwerveTrajectory.trajectoryRunner(TrajectoryContainer.jonahTrajectory, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
-    SwerveTrajectory.PathPlannerRunner(TrajectoryContainer.heteroPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     }
   }
 
@@ -118,7 +116,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     SWERVEDRIVE.setToBrake();
-    //if(CHARACTERIZE_ROBOT){SWERVERCHARACTERIZATION.init(true);}
   }
 
   /** This function is called periodically during operator control. */
@@ -143,9 +140,6 @@ public class Robot extends TimedRobot {
     // INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
     SHOOTER.shoot();
-      
-
-    
   }
 
   /** This function is called once when the robot is disabled. */

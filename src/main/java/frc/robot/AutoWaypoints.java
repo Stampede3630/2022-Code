@@ -2,6 +2,9 @@ package frc.robot;
 
 import javax.lang.model.element.VariableElement;
 
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.trajectory.Trajectory.State;
@@ -14,12 +17,18 @@ public class AutoWaypoints implements Loggable {
 
     private static AutoWaypoints SINGLE_INSTANCE = new AutoWaypoints();
 
+    public PathPlannerTrajectory fourBallAutoPath;
+
     private double stateStartTime;
     private double currentX;
     private double currentY;
  
     public static AutoWaypoints getInstance() {
         return SINGLE_INSTANCE;
+    }
+
+    public void init() {
+        fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 1.5, 2.5);
     }
 
     public void autoPeriodic() {
@@ -183,8 +192,8 @@ public class AutoWaypoints implements Loggable {
 
     }
 
-    private double getDistance(double currentX, double currentY, double newX, double newY) {
-        double distance = Math.sqrt(Math.pow((newX - currentX), 2) + Math.pow((newY - currentY), 2));
+    private double getDistance(double X1, double Y1, double X2, double Y2) {
+        double distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
         return distance;
     }
  
@@ -193,7 +202,7 @@ public class AutoWaypoints implements Loggable {
     public void fbaStartButton(boolean _input, double thisX, double thisY, double thisRot){
         if(_input){
             _startPoint = "STARTINGPOINTFBA";
-            Robot.SWERVEDRIVE.holdRobotAngleSetpoint = thisRot;
+            SwerveMap.GYRO.setAngleAdjustment(thisRot);
             currentX = thisX;
             currentY = thisY;
             _input = false;
