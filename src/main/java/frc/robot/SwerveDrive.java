@@ -46,6 +46,8 @@ public class SwerveDrive implements Loggable {
     m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.getRobotAngle());
     holdRobotAngleController.disableContinuousInput();
     holdRobotAngleController.setTolerance(Math.toRadians(2));
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
   }
   
   public void swervePeriodic() {
@@ -66,10 +68,16 @@ public class SwerveDrive implements Loggable {
   */
   @SuppressWarnings("ParameterName")
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
-    if (_rot == 0 && holdRobotAngleEnabled){
-      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint + limelightTX());
+    if (Robot.xbox.getRightBumper()){
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
+      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX())/360)*(2*Math.PI));
+      holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
+    } else if (_rot == 0 && holdRobotAngleEnabled){
+      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
     } else {
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
     }
     SwerveModuleState[] moduleStates =
       m_kinematics.toSwerveModuleStates( _fieldRelative ? 
@@ -129,8 +137,7 @@ public class SwerveDrive implements Loggable {
     NeutralMode = "Brake";
   }
 
-  public double limelightTX() { 
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0); 
+  public double limelightTX() {  
     return NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
   } //Testing kP=1.5
 

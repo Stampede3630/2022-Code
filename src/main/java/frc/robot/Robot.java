@@ -61,8 +61,8 @@ public class Robot extends TimedRobot {
 
 
     // ****Shooter method starts here****
-    SHOOTER = Shooter.getInstance();
-    SHOOTER.init();
+    // SHOOTER = Shooter.getInstance();
+    // SHOOTER.init();
 
     // // *****test climber method starts here*****
     // CLIMBER = Climber.getInstance();
@@ -126,11 +126,11 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.swervePeriodic();
       //intake code for teleop
 
-    CLIMBER.periodic();
+    // CLIMBER.periodic();
 
-    INTAKE.intakePeriodic();
+    // INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
-    SHOOTER.shoot();
+    // SHOOTER.shoot();
   }
 
   /** This function is called once when the robot is disabled. */
