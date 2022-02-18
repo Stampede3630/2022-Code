@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -66,7 +67,7 @@ public class SwerveDrive implements Loggable {
   @SuppressWarnings("ParameterName")
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
     if (_rot == 0 && holdRobotAngleEnabled){
-      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
+      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint + limelightTX());
     } else {
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
     }
@@ -127,6 +128,12 @@ public class SwerveDrive implements Loggable {
     SwerveMap.BackLeftSwerveModule.swerveEnabledInit();
     NeutralMode = "Brake";
   }
+
+  public double limelightTX() { 
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0); 
+    return NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+  } //Testing kP=1.5
+
 /**Sets the robots speed parameters to zero */
   public void zeroSwerveDrive(){
     SDxSpeed = 0;
