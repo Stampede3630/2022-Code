@@ -125,4 +125,18 @@ public class Constants {
         double radius = Math.sqrt(Math.pow(side1, 2) + Math.pow(side2, 2));
         return radius;
     }
+
+/* 
+    ***Field Measurements (Centimeters) From Center*** 
+
+    x = 652, y = 412
+    x = 821, y = 229
+    x = 276, y = 106
+    x = 276, y = 102
+    x = 271, y = 95
+    x = 252, y = 138
+    x = 137, y = 261
+    x = 106, y = 276
+    x = 95, y = 271
+*/
 }

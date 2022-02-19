@@ -70,7 +70,7 @@ public class AutoContainer implements Loggable {
             CurrentState = AutoState.values()[0].toString();
         }
 
-        //if we made one round with the state, we have successfully initialized
+        // If we made one round with the state, we have successfully initialized
         AutoState.valueOf(CurrentState).getAction().run();
         if (!StateHasInitialized) {StateHasInitialized = true;}
         if (StateHasFinished){
