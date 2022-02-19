@@ -175,8 +175,6 @@ public class SwerveDrive implements Loggable {
     //System.out.println("FL: " + Math.round(SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " FR: " +Math.round(SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
     //System.out.println("BL: " + Math.round(SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " BR: " +Math.round(SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
   }
-
-
   
   @Log.Gyro(name = "Robot Angle", rowIndex = 2, columnIndex = 5)
   private AHRS getGyro(){

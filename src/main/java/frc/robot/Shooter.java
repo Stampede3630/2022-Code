@@ -12,7 +12,6 @@ public class Shooter implements Loggable {
     private double shooterSpeed = 5000;
     private WPI_TalonFX shooterDrive;
 
-
     public static Shooter getInstance() {
         return SINGLE_INSTANCE;
     }
@@ -20,7 +19,6 @@ public class Shooter implements Loggable {
     public void init() {  //TEST!!!!!
         shooterDrive = new WPI_TalonFX(0);
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
-
         shooterDrive.config_kF(0,
             1023*0.94/18000, 20);
 
@@ -29,7 +27,7 @@ public class Shooter implements Loggable {
     }
 
     public boolean shooterAtSpeed(){
-        if (shooterDrive.getSelectedSensorVelocity(0) >= shooterSpeed){ //checks if the shooter is spinning fast enough to shoot *see intake file*
+        if (shooterDrive.getSelectedSensorVelocity(0) >= shooterSpeed){ // Checks if the shooter is spinning fast enough to shoot *see intake file*
             return true;
         } else {
             return false;
@@ -44,7 +42,6 @@ public class Shooter implements Loggable {
             shooterDrive.set(0);
         }
     }
-
 
     @Config.NumberSlider(name="Set Shooter Speed", min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 5, width = 5)
     public void setShooterSpeed(double targetVelocity) {

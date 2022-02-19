@@ -52,7 +52,6 @@ public class AutoWaypoints implements Loggable {
     public enum AutoPoses {
         STARTINGPOINTFBA(7.80, 1.68, 0.00, "STARTINGPOINTFBA");
 
-
         private double thisX;
         private double thisY;
         private double thisRot;
@@ -93,7 +92,6 @@ public class AutoWaypoints implements Loggable {
     }
 
     public enum AutoState {
-        STARTSTATE(SINGLE_INSTANCE::amritUwU, "BALL1TRANSITION"),
         BALL1TRANSITION(SINGLE_INSTANCE::intakeBall1, "SHOOT1TRANSITION"),
         SHOOT1TRANSITION(SINGLE_INSTANCE::shoot1, "BALL2TRANSITION"),
         BALL2TRANSITION(SINGLE_INSTANCE::intakeBall2, "BALL3TRANSITION"),
@@ -187,17 +185,11 @@ public class AutoWaypoints implements Loggable {
         }
     }
 
-    private void amritUwU(){
-        StateHasFinished = true;
-
-    }
-
     private double getDistance(double X1, double Y1, double X2, double Y2) {
         double distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
         return distance;
     }
  
-    
     @Config.ToggleButton(name = "Four Ball Auto", defaultValue = false)
     public void fbaStartButton(boolean _input, double thisX, double thisY, double thisRot){
         if(_input){

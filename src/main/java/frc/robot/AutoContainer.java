@@ -5,8 +5,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
-
-
 public class AutoContainer implements Loggable {
     @Log
     boolean StateHasFinished = false;
@@ -31,7 +29,6 @@ public class AutoContainer implements Loggable {
     // waypoint 4: x = 11.23, y = 6.18
     // waypoint 5: x = 15.11, y = 6.97
     // waypoint 6: x = 9.16, y = 5.23
-
 
     public enum AutoState {
         STATEAUTOSTART(SINGLE_INSTANCE::bruh, "TIMETOBALL1"),
@@ -72,7 +69,6 @@ public class AutoContainer implements Loggable {
         if (CurrentState == "") {
             CurrentState = AutoState.values()[0].toString();
         }
-
 
         //if we made one round with the state, we have successfully initialized
         AutoState.valueOf(CurrentState).getAction().run();
@@ -122,7 +118,6 @@ public class AutoContainer implements Loggable {
         }
     }
 
-
     @Config.ToggleButton(name="Field Position 1", defaultValue = false, rowIndex = 1, columnIndex = 1, height = 1, width = 2)
     private static void fieldPosition1(boolean pos1) {
         if (pos1) { setAuto(1); }
@@ -149,7 +144,7 @@ public class AutoContainer implements Loggable {
 
     private static void setAuto(int autoPosition) {
         
-        switch (autoPosition) { // These are fake values, put in real stuff
+        switch (autoPosition) { // *** These are fake values, put in real stuff ***
             case 1:
                 SwerveMap.GYRO.setAngleAdjustment(45);
                 break;
