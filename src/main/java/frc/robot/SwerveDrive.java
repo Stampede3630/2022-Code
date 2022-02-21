@@ -72,9 +72,9 @@ public class SwerveDrive implements Loggable {
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
       _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX())/360)*(2*Math.PI));
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
-    } else if (_rot == 0 && holdRobotAngleEnabled){
-      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
-      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+    // } else if (_rot == 0 && holdRobotAngleEnabled){
+    //   _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
+    //   NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
     } else {
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
@@ -212,7 +212,7 @@ public class SwerveDrive implements Loggable {
     SDFieldRelative = _input;
   }
 
-  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = true, rowIndex = 0, columnIndex =0, height = 1, width = 2)
+  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = false, rowIndex = 0, columnIndex =0, height = 1, width = 2)
   public void setHoldAngleEnabled(boolean _boolean){
     holdRobotAngleEnabled = _boolean;
   }

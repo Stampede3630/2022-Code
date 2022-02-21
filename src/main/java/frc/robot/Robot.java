@@ -26,7 +26,6 @@ public class Robot extends TimedRobot {
   public static final boolean RUN_TRAJECTORY = true;
 
   public static SwerveDrive SWERVEDRIVE;
-  public static AutoContainer AUTOCONTAINER;
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
@@ -40,6 +39,8 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+
+   // --- INIT METHOD ---
   @Override
   public void robotInit() {
      SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
@@ -57,7 +58,7 @@ public class Robot extends TimedRobot {
     // INTAKE.init();
 
     //*** Auto Container method starts here***
-    AUTOCONTAINER = AutoContainer.getInstance();
+    AUTOWAYPOINTS = AutoWaypoints.getInstance();
 
 
     // ****Shooter method starts here****
@@ -96,6 +97,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
      SWERVEDRIVE.setToBrake();
+     AUTOWAYPOINTS.init();
 
     // For Trajectory instructions go to SwerverTrajectory.java
      if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
@@ -106,7 +108,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     
-    AUTOCONTAINER.autoRunner("");
+    AUTOWAYPOINTS.autoPeriodic();
     if(RUN_TRAJECTORY){
     SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     }

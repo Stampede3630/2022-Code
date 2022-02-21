@@ -44,9 +44,9 @@ public class Constants {
     //PHYSICALLY zero out the motor 
     //place the OPPOSITE of the value
     public static double FRSensorOffset = -72.598;
-    public static double FLSensorOffset = -36.035;
+    public static double FLSensorOffset = 0;
     public static double BRSensorOffset = -66.533;
-    public static double BLSensorOffset = 37.529;
+    public static double BLSensorOffset = 0;
 
 
     //Give a positive input on the joystick or phoenix tuner

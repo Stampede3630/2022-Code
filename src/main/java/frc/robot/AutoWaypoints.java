@@ -28,7 +28,9 @@ public class AutoWaypoints implements Loggable {
     }
 
     public void init() {
-        fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 1.5, 2.5);
+        fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 3, 2.5);
+        SwerveMap.GYRO.reset();
+        SwerveMap.GYRO.setAngleAdjustment(-90);
     }
 
     public void autoPeriodic() {
@@ -140,7 +142,7 @@ public class AutoWaypoints implements Loggable {
         double ballY = 1.6783324705889917;
 
         if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            //Robot.INTAKE.intakeNow = true;
             StateHasFinished = true;
         }
     }
@@ -150,7 +152,7 @@ public class AutoWaypoints implements Loggable {
         double ballY = 2.0139989647067895;
 
         if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            // Robot.INTAKE.intakeNow = true;
             StateHasFinished = true;
         }
     }
@@ -160,7 +162,7 @@ public class AutoWaypoints implements Loggable {
         double ballY = 1.2153442028403045;
 
         if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            // Robot.INTAKE.intakeNow = true;
             StateHasFinished = true;
         }
     }
@@ -170,7 +172,7 @@ public class AutoWaypoints implements Loggable {
         double posY = 2.951550206897882;
 
         if (getDistance(currentX, currentY, posX, posY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            // Robot.INTAKE.shootNow = true;
             StateHasFinished = true;
         }
     }
@@ -180,7 +182,7 @@ public class AutoWaypoints implements Loggable {
         double posY = 3.0325731537539022;
 
         if (getDistance(currentX, currentY, posX, posY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            // Robot.INTAKE.shootNow = true;
             StateHasFinished = true;
         }
     }
