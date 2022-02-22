@@ -4,13 +4,10 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -34,7 +31,7 @@ public class Climber implements Loggable{
     final double TICKSPERINCH=TICKSATTOP/INCHESATTOP;
     final int FULLEXTEND = 27;
     final int HALFEXTEND = 12;
-    final int CLICKARMS = 5; // <-- place holder value, position to move climber arms down (in inches)
+    final int CLICKARMS = 5; // <-- Place holder value, position to move climber arms down (in inches)
 
     public DigitalInput climberHomeLeft;
     public DigitalInput climberHomeRight;
@@ -64,7 +61,6 @@ public class Climber implements Loggable{
     public void periodic() {
         manualClimberSolenoid();
         manualClimberMotor();
-        // solenoidController();
         if(atOrigin){
             climberRunner("");
         } else{
@@ -95,10 +91,10 @@ public class Climber implements Loggable{
 
     public enum ClimberState{
         START(SINGLE_INSTANCE::getUserInput, "OPENSOLENOID1"),
-        OPENSOLENOID1(SINGLE_INSTANCE::openSolenoid, "RAISEARM1"), // change back to raise28 when done 
+        OPENSOLENOID1(SINGLE_INSTANCE::openSolenoid, "RAISEARM1"), // Change back to raise28 when done 
         RAISEARM1(SINGLE_INSTANCE::raiseArm28, "USERINPUT1"),
         USERINPUT1(SINGLE_INSTANCE::getUserInput, "LOWERARM1"), 
-        LOWERARM1(SINGLE_INSTANCE::lowerArm28, "USERINPUT2"), // change back to lower28 when done (hasn't been tested yet)
+        LOWERARM1(SINGLE_INSTANCE::lowerArm28, "USERINPUT2"), // Change back to lower28 when done (hasn't been tested yet)
         USERINPUT2(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND1"), 
         RAISEANDEXTEND1(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT3"), 
         USERINPUT3(SINGLE_INSTANCE::getUserInput, "OPENSOLENOID2"),
@@ -147,7 +143,7 @@ public class Climber implements Loggable{
         }
 
 
-        //if we made one round with the state, we have successfully initialized
+        // If we made one round with the state, we have successfully initialized
         if (!StateHasInitialized) {StateHasInitialized = true;}
         ClimberState.valueOf(CurrentState).getAction().run();
         if (StateHasFinished){

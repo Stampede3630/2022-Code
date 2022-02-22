@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -45,6 +46,8 @@ public class SwerveDrive implements Loggable {
     m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.getRobotAngle());
     holdRobotAngleController.disableContinuousInput();
     holdRobotAngleController.setTolerance(Math.toRadians(2));
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
   }
   
   public void swervePeriodic() {
@@ -65,10 +68,16 @@ public class SwerveDrive implements Loggable {
   */
   @SuppressWarnings("ParameterName")
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
-    if (_rot == 0 && holdRobotAngleEnabled){
-      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
+    if (Robot.xbox.getRightBumper()){
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
+      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX())/360)*(2*Math.PI));
+      holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
+    // } else if (_rot == 0 && holdRobotAngleEnabled){
+    //   _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
+    //   NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
     } else {
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
     }
     SwerveModuleState[] moduleStates =
       m_kinematics.toSwerveModuleStates( _fieldRelative ? 
@@ -127,6 +136,11 @@ public class SwerveDrive implements Loggable {
     SwerveMap.BackLeftSwerveModule.swerveEnabledInit();
     NeutralMode = "Brake";
   }
+
+  public double limelightTX() {  
+    return NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+  } //Testing kP=1.5
+
 /**Sets the robots speed parameters to zero */
   public void zeroSwerveDrive(){
     SDxSpeed = 0;
@@ -161,8 +175,6 @@ public class SwerveDrive implements Loggable {
     //System.out.println("FL: " + Math.round(SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " FR: " +Math.round(SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
     //System.out.println("BL: " + Math.round(SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " BR: " +Math.round(SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
   }
-
-
   
   @Log.Gyro(name = "Robot Angle", rowIndex = 2, columnIndex = 5)
   private AHRS getGyro(){
@@ -200,7 +212,7 @@ public class SwerveDrive implements Loggable {
     SDFieldRelative = _input;
   }
 
-  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = true, rowIndex = 0, columnIndex =0, height = 1, width = 2)
+  @Config.ToggleButton(name = "Hold Robot Angle?", defaultValue = false, rowIndex = 0, columnIndex =0, height = 1, width = 2)
   public void setHoldAngleEnabled(boolean _boolean){
     holdRobotAngleEnabled = _boolean;
   }

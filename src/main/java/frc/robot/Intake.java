@@ -46,56 +46,56 @@ public class Intake implements Loggable {
   }
 
   private void intake() {
-    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {   //right trigger held --> intake goes down and spins intake motor
+    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       intakeSolenoid.set(Value.kReverse);
       intakeDrive.set(ControlMode.PercentOutput, .3);
 
     } else { 
-      intakeSolenoid.set(Value.kForward); //pulls intake back up and stops spinning
+      intakeSolenoid.set(Value.kForward); // Pulls intake back up and stops spinning
       intakeDrive.set(ControlMode.PercentOutput, 0);
     }
   }
 
   private void shootIndexManager() {
-    if ((Robot.SHOOTER.shooterAtSpeed() && Robot.xbox.getLeftTriggerAxis() > 0) || shootNow) {  //once shooter gets up to speed AND left trigger held, balls fed to shooter
-      if ((!bottomLimitSwitch.get() && !topLimitSwitch.get()) || shootNow) {
-        indexTop.set(ControlMode.PercentOutput, 0.2); //if there's only one ball being shot
+    if (Robot.SHOOTER.shooterAtSpeed() && (Robot.xbox.getLeftTriggerAxis() > 0 || shootNow)) {  // Once shooter gets up to speed AND left trigger held, balls fed to shooter
+      if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) {
+        indexTop.set(ControlMode.PercentOutput, 0.2); // If there's only one ball being shot
       } else {
-        indexTop.set(ControlMode.PercentOutput, 0.2); //if two balls are being shot
+        indexTop.set(ControlMode.PercentOutput, 0.2); // If two balls are being shot
         indexBottom.set(ControlMode.PercentOutput, 0.2);
       }
     } else {
-      indexerDrive(); //defaults to state machine below
+      indexerDrive(); // Defaults to state machine below
     }
   }
 
   private void indexerDrive() {
       switch (indexManager()) {
-        case "1 Ball": //hold the ball at the top of tower
+        case "1 Ball": // Hold the ball at the top of tower
           indexBottom.set(ControlMode.PercentOutput, 0.1);
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
 
-        case "2 Balls": //indexer full
+        case "2 Balls": // Indexer full
           indexBottom.set(ControlMode.PercentOutput, 0); 
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
 
-        case "Cargo in Transit":  //bring ball from intake to top of tower
+        case "Cargo in Transit":  // Bring ball from intake to top of tower
           indexTop.set(ControlMode.PercentOutput, 0.2);
           indexBottom.set(ControlMode.PercentOutput, 0.2);
           break;
 
-        case "Reverse Intake":  //both intakes go backwards
+        case "Reverse Intake":  // Both intakes go backwards
           indexTop.set(ControlMode.PercentOutput, -0.2);
           indexBottom.set(ControlMode.PercentOutput, -0.2);
           break;
 
-        case "Intake Ball": //spins bottom intake while ball in being intaked
+        case "Intake Ball": // Spins bottom intake while ball in being intaked
           indexBottom.set(ControlMode.PercentOutput, 0.2);
           break;
 
-        default:  //everything stops
+        default:  // Everything stops
           indexBottom.set(ControlMode.PercentOutput, 0);
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
@@ -105,15 +105,15 @@ public class Intake implements Loggable {
   private String indexManager() {
     if (Robot.xbox.getBButton()) {
       return "Reverse Intake";
-    } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { //both switches pressed
+    } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { // Both switches pressed
       return "2 Balls";
-    } else if (!bottomLimitSwitch.get() || (cargoInTransit && bottomLimitSwitch.get() && topLimitSwitch.get())) { //bottom switch pressed/cargo in transit
+    } else if (!bottomLimitSwitch.get() || (cargoInTransit && bottomLimitSwitch.get() && topLimitSwitch.get())) { // Bottom switch pressed/cargo in transit
       cargoInTransit = true;
       return "Cargo in Transit";
     } else if (!topLimitSwitch.get()) { //top switch pressed
       cargoInTransit = false;
       return "1 Ball";
-    } else if (bottomLimitSwitch.get() && Robot.xbox.getRightTriggerAxis() > 0) { //right trigger held AND nothing pressing the bottom switch
+    } else if (bottomLimitSwitch.get() && Robot.xbox.getRightTriggerAxis() > 0) { // Right trigger held AND nothing pressing the bottom switch
       return "Intake Ball";
     } else {
       return "default";

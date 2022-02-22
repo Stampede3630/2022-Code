@@ -5,8 +5,6 @@
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -26,7 +24,6 @@ public class Robot extends TimedRobot {
   public static final boolean RUN_TRAJECTORY = true;
 
   public static SwerveDrive SWERVEDRIVE;
-  public static AutoContainer AUTOCONTAINER;
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
@@ -40,6 +37,8 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+
+   // --- INIT METHOD ---
   @Override
   public void robotInit() {
      SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
@@ -57,12 +56,12 @@ public class Robot extends TimedRobot {
     // INTAKE.init();
 
     //*** Auto Container method starts here***
-    AUTOCONTAINER = AutoContainer.getInstance();
+    AUTOWAYPOINTS = AutoWaypoints.getInstance();
 
 
     // ****Shooter method starts here****
-    SHOOTER = Shooter.getInstance();
-    SHOOTER.init();
+    // SHOOTER = Shooter.getInstance();
+    // SHOOTER.init();
 
     // // *****test climber method starts here*****
     // CLIMBER = Climber.getInstance();
@@ -96,6 +95,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
      SWERVEDRIVE.setToBrake();
+     AUTOWAYPOINTS.init();
 
     // For Trajectory instructions go to SwerverTrajectory.java
      if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
@@ -106,7 +106,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     
-    AUTOCONTAINER.autoRunner("");
+    AUTOWAYPOINTS.autoPeriodic();
     if(RUN_TRAJECTORY){
     SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     }
@@ -126,11 +126,11 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.swervePeriodic();
       //intake code for teleop
 
-    CLIMBER.periodic();
+    // CLIMBER.periodic();
 
-    INTAKE.intakePeriodic();
+    // INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
-    SHOOTER.shoot();
+    // SHOOTER.shoot();
   }
 
   /** This function is called once when the robot is disabled. */

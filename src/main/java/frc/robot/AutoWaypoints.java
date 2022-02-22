@@ -1,17 +1,12 @@
 package frc.robot;
 
-import javax.lang.model.element.VariableElement;
-
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
-import io.github.oblarg.oblog.annotations.Config.ToggleButton;
 
 public class AutoWaypoints implements Loggable {
 
@@ -28,7 +23,9 @@ public class AutoWaypoints implements Loggable {
     }
 
     public void init() {
-        fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 1.5, 2.5);
+        fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 3, 2.5);
+        SwerveMap.GYRO.reset();
+        SwerveMap.GYRO.setAngleAdjustment(-90);
     }
 
     public void autoPeriodic() {
@@ -51,7 +48,6 @@ public class AutoWaypoints implements Loggable {
 
     public enum AutoPoses {
         STARTINGPOINTFBA(7.80, 1.68, 0.00, "STARTINGPOINTFBA");
-
 
         private double thisX;
         private double thisY;
@@ -79,7 +75,7 @@ public class AutoWaypoints implements Loggable {
         public String getStartPoint(){
             return thisStartPoint;
         }
-
+  
     }
 
     public void startPointRunner(String _startPoint){
@@ -93,7 +89,6 @@ public class AutoWaypoints implements Loggable {
     }
 
     public enum AutoState {
-        STARTSTATE(SINGLE_INSTANCE::amritUwU, "BALL1TRANSITION"),
         BALL1TRANSITION(SINGLE_INSTANCE::intakeBall1, "SHOOT1TRANSITION"),
         SHOOT1TRANSITION(SINGLE_INSTANCE::shoot1, "BALL2TRANSITION"),
         BALL2TRANSITION(SINGLE_INSTANCE::intakeBall2, "BALL3TRANSITION"),
@@ -142,7 +137,7 @@ public class AutoWaypoints implements Loggable {
         double ballY = 1.6783324705889917;
 
         if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            //Robot.INTAKE.intakeNow = true;
             StateHasFinished = true;
         }
     }
@@ -152,7 +147,7 @@ public class AutoWaypoints implements Loggable {
         double ballY = 2.0139989647067895;
 
         if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            // Robot.INTAKE.intakeNow = true;
             StateHasFinished = true;
         }
     }
@@ -162,7 +157,7 @@ public class AutoWaypoints implements Loggable {
         double ballY = 1.2153442028403045;
 
         if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            // Robot.INTAKE.intakeNow = true;
             StateHasFinished = true;
         }
     }
@@ -172,7 +167,7 @@ public class AutoWaypoints implements Loggable {
         double posY = 2.951550206897882;
 
         if (getDistance(currentX, currentY, posX, posY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            // Robot.INTAKE.shootNow = true;
             StateHasFinished = true;
         }
     }
@@ -182,22 +177,16 @@ public class AutoWaypoints implements Loggable {
         double posY = 3.0325731537539022;
 
         if (getDistance(currentX, currentY, posX, posY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
+            // Robot.INTAKE.shootNow = true;
             StateHasFinished = true;
         }
     }
 
-    private void amritUwU(){
-        StateHasFinished = true;
-
-    }
-
-    private double getDistance(double X1, double Y1, double X2, double Y2) {
+    private double getDistance(double X1, double Y1, double X2, double Y2) { //just the distance formula - uses current x and y positions
         double distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
         return distance;
     }
  
-    
     @Config.ToggleButton(name = "Four Ball Auto", defaultValue = false)
     public void fbaStartButton(boolean _input, double thisX, double thisY, double thisRot){
         if(_input){
