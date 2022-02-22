@@ -21,9 +21,9 @@ public class SwerveDrive implements Loggable {
   private double SDxSpeed=0;
   private double SDySpeed=0;
   private double SDrotation=0;
-  private boolean SDFieldRelative=Constants.DEFAULT_FIELD_RELATIVE_DRIVE;
-  private boolean holdRobotAngleEnabled = Constants.DEFAULT_HOLD_ROBOT_ANGLE;
-  private PIDController holdRobotAngleController = new PIDController(Constants.ROBOTHoldAngleKP, 0, 0);
+  public boolean SDFieldRelative= Constants.DEFAULT_FIELD_RELATIVE_DRIVE;
+  public boolean holdRobotAngleEnabled = Constants.DEFAULT_HOLD_ROBOT_ANGLE;
+  public PIDController holdRobotAngleController = new PIDController(Constants.ROBOTHoldAngleKP, 0, 0);
   
   public double holdRobotAngleSetpoint = Constants.DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT;
   public double joystickDriveGovernor = Constants.SPEED_GOVERNOR;
