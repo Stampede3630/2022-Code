@@ -18,6 +18,7 @@ public class Intake implements Loggable {
   private WPI_TalonFX indexBottom;
   private WPI_TalonFX indexTop;
   private DoubleSolenoid intakeSolenoid;
+  private DoubleSolenoid limelightSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
   private DigitalInput bottomLimitSwitch;
@@ -36,6 +37,8 @@ public class Intake implements Loggable {
     indexTop = new WPI_TalonFX(16);
 
     intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 6);
+
+    limelightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 2);
 
     bottomLimitSwitch = new DigitalInput(1);
     topLimitSwitch = new DigitalInput(0);
@@ -118,6 +121,14 @@ public class Intake implements Loggable {
     } else {
       return "default";
     }
+  }
+
+  public void openLimelight() {
+    limelightSolenoid.set(Value.kForward);
+  }
+    
+  public void closeLimelight() {
+    limelightSolenoid.set(Value.kReverse);
   }
 
   @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
