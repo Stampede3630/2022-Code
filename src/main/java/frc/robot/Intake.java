@@ -18,7 +18,7 @@ public class Intake implements Loggable {
   private WPI_TalonFX indexBottom;
   private WPI_TalonFX indexTop;
   private DoubleSolenoid intakeSolenoid;
-  private DoubleSolenoid limelightSolenoid;
+  public DoubleSolenoid limelightSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
   private DigitalInput bottomLimitSwitch;
@@ -26,6 +26,7 @@ public class Intake implements Loggable {
   private boolean cargoInTransit = false;
   public boolean intakeNow = false;
   public boolean shootNow = false;
+  public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
 
   public static Intake getInstance() {
       return SINGLE_INSTANCE;
@@ -123,12 +124,10 @@ public class Intake implements Loggable {
     }
   }
 
-  public void openLimelight() {
-    limelightSolenoid.set(Value.kForward);
-  }
-    
-  public void closeLimelight() {
+  public void turnToIntake() {
     limelightSolenoid.set(Value.kReverse);
+    limelightIsOpen = false;
+    // ^^^
   }
 
   @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
