@@ -1,17 +1,12 @@
 package frc.robot;
 
-import javax.lang.model.element.VariableElement;
-
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
-import io.github.oblarg.oblog.annotations.Config.ToggleButton;
 
 public class AutoWaypoints implements Loggable {
 
@@ -80,7 +75,7 @@ public class AutoWaypoints implements Loggable {
         public String getStartPoint(){
             return thisStartPoint;
         }
-
+  
     }
 
     public void startPointRunner(String _startPoint){
@@ -187,7 +182,7 @@ public class AutoWaypoints implements Loggable {
         }
     }
 
-    private double getDistance(double X1, double Y1, double X2, double Y2) {
+    private double getDistance(double X1, double Y1, double X2, double Y2) { //just the distance formula - uses current x and y positions
         double distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
         return distance;
     }

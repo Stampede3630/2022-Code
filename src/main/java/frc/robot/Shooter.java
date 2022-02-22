@@ -12,6 +12,8 @@ public class Shooter implements Loggable {
     private double shooterSpeed = 5000;
     private WPI_TalonFX shooterDrive;
 
+    public boolean homocideTheBattery;
+
     public static Shooter getInstance() {
         return SINGLE_INSTANCE;
     }
@@ -24,6 +26,8 @@ public class Shooter implements Loggable {
 
         shooterDrive.config_kP(0,
             0.075, 20);
+
+        homocideTheBattery = false;
     }
 
     public boolean shooterAtSpeed(){
@@ -36,7 +40,7 @@ public class Shooter implements Loggable {
     }
 
     public void shoot() {
-        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow) {
+        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || homocideTheBattery) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed);
         } else {
             shooterDrive.set(0);
@@ -47,5 +51,10 @@ public class Shooter implements Loggable {
     public void setShooterSpeed(double targetVelocity) {
         shooterSpeed = targetVelocity;
        
+    }
+
+    @Config.ToggleButton(name = "kill battery?",defaultValue = false, rowIndex = 1, columnIndex = 0)
+    public void killTheBattery(boolean _input) {
+        homocideTheBattery = _input;
     }
 }
