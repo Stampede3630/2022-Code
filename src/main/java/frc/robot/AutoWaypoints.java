@@ -63,8 +63,7 @@ public class AutoWaypoints implements Loggable {
             thisY = _y;
             thisRot = _rot;
             thisStartPoint = _startPoint;
-            
-            
+
         }
 
         public double getThisX(){
@@ -84,7 +83,10 @@ public class AutoWaypoints implements Loggable {
   
     }
     public void chooserBuilder(){
-     SINGLE_INSTANCE.m_autoChooser.addOption(AutoPoses.STARTINGPOINTFBA.name(), AutoPoses.STARTINGPOINTFBA);
+       for (AutoPoses myAutoPose : AutoPoses.values()){
+           
+        SINGLE_INSTANCE.m_autoChooser.addOption(myAutoPose.toString(), myAutoPose);
+       }
         
     }
     
