@@ -29,6 +29,7 @@ public class Robot extends TimedRobot {
   public static Climber CLIMBER;
   public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
+  public static CompetitionLogger COMPETITIONLOGGER;
 
   public static XboxController xbox = new XboxController(0);
 
@@ -57,7 +58,7 @@ public class Robot extends TimedRobot {
 
     //*** Auto Container method starts here***
     AUTOWAYPOINTS = AutoWaypoints.getInstance();
-
+    AUTOWAYPOINTS.init();
 
     // ****Shooter method starts here****
     // SHOOTER = Shooter.getInstance();
@@ -76,6 +77,9 @@ public class Robot extends TimedRobot {
     // Keep this statement on the BOTTOM of your robotInit
     // It's responsible for all the shuffleboard outputs.  
     // It's a lot easier to use than standard shuffleboard syntax
+
+    COMPETITIONLOGGER = CompetitionLogger.getInstance();
+    
     Logger.configureLoggingAndConfig(this, false);
   }
 
@@ -95,7 +99,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
      SWERVEDRIVE.setToBrake();
-     AUTOWAYPOINTS.init();
+     
 
     // For Trajectory instructions go to SwerverTrajectory.java
      if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
@@ -155,4 +159,4 @@ public class Robot extends TimedRobot {
   }
 
 
-}
+} 
