@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -23,6 +24,13 @@ public class CompetitionLogger implements Loggable {
     private SwerveDriveDB mySwerveDrivebuttons = new SwerveDriveDB();
    // private String autoChooser;
     public class SwerveDriveDB implements Loggable {
+        
+        
+        @Override
+        public int[] configureLayoutSize() {
+            int[] size = {2,3};
+            return size;
+        }
         @Config
         public void HoldRobotAngle(boolean _input){
             Robot.SWERVEDRIVE.holdRobotAngleEnabled = _input;
