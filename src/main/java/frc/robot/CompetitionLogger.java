@@ -4,15 +4,42 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
+import io.github.oblarg.oblog.annotations.Log;
 
 public class CompetitionLogger implements Loggable {
+    private static CompetitionLogger SINGLE_INSTANCE = new CompetitionLogger();
 
-    public void competitionTab(boolean HoldRobotAngle, boolean FieldOriented, boolean ResetGyroAndOdometry) {
-        Robot.SWERVEDRIVE.holdRobotAngleEnabled = HoldRobotAngle;
-        Robot.SWERVEDRIVE.SDFieldRelative = FieldOriented;
-        Robot.SWERVEDRIVE.resetGyroAndOdometry(ResetGyroAndOdometry);
+    public static CompetitionLogger getInstance() {
+        return SINGLE_INSTANCE;
     }
+
+   
+
+
     
+    private SwerveDriveDB mySwerveDrivebuttons = new SwerveDriveDB();
+   // private String autoChooser;
+    public class SwerveDriveDB implements Loggable {
+        @Config
+        public void HoldRobotAngle(boolean _input){
+            Robot.SWERVEDRIVE.holdRobotAngleEnabled = _input;
+        }
+        @Config
+        public void FieldRelativeDrive(boolean _input){
+            Robot.SWERVEDRIVE.SDFieldRelative = _input;
+        }
+        @Config
+        public void ResetGyroAndOdometry(boolean _input){
+            Robot.SWERVEDRIVE.resetGyroAndOdometry(_input);
+        }
+
+    }
+
+    @Log
+    SendableChooser autoChooser = Robot.AUTOWAYPOINTS.m_autoChooser;
+
+
 }

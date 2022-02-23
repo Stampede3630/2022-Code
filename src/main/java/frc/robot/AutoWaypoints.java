@@ -4,6 +4,7 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -26,6 +27,7 @@ public class AutoWaypoints implements Loggable {
         fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 3, 2.5);
         SwerveMap.GYRO.reset();
         SwerveMap.GYRO.setAngleAdjustment(-90);
+        chooserBuilder();
     }
 
     public void autoPeriodic() {
@@ -45,6 +47,8 @@ public class AutoWaypoints implements Loggable {
     String _startPoint;
     String CurrentStartPoint;
 
+    
+    public SendableChooser<AutoPoses> m_autoChooser = new SendableChooser<>();
 
     public enum AutoPoses {
         STARTINGPOINTFBA(7.80, 1.68, 0.00, "STARTINGPOINTFBA");
@@ -59,6 +63,8 @@ public class AutoWaypoints implements Loggable {
             thisY = _y;
             thisRot = _rot;
             thisStartPoint = _startPoint;
+            
+            
         }
 
         public double getThisX(){
@@ -77,6 +83,12 @@ public class AutoWaypoints implements Loggable {
         }
   
     }
+    public void chooserBuilder(){
+     SINGLE_INSTANCE.m_autoChooser.addOption(AutoPoses.STARTINGPOINTFBA.name(), AutoPoses.STARTINGPOINTFBA);
+        
+    }
+    
+
 
     public void startPointRunner(String _startPoint){
         if(_startPoint != ""){

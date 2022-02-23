@@ -37,7 +37,6 @@ public class SwerveDrive implements Loggable {
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
   public SwerveDriveOdometry m_odometry;
   
-
   public static SwerveDrive getInstance() {
     return SINGLE_INSTANCE;
   }

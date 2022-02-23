@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Intake implements Loggable {
   
@@ -29,7 +30,7 @@ public class Intake implements Loggable {
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
 
   public static Intake getInstance() {
-      return SINGLE_INSTANCE;
+    return SINGLE_INSTANCE;
   }
 
   public void init(){
@@ -53,6 +54,7 @@ public class Intake implements Loggable {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       intakeSolenoid.set(Value.kReverse);
       intakeDrive.set(ControlMode.PercentOutput, .3);
+      turnToIntake();
 
     } else { 
       intakeSolenoid.set(Value.kForward); // Pulls intake back up and stops spinning
@@ -107,7 +109,7 @@ public class Intake implements Loggable {
     } 
 
   private String indexManager() {
-    if (Robot.xbox.getBButton()) {
+    if (Robot.xbox.getRightStickButtonPressed()) {
       return "Reverse Intake";
     } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { // Both switches pressed
       return "2 Balls";
@@ -126,6 +128,8 @@ public class Intake implements Loggable {
 
   public void turnToIntake() {
     limelightSolenoid.set(Value.kReverse);
+    // Make intake pipeline
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
     limelightIsOpen = false;
     // ^^^
   }
