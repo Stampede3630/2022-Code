@@ -51,7 +51,8 @@ public class AutoWaypoints implements Loggable {
     public SendableChooser<AutoPoses> m_autoChooser = new SendableChooser<>();
 
     public enum AutoPoses {
-        STARTINGPOINTFBA(7.80, 1.68, 0.00, "STARTINGPOINTFBA");
+        STARTINGPOINTFBA(7.80, 1.68, 0.00, "STARTINGPOINTFBA"),
+        STARTINGPOINTTBA(7.82, 1.91, 86.82, "STARTINGPOINTTBA");
 
         private double thisX;
         private double thisY;
@@ -102,7 +103,7 @@ public class AutoWaypoints implements Loggable {
 
     }
 
-    public enum AutoState {
+    public enum FourBallAuto {
         BALL1TRANSITION(SINGLE_INSTANCE::intakeBall1, "SHOOT1TRANSITION"),
         SHOOT1TRANSITION(SINGLE_INSTANCE::shoot1, "BALL2TRANSITION"),
         BALL2TRANSITION(SINGLE_INSTANCE::intakeBall2, "BALL3TRANSITION"),
@@ -112,7 +113,7 @@ public class AutoWaypoints implements Loggable {
         private Runnable action;
         private String nextState;
 
-        AutoState(Runnable _action, String _nextState){
+        FourBallAuto(Runnable _action, String _nextState){
             action = _action;
             nextState = _nextState;
         }
@@ -133,18 +134,75 @@ public class AutoWaypoints implements Loggable {
         } 
        
         if (CurrentState == "") {
-            CurrentState = AutoState.values()[0].toString();
+            CurrentState = FourBallAuto.values()[0].toString();
         }
+    }
+        public enum TwoBallAuto {
+            TWOBALLTRANSITION1(SINGLE_INSTANCE::twoBallIntake1, "TWOBALLTRANSITION2"),
+            TWOBALLTRANSITION2(SINGLE_INSTANCE::twoBallShoot, "TWOBALLTRANSITION2");
+
+            
+            private Runnable action;
+            private String nextState;
+    
+            TwoBallAuto(Runnable _action, String _nextState){
+                action = _action;
+                nextState = _nextState;
+            }
+    
+            public Runnable getAction() {
+                return action;
+            }
+    
+            public String getNextState() {
+                return nextState;
+            }
+
+        }
+        
+        
+    
+        public void autoTwoBallRunner(String _startingState){
+            if (_startingState != "" && StartingStateOverride){
+                CurrentState = _startingState;
+                StartingStateOverride = false;
+            } 
+           
+            if (CurrentState == "") {
+                CurrentState = FourBallAuto.values()[0].toString();
+            }
 
         //if we made one round with the state, we have successfully initialized
-        AutoState.valueOf(CurrentState).getAction().run();
+        FourBallAuto.valueOf(CurrentState).getAction().run();
         if (!StateHasInitialized) {StateHasInitialized = true;}
         if (StateHasFinished){
-            CurrentState = AutoState.valueOf(CurrentState).getNextState();
+            CurrentState = FourBallAuto.valueOf(CurrentState).getNextState();
             StateHasFinished = false; 
             StateHasInitialized = false;
         }
     }
+
+    //TWO BALL AUTO METHODS HERE
+
+    private void twoBallIntake1() {
+        double ballX = 7.65;
+        double ballY = 0.60;
+
+        if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
+            StateHasFinished = true;
+        }
+    }
+
+    private void twoBallShoot() {
+        double ballX = 7.88;
+        double ballY = 2.86;
+
+        if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
+            StateHasFinished = true;
+        }
+    }
+
+    //FOUR BALL AUTO METHODS HERE
 
     private void intakeBall1() {
         double ballX = 7.801352311565382;
@@ -205,6 +263,17 @@ public class AutoWaypoints implements Loggable {
     public void fbaStartButton(boolean _input, double thisX, double thisY, double thisRot){
         if(_input){
             _startPoint = "STARTINGPOINTFBA";
+            SwerveMap.GYRO.setAngleAdjustment(thisRot);
+            currentX = thisX;
+            currentY = thisY;
+            _input = false;
+        }
+    }
+
+        @Config.ToggleButton(name = "Two Ball Auto", defaultValue = false)
+    public void tbaStartButton(boolean _input, double thisX, double thisY, double thisRot){
+        if(_input){
+            _startPoint = "STARTINGPOINTTBA";
             SwerveMap.GYRO.setAngleAdjustment(thisRot);
             currentX = thisX;
             currentY = thisY;
