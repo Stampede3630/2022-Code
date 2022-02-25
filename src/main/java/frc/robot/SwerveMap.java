@@ -119,6 +119,7 @@ public class SwerveMap {
             //Setup the the closed-loop PID for the steering module loop
             
             mSteeringMotor.configFactoryDefault();
+            mSteeringMotor.setInverted(TalonFXInvertType.Clockwise);
             mSteeringMotor.configFeedbackNotContinuous(false, Constants.kDefaultTimeout);
             mSteeringMotor.configSelectedFeedbackCoefficient(1/Constants.TICKSperTALONFX_DEGREE,0,Constants.kDefaultTimeout);
             mSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor,0,Constants.kDefaultTimeout);

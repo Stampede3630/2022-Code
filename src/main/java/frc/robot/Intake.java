@@ -34,13 +34,13 @@ public class Intake implements Loggable {
   }
 
   public void init(){
-    intakeDrive  = new WPI_TalonFX(13);
-    indexBottom = new WPI_TalonFX(12);
-    indexTop = new WPI_TalonFX(16);
+    intakeDrive  = new WPI_TalonFX(7);
+    indexBottom = new WPI_TalonFX(9);
+    indexTop = new WPI_TalonFX(6);
 
-    intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 5, 6);
+    intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 5);
 
-    limelightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 2);
+    limelightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
 
     bottomLimitSwitch = new DigitalInput(1);
     topLimitSwitch = new DigitalInput(0);

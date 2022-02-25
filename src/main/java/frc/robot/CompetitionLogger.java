@@ -46,8 +46,8 @@ public class CompetitionLogger implements Loggable {
 
     }
 
-    @Log
-    SendableChooser autoChooser = Robot.AUTOWAYPOINTS.m_autoChooser;
+    // @Log
+    // SendableChooser autoChooser = Robot.AUTOWAYPOINTS.m_autoChooser;
 
 
 }

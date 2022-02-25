@@ -53,20 +53,20 @@ public class Robot extends TimedRobot {
      SWERVEDRIVE.zeroSwerveDrive();
 
     //**Intake method starts here**
-    // INTAKE = Intake.getInstance();
-    // INTAKE.init();
+    INTAKE = Intake.getInstance();
+    INTAKE.init();
 
     //*** Auto Container method starts here***
-    AUTOWAYPOINTS = AutoWaypoints.getInstance();
-    AUTOWAYPOINTS.init();
+    //AUTOWAYPOINTS = AutoWaypoints.getInstance();
+    //AUTOWAYPOINTS.init();
 
     // ****Shooter method starts here****
-    // SHOOTER = Shooter.getInstance();
-    // SHOOTER.init();
+    SHOOTER = Shooter.getInstance();
+    SHOOTER.init();
 
     // // *****test climber method starts here*****
-    // CLIMBER = Climber.getInstance();
-    // CLIMBER.init();
+    CLIMBER = Climber.getInstance();
+    CLIMBER.init();
 
 
 
@@ -110,10 +110,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     
-    AUTOWAYPOINTS.autoPeriodic();
-    if(RUN_TRAJECTORY){
-    SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
-    }
+    // AUTOWAYPOINTS.autoPeriodic();
+    // if(RUN_TRAJECTORY){
+    // SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    // }
   }
 
   /** This function is called once when teleop is enabled. */
@@ -130,11 +130,11 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.swervePeriodic();
       //intake code for teleop
 
-    // CLIMBER.periodic();
+    CLIMBER.periodic();
 
-    // INTAKE.intakePeriodic();
+    INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
-    // SHOOTER.shoot();
+    SHOOTER.shoot();
   }
 
   /** This function is called once when the robot is disabled. */

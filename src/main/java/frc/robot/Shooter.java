@@ -2,11 +2,12 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 
@@ -22,7 +23,8 @@ public class Shooter implements Loggable {
     }
 
     public void init() { // TEST!!!!!
-        shooterDrive = new WPI_TalonFX(0);
+        shooterDrive = new WPI_TalonFX(10);
+        shooterDrive.setInverted(TalonFXInvertType.Clockwise);
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
         shooterDrive.config_kF(0,
                 1023 * 0.94 / 18000, 20);
