@@ -22,8 +22,8 @@ public class Intake implements Loggable {
   public DoubleSolenoid limelightSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
-  private DigitalInput bottomLimitSwitch;
-  private DigitalInput topLimitSwitch;
+  public DigitalInput bottomLimitSwitch;
+  public DigitalInput topLimitSwitch;
   private boolean cargoInTransit = false;
   public boolean intakeNow = false;
   public boolean shootNow = false;

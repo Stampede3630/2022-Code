@@ -36,7 +36,7 @@ public class Shooter implements Loggable {
     }
 
     public boolean shooterAtSpeed() {
-        if (shooterDrive.getSelectedSensorVelocity(0) >= shooterSpeed) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
+        if (shooterDrive.getSelectedSensorVelocity(0) >= shooterSpeed * 0.95) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
             return true;
         } else {
             return false;
@@ -45,7 +45,7 @@ public class Shooter implements Loggable {
     }
 
     public void shoot() {
-        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || homocideTheBattery) {
+        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed);
             turnToShooter();
         } else {
