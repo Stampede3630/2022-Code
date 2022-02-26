@@ -52,7 +52,7 @@ public class AutoWaypoints implements Loggable {
 
     public enum AutoPoses {
         STARTINGPOINTFBA(7.80, 1.68, 0.00, "STARTINGPOINTFBA"),
-        STARTINGPOINTTBA(7.82, 1.91, 86.82, "STARTINGPOINTTBA");
+        STARTINGPOINTTBA(6.09, 5.23, -43.78, "STARTINGPOINTTBA");
 
         private double thisX;
         private double thisY;

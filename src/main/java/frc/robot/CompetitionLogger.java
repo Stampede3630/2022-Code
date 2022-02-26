@@ -17,9 +17,14 @@ public class CompetitionLogger implements Loggable {
         return SINGLE_INSTANCE;
     }
 
-   
+    public boolean beginClimb = false;
 
-
+    @Config.ToggleButton(name = "climb?", defaultValue = false)
+    private void beginClimbing(boolean _input, boolean beginClimb){
+        if(_input){
+            beginClimb = true;
+            }
+        }
     
     private SwerveDriveDB mySwerveDrivebuttons = new SwerveDriveDB();
    // private String autoChooser;

@@ -25,6 +25,7 @@ public class Climber implements Loggable{
     boolean atOrigin;
     boolean upOne;
     boolean tiltArms = false;
+    
     final double TICKSPERREVOLUTION=2048;
     final double TICKSATTOP=239200;
     final double INCHESATTOP=27;
@@ -32,6 +33,7 @@ public class Climber implements Loggable{
     final int FULLEXTEND = 27;
     final int HALFEXTEND = 12;
     final int CLICKARMS = 5; // <-- Place holder value, position to move climber arms down (in inches)
+
 
     public DigitalInput climberHomeLeft;
     public DigitalInput climberHomeRight;
@@ -54,6 +56,7 @@ public class Climber implements Loggable{
         atOrigin = false;
         upOne = false;
 
+
         // We want the default state to keep climber upright
         climberSolenoid.set(Value.kForward);
     }
@@ -61,8 +64,8 @@ public class Climber implements Loggable{
     public void periodic() {
         manualClimberSolenoid();
         manualClimberMotor();
-        if(atOrigin){
-            climberRunner("");
+        if(atOrigin && Robot.COMPETITIONLOGGER.beginClimb) {
+          climberRunner("");
         } else{
             reZero();
            
@@ -72,10 +75,10 @@ public class Climber implements Loggable{
 
     private void manualClimberMotor(){
         if (Robot.xbox.getPOV()==0){
-            climberTalon.set(ControlMode.PercentOutput, 0.3);
+            climberTalon.set(ControlMode.PercentOutput, 0.5); // Set faster climb speed for auto
         }
         else if (Robot.xbox.getPOV()==180){
-            climberTalon.set(ControlMode.PercentOutput, -0.3);
+            climberTalon.set(ControlMode.PercentOutput, -0.5);
         } else {
             climberTalon.set(ControlMode.PercentOutput, 0);
         }
@@ -86,6 +89,7 @@ public class Climber implements Loggable{
            openSolenoid();
         } else if (Robot.xbox.getPOV()==270 ){ 
            closeSolenoid();
+           
         }
     }
 
@@ -170,10 +174,10 @@ public class Climber implements Loggable{
     }
 
     public void raiseAndExtend()  {
-        if (climberTalon.getSelectedSensorPosition(0) < 8) {
-            climberTalon.set(ControlMode.Position, 10);
+        if (climberTalon.getSelectedSensorPosition(0) < 15) {
+            climberTalon.set(ControlMode.Position, 17);
             climberSolenoid.set(Value.kReverse);
-        } else if (climberTalon.getSelectedSensorPosition(0) >= 8) {
+        } else if (climberTalon.getSelectedSensorPosition(0) >= 15) {
             climberTalon.set(ControlMode.Position, 27);
             
             if (climberTalon.getSelectedSensorPosition(0) >= 27) {

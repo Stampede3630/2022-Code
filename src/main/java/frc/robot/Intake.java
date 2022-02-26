@@ -35,15 +35,15 @@ public class Intake implements Loggable {
 
   public void init(){
     intakeDrive  = new WPI_TalonFX(7);
-    indexBottom = new WPI_TalonFX(9);
-    indexTop = new WPI_TalonFX(6);
+    indexBottom = new WPI_TalonFX(6);
+    indexTop = new WPI_TalonFX(9);
 
     intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 5);
 
     limelightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
 
-    bottomLimitSwitch = new DigitalInput(1);
-    topLimitSwitch = new DigitalInput(0);
+    bottomLimitSwitch = new DigitalInput(0);
+    topLimitSwitch = new DigitalInput(1);
   }
   public void intakePeriodic(){
     intake();
@@ -53,7 +53,7 @@ public class Intake implements Loggable {
   private void intake() {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       intakeSolenoid.set(Value.kReverse);
-      intakeDrive.set(ControlMode.PercentOutput, .3);
+      intakeDrive.set(ControlMode.PercentOutput, .7);
       turnToIntake();
 
     } else { 
@@ -65,10 +65,10 @@ public class Intake implements Loggable {
   private void shootIndexManager() {
     if (Robot.SHOOTER.shooterAtSpeed() && (Robot.xbox.getLeftTriggerAxis() > 0 || shootNow)) {  // Once shooter gets up to speed AND left trigger held, balls fed to shooter
       if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) {
-        indexTop.set(ControlMode.PercentOutput, 0.2); // If there's only one ball being shot
+        indexTop.set(ControlMode.PercentOutput, -0.2); // If there's only one ball being shot
       } else {
-        indexTop.set(ControlMode.PercentOutput, 0.2); // If two balls are being shot
-        indexBottom.set(ControlMode.PercentOutput, 0.2);
+        indexTop.set(ControlMode.PercentOutput, -0.2); // If two balls are being shot
+        indexBottom.set(ControlMode.PercentOutput, -0.2);
       }
     } else {
       indexerDrive(); // Defaults to state machine below
@@ -78,7 +78,7 @@ public class Intake implements Loggable {
   private void indexerDrive() {
       switch (indexManager()) {
         case "1 Ball": // Hold the ball at the top of tower
-          indexBottom.set(ControlMode.PercentOutput, 0.1);
+          indexBottom.set(ControlMode.PercentOutput, -0.1);
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
 
@@ -88,17 +88,17 @@ public class Intake implements Loggable {
           break;
 
         case "Cargo in Transit":  // Bring ball from intake to top of tower
-          indexTop.set(ControlMode.PercentOutput, 0.2);
-          indexBottom.set(ControlMode.PercentOutput, 0.2);
-          break;
-
-        case "Reverse Intake":  // Both intakes go backwards
           indexTop.set(ControlMode.PercentOutput, -0.2);
           indexBottom.set(ControlMode.PercentOutput, -0.2);
           break;
 
-        case "Intake Ball": // Spins bottom intake while ball in being intaked
+        case "Reverse Intake":  // Both intakes go backwards
+          indexTop.set(ControlMode.PercentOutput, 0.2);
           indexBottom.set(ControlMode.PercentOutput, 0.2);
+          break;
+
+        case "Intake Ball": // Spins bottom intake while ball in being intaked
+          indexBottom.set(ControlMode.PercentOutput, -0.2);
           break;
 
         default:  // Everything stops
@@ -109,7 +109,7 @@ public class Intake implements Loggable {
     } 
 
   private String indexManager() {
-    if (Robot.xbox.getRightStickButtonPressed()) {
+    if (Robot.xbox.getBButton()) {
       return "Reverse Intake";
     } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { // Both switches pressed
       return "2 Balls";
