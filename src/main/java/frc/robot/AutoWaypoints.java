@@ -130,6 +130,29 @@ public class AutoWaypoints implements Loggable {
         }
     }
 
+    public enum TwoBallAuto {
+        TWOBALLTRANSITION1(SINGLE_INSTANCE::twoBallIntake1, "TWOBALLTRANSITION2"),
+        TWOBALLTRANSITION2(SINGLE_INSTANCE::twoBallShoot, "TWOBALLTRANSITION2");
+
+    
+        private Runnable action;
+        private String nextState;
+
+        TwoBallAuto(Runnable _action, String _nextState){
+            action = _action;
+            nextState = _nextState;
+        }
+
+        public Runnable getAction() {
+            return action;
+        }
+
+        public String getNextState() {
+            return nextState;
+        }
+
+    }
+
     public void autoRunner(String _startingState){
         if (_startingState != "" && StartingStateOverride){
             CurrentState = _startingState;
@@ -150,38 +173,39 @@ public class AutoWaypoints implements Loggable {
          }
     }
         
-        public enum TwoBallAuto {
-            TWOBALLTRANSITION1(SINGLE_INSTANCE::twoBallIntake1, "TWOBALLTRANSITION2"),
-            TWOBALLTRANSITION2(SINGLE_INSTANCE::twoBallShoot, "TWOBALLTRANSITION2");
 
-            
-            private Runnable action;
-            private String nextState;
-    
-            TwoBallAuto(Runnable _action, String _nextState){
-                action = _action;
-                nextState = _nextState;
-            }
-    
-            public Runnable getAction() {
-                return action;
-            }
-    
-            public String getNextState() {
-                return nextState;
-            }
+    private void intakeBall() {
+        FourBallAuto _state = FourBallAuto.valueOf(CurrentState);
 
+        if (getDistance(currentX, currentY, _state.posX, _state.posY) < 0.5) {
+            Robot.INTAKE.intakeNow = true;
+
+            if (getDistance(currentX, currentY, _state.posX, _state.posY) > 0.5) {
+                StateHasFinished = true;
+            }
         }
+
+        
+    }
+
+    private void shoot() {
+        FourBallAuto _state = FourBallAuto.valueOf(CurrentState);
+
+        if (getDistance(currentX, currentY, _state.posX, _state.posY) < 0.5) {
+            Robot.INTAKE.shootNow = true;
+            StateHasFinished = true;
+        }
+    }
     
-        public void autoTwoBallRunner(String _startingState){
-            if (_startingState != "" && StartingStateOverride){
-                CurrentState = _startingState;
-                StartingStateOverride = false;
-            } 
-           
-            if (CurrentState == "") {
-                CurrentState = FourBallAuto.values()[0].toString();
-            }
+    public void autoTwoBallRunner(String _startingState){
+        if (_startingState != "" && StartingStateOverride){
+            CurrentState = _startingState;
+            StartingStateOverride = false;
+        } 
+        
+        if (CurrentState == "") {
+            CurrentState = FourBallAuto.values()[0].toString();
+        }
 
         //if we made one round with the state, we have successfully initialized
         FourBallAuto.valueOf(CurrentState).getAction().run();
@@ -214,28 +238,7 @@ public class AutoWaypoints implements Loggable {
     }
 
     //FOUR BALL AUTO METHODS HERE
-    private void intakeBall() {
-        FourBallAuto currentState = FourBallAuto.valueOf(CurrentState);
-
-        if (getDistance(currentX, currentY, currentState.posX, currentState.posY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
-
-            if (getDistance(currentX, currentY, currentState.posX, currentState.posY) > 0.5) {
-                StateHasFinished = true;
-            }
-        }
-
-        
-    }
-
-    private void shoot() {
-        FourBallAuto currentState = FourBallAuto.valueOf(CurrentState);
-
-        if (getDistance(currentX, currentY, currentState.posX, currentState.posY) < 0.5) {
-            Robot.INTAKE.shootNow = true;
-            StateHasFinished = true;
-        }
-    }
+    
 
     private double getDistance(double X1, double Y1, double X2, double Y2) { //just the distance formula - uses current x and y positions
         double distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
