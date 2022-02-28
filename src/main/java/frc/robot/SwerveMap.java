@@ -154,12 +154,14 @@ public class SwerveMap {
                 if(mSteeringSensor.getLastError()==ErrorCode.OK){
                     hasGoodCANCoderSeedingOccurred = true;
                 } else {
-                    System.out.println("Couldn't zero swerve module");
+                    System.out.println("Couldn't zero swerve module!!!");
                 }
             } else if(!hasSwerveZeroingOccurred){
                 mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,Constants.kDefaultTimeout);
                 if(mSteeringMotor.getLastError()==ErrorCode.OK){
                     hasSwerveZeroingOccurred = true;
+                } else {
+                    System.out.println("Couldn't zero swerve module!!!2");
                 }
             }
         }
