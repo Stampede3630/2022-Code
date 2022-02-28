@@ -144,7 +144,7 @@ public class SwerveMap {
         }
 
         public void zeroSwerveAngle() {
-            mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,Constants.kDefaultTimeout);
+            mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getAbsolutePosition(),0,Constants.kDefaultTimeout);
         }
         public void REzeroSwerveAngle() {
             mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getAbsolutePosition()-mSteeringMotor.getSelectedSensorPosition(),0,Constants.kDefaultTimeout);

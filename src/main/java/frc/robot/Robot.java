@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.fasterxml.jackson.databind.ser.std.StdArraySerializers.IntArraySerializer;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
@@ -57,8 +58,8 @@ public class Robot extends TimedRobot {
     INTAKE.init();
 
     //*** Auto Container method starts here***
-    //AUTOWAYPOINTS = AutoWaypoints.getInstance();
-    //AUTOWAYPOINTS.init();
+    // AUTOWAYPOINTS = AutoWaypoints.getInstance();
+    // AUTOWAYPOINTS.init();
 
     // ****Shooter method starts here****
     SHOOTER = Shooter.getInstance();
@@ -114,12 +115,18 @@ public class Robot extends TimedRobot {
     // if(RUN_TRAJECTORY){
     // SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     // }
+
+    // INTAKE.intakePeriodic();
+    // SHOOTER.shoot();
+
   }
+
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
     SWERVEDRIVE.setToBrake();
+    INTAKE.intakeNow = false;
   }
 
   /** This function is called periodically during operator control. */

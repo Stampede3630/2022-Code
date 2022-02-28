@@ -286,7 +286,7 @@ public class SwerveDrive implements Loggable {
   public boolean getGyroInterference(){
     return SwerveMap.GYRO.isMagneticDisturbance();
   }
-  @Config.NumberSlider(name="Governor", defaultValue = .51, min = 0, max = 1, rowIndex = 2, columnIndex = 0, height = 1, width = 2)
+  @Config.NumberSlider(name="Governor", defaultValue = 1, min = 0, max = 1, rowIndex = 2, columnIndex = 0, height = 1, width = 2)
   public void setJoystickGovernor(double _input){
     joystickDriveGovernor = _input;
   }
@@ -298,6 +298,7 @@ public class SwerveDrive implements Loggable {
     holdRobotAngleSetpoint = 0;
     Robot.SWERVEDRIVE.m_odometry.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
     _input = false;
+    SwerveMap.GYRO.setAngleAdjustment(0);
     }
   }
 

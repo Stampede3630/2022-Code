@@ -19,12 +19,7 @@ public class CompetitionLogger implements Loggable {
 
     public boolean beginClimb = false;
 
-    @Config.ToggleButton(name = "climb?", defaultValue = false)
-    private void beginClimbing(boolean _input, boolean beginClimb){
-        if(_input){
-            beginClimb = true;
-            }
-        }
+
     
     private SwerveDriveDB mySwerveDrivebuttons = new SwerveDriveDB();
    // private String autoChooser;
@@ -48,6 +43,13 @@ public class CompetitionLogger implements Loggable {
         public void ResetGyroAndOdometry(boolean _input){
             Robot.SWERVEDRIVE.resetGyroAndOdometry(_input);
         }
+
+        @Config
+        private void beginClimbing(boolean _input){
+            if(_input){
+                beginClimb = true;
+                }
+            }
 
     }
 

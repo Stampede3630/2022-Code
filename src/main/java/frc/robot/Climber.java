@@ -27,8 +27,8 @@ public class Climber implements Loggable{
     boolean tiltArms = false;
     
     final double TICKSPERREVOLUTION=2048;
-    final double TICKSATTOP=239200;
-    final double INCHESATTOP=27;
+    final double TICKSATTOP=1;
+    final double INCHESATTOP=1;
     final double TICKSPERINCH=TICKSATTOP/INCHESATTOP;
     final int FULLEXTEND = 27;
     final int HALFEXTEND = 12;
@@ -52,7 +52,7 @@ public class Climber implements Loggable{
         climberTalon.setSelectedSensorPosition(0,0,20);
         climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
         climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 3);
-        climberTalon.config_kP(0, 500, 20);
+        climberTalon.config_kP(0, 750, 20);
         atOrigin = false;
         upOne = false;
 
@@ -75,10 +75,10 @@ public class Climber implements Loggable{
 
     private void manualClimberMotor(){
         if (Robot.xbox.getPOV()==0){
-            climberTalon.set(ControlMode.PercentOutput, 0.5); // Set faster climb speed for auto
+            climberTalon.set(ControlMode.PercentOutput, 1); // Set faster climb speed for auto
         }
         else if (Robot.xbox.getPOV()==180){
-            climberTalon.set(ControlMode.PercentOutput, -0.5);
+            climberTalon.set(ControlMode.PercentOutput, -1);
         } else {
             climberTalon.set(ControlMode.PercentOutput, 0);
         }
@@ -174,28 +174,28 @@ public class Climber implements Loggable{
     }
 
     public void raiseAndExtend()  {
-        if (climberTalon.getSelectedSensorPosition(0) < 15) {
-            climberTalon.set(ControlMode.Position, 17);
+        if (climberTalon.getSelectedSensorPosition(0) < 10.0) {
+            climberTalon.set(ControlMode.Position, 12.0);
+        } else if (climberTalon.getSelectedSensorPosition(0) >= 10.0) {
             climberSolenoid.set(Value.kReverse);
-        } else if (climberTalon.getSelectedSensorPosition(0) >= 15) {
-            climberTalon.set(ControlMode.Position, 27);
+            climberTalon.set(ControlMode.Position, 28.5);
             
-            if (climberTalon.getSelectedSensorPosition(0) >= 27) {
+            if (climberTalon.getSelectedSensorPosition(0) >= 28.5) {
                 StateHasFinished = true;
             }
         }
     }
 
     public void raiseArm28() {
-        climberTalon.set(ControlMode.Position, 28);
+        climberTalon.set(ControlMode.Position, 28.5);
 
-        if (climberTalon.getSelectedSensorPosition(0) >= 28) {
+        if (climberTalon.getSelectedSensorPosition(0) >= 28.0) {
             StateHasFinished  = true;
         }
     }
 
     public void lowerArm28() {
-        climberTalon.set(ControlMode.PercentOutput, -0.5);
+        climberTalon.set(ControlMode.PercentOutput, -0.50);
 
         // **** Add fault tolerance for arms ****
         if ((climberHomeLeft.get() || climberHomeRight.get()) && climberTalon.getSelectedSensorPosition(0) <= 2) {

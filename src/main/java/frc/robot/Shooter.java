@@ -61,7 +61,7 @@ public class Shooter implements Loggable {
         // Figure out which way later
     }
 
-    @Config.NumberSlider(name = "Set Shooter Speed", min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 5, width = 5)
+    @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 5, width = 5)
     public void setShooterSpeed(double targetVelocity) {
         shooterSpeed = targetVelocity;
 

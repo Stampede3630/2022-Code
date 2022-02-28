@@ -33,6 +33,7 @@ public class AutoWaypoints implements Loggable {
     public void autoPeriodic() {
         currentX = Robot.SWERVEDRIVE.getXPos();
         currentY = Robot.SWERVEDRIVE.getYPos();
+        autoRunner("");
     }
 
     @Log
@@ -90,8 +91,6 @@ public class AutoWaypoints implements Loggable {
        }
         
     }
-    
-
 
     public void startPointRunner(String _startPoint){
         if(_startPoint != ""){
@@ -104,18 +103,22 @@ public class AutoWaypoints implements Loggable {
     }
 
     public enum FourBallAuto {
-        BALL1TRANSITION(SINGLE_INSTANCE::intakeBall1, "SHOOT1TRANSITION"),
-        SHOOT1TRANSITION(SINGLE_INSTANCE::shoot1, "BALL2TRANSITION"),
-        BALL2TRANSITION(SINGLE_INSTANCE::intakeBall2, "BALL3TRANSITION"),
-        BALL3TRANSITION(SINGLE_INSTANCE::intakeBall3, "SHOOT2TRANSITION"),
-        SHOOT2TRANSITION(SINGLE_INSTANCE::shoot2, "SHOOT2TRANSITION");
+        BALL1TRANSITION(SINGLE_INSTANCE::intakeBall, 7.801, 1.678, "SHOOT1TRANSITION"),
+        SHOOT1TRANSITION(SINGLE_INSTANCE::shoot, 7.882, 2.952, "BALL2TRANSITION"),
+        BALL2TRANSITION(SINGLE_INSTANCE::intakeBall, 5.278, 2.014, "BALL3TRANSITION"),
+        BALL3TRANSITION(SINGLE_INSTANCE::intakeBall, 1.273, 1.215,"SHOOT2TRANSITION"),
+        SHOOT2TRANSITION(SINGLE_INSTANCE::shoot, 7.581, 3.033, "SHOOT2TRANSITION");
         
         private Runnable action;
         private String nextState;
+        private double posX, posY;
 
-        FourBallAuto(Runnable _action, String _nextState){
+        FourBallAuto(Runnable _action, double _posX, double _posY, String _nextState){
             action = _action;
             nextState = _nextState;
+            posX = _posX;
+            posY = _posY;
+
         }
 
         public Runnable getAction() {
@@ -136,7 +139,17 @@ public class AutoWaypoints implements Loggable {
         if (CurrentState == "") {
             CurrentState = FourBallAuto.values()[0].toString();
         }
+
+         // If we made one round with the state, we have successfully initialized
+         if (!StateHasInitialized) {StateHasInitialized = true;}
+         FourBallAuto.valueOf(CurrentState).getAction().run();
+         if (StateHasFinished){
+             CurrentState = FourBallAuto.valueOf(CurrentState).getNextState();
+             StateHasFinished = false; 
+             StateHasInitialized = false;
+         }
     }
+        
         public enum TwoBallAuto {
             TWOBALLTRANSITION1(SINGLE_INSTANCE::twoBallIntake1, "TWOBALLTRANSITION2"),
             TWOBALLTRANSITION2(SINGLE_INSTANCE::twoBallShoot, "TWOBALLTRANSITION2");
@@ -159,8 +172,6 @@ public class AutoWaypoints implements Loggable {
             }
 
         }
-        
-        
     
         public void autoTwoBallRunner(String _startingState){
             if (_startingState != "" && StartingStateOverride){
@@ -203,53 +214,25 @@ public class AutoWaypoints implements Loggable {
     }
 
     //FOUR BALL AUTO METHODS HERE
+    private void intakeBall() {
+        FourBallAuto currentState = FourBallAuto.valueOf(CurrentState);
 
-    private void intakeBall1() {
-        double ballX = 7.801352311565382;
-        double ballY = 1.6783324705889917;
+        if (getDistance(currentX, currentY, currentState.posX, currentState.posY) < 0.5) {
+            Robot.INTAKE.intakeNow = true;
 
-        if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            //Robot.INTAKE.intakeNow = true;
-            StateHasFinished = true;
+            if (getDistance(currentX, currentY, currentState.posX, currentState.posY) > 0.5) {
+                StateHasFinished = true;
+            }
         }
+
+        
     }
 
-    private void intakeBall2() {
-        double ballX = 5.278066252335036;
-        double ballY = 2.0139989647067895;
+    private void shoot() {
+        FourBallAuto currentState = FourBallAuto.valueOf(CurrentState);
 
-        if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            // Robot.INTAKE.intakeNow = true;
-            StateHasFinished = true;
-        }
-    }
-
-    private void intakeBall3() {
-        double ballX = 1.2732177363088897;
-        double ballY = 1.2153442028403045;
-
-        if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            // Robot.INTAKE.intakeNow = true;
-            StateHasFinished = true;
-        }
-    }
-
-    private void shoot1() {
-        double posX = 7.882375258421403;
-        double posY = 2.951550206897882;
-
-        if (getDistance(currentX, currentY, posX, posY) < 0.5) {
-            // Robot.INTAKE.shootNow = true;
-            StateHasFinished = true;
-        }
-    }
-
-    private void shoot2() {
-        double posX = 7.581432884384757;
-        double posY = 3.0325731537539022;
-
-        if (getDistance(currentX, currentY, posX, posY) < 0.5) {
-            // Robot.INTAKE.shootNow = true;
+        if (getDistance(currentX, currentY, currentState.posX, currentState.posY) < 0.5) {
+            Robot.INTAKE.shootNow = true;
             StateHasFinished = true;
         }
     }
