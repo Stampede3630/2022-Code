@@ -24,8 +24,10 @@ public class AutoWaypoints implements Loggable {
     }
 
     public void init() {
+        //SJV: PUT ALL PATH PLANNER PATH LOADS INTO A SEPARATE METHOD AND EXECUTE AT ROBOTINIT
         fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 3, 2.5);
         SwerveMap.GYRO.reset();
+        ///SJV: SET THIS ANGLE ACCORDING TO THE CHOSEN PATH IN COMPETITION
         SwerveMap.GYRO.setAngleAdjustment(-90);
         chooserBuilder();
     }
@@ -52,12 +54,14 @@ public class AutoWaypoints implements Loggable {
     public SendableChooser<AutoPoses> m_autoChooser = new SendableChooser<>();
 
     public enum AutoPoses {
+        //SJV: NAME THESE SOMETHING SIMILAR TO THE PATH IN PATH PLANNER FOR READABILITY SAKES
         STARTINGPOINTFBA(7.80, 1.68, 0.00, "STARTINGPOINTFBA"),
         STARTINGPOINTTBA(6.09, 5.23, -43.78, "STARTINGPOINTTBA");
 
         private double thisX;
         private double thisY;
         private double thisRot;
+        //SJV: I DONT THINK YOU NEED THIS YOU CAN GET THE NAME OF THE ENUM BY DOING "toString()"
         private String thisStartPoint;
 
         AutoPoses(double _x, double _y, double _rot, String _startPoint){
@@ -85,6 +89,7 @@ public class AutoWaypoints implements Loggable {
   
     }
     public void chooserBuilder(){
+        //SJV: DESIGN A DEFAULT AUTO WHICH SHOOTS A BALL AND MOVES OFF THE TARMAC
        for (AutoPoses myAutoPose : AutoPoses.values()){
            
         SINGLE_INSTANCE.m_autoChooser.addOption(myAutoPose.toString(), myAutoPose);
@@ -92,6 +97,7 @@ public class AutoWaypoints implements Loggable {
         
     }
 
+    //SJV: EVALUATE WHETHER OR NOT WE NEED THIS?
     public void startPointRunner(String _startPoint){
         if(_startPoint != ""){
             CurrentStartPoint = _startPoint;
@@ -160,6 +166,7 @@ public class AutoWaypoints implements Loggable {
         } 
        
         if (CurrentState == "") {
+            //SJV: MAKE THIS TAKE THE CHOSEN PATH FROM THE CHOOSER SO YOU DONT NEED AN AUTO RUNNER FOR EACH AUTO
             CurrentState = FourBallAuto.values()[0].toString();
         }
 
@@ -176,7 +183,7 @@ public class AutoWaypoints implements Loggable {
 
     private void intakeBall() {
         FourBallAuto _state = FourBallAuto.valueOf(CurrentState);
-
+        //SJV: NEED TO TURN INTAKE OFF WHEN STATE IS FINISHED, NEED TO PROLLY LOWER THE DISTANCE FROM HALF A METER TO LESS (TEST PLEASE)
         if (getDistance(currentX, currentY, _state.posX, _state.posY) < 0.5) {
             Robot.INTAKE.intakeNow = true;
 
@@ -190,7 +197,7 @@ public class AutoWaypoints implements Loggable {
 
     private void shoot() {
         FourBallAuto _state = FourBallAuto.valueOf(CurrentState);
-
+        //SJV: TO ALLOW FOR SPINUP, WE MAY WANT TO SET KILL THE BATTERY EARLIER IN INIT OR HERE
         if (getDistance(currentX, currentY, _state.posX, _state.posY) < 0.5) {
             Robot.INTAKE.shootNow = true;
             StateHasFinished = true;
@@ -218,7 +225,7 @@ public class AutoWaypoints implements Loggable {
     }
 
     //TWO BALL AUTO METHODS HERE
-
+    //SJV: CONVERT THESE TO THE REAL TWOBALL AUTO AND FOLLOW FORMAT ON FOURBALLAUTO
     private void twoBallIntake1() {
         double ballX = 7.65;
         double ballY = 0.60;
@@ -244,7 +251,7 @@ public class AutoWaypoints implements Loggable {
         double distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
         return distance;
     }
- 
+ //SJV: I THINK THESE ARE NOW OBSOLETE, HAVING A SEPARATE BUTTON FOR EACH AUTO WILL MAKE OUR ROBOT SCHIZOPHRENIC
     @Config.ToggleButton(name = "Four Ball Auto", defaultValue = false)
     public void fbaStartButton(boolean _input, double thisX, double thisY, double thisRot){
         if(_input){

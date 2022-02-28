@@ -34,6 +34,8 @@ public class Intake implements Loggable {
   }
 
   public void init(){
+
+    //SJV: PUT ALL SOLENOID AND MOTOR VALUES IN CONSTANTS, FORMATE BELOW SHOULD LOOK LIKE "=new WPI_TalonFX(Constants.intakeMotor);"
     intakeDrive  = new WPI_TalonFX(7);
     indexBottom = new WPI_TalonFX(6);
     indexTop = new WPI_TalonFX(9);
@@ -49,7 +51,7 @@ public class Intake implements Loggable {
     intake();
     shootIndexManager();
   }
-
+//SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
   private void intake() {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       intakeSolenoid.set(Value.kReverse);
@@ -74,7 +76,7 @@ public class Intake implements Loggable {
       indexerDrive(); // Defaults to state machine below
     }
   }
-
+  //SJV: DOES INDEXER NEED TO BE RUN FASTER?
   private void indexerDrive() {
       switch (indexManager()) {
         case "1 Ball": // Hold the ball at the top of tower
@@ -129,6 +131,7 @@ public class Intake implements Loggable {
   public void turnToIntake() {
     limelightSolenoid.set(Value.kReverse);
     // Make intake pipeline
+    //SJV: time to make those pipe lines
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
     limelightIsOpen = false;
     // ^^^
