@@ -141,7 +141,7 @@ public class Robot extends TimedRobot {
 
     INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
-    SHOOTER.shoot();
+    SHOOTER.shooterPeriodic();
   }
 
   /** This function is called once when the robot is disabled. */

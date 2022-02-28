@@ -43,8 +43,8 @@ public class Shooter implements Loggable {
         }
 
     }
-
-    public void shoot() {
+    //SJV: I hope ur fine with me renaming this method
+    public void shooterPeriodic() {
         if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed);
             turnToShooter();
@@ -61,6 +61,8 @@ public class Shooter implements Loggable {
         // Figure out which way later
     }
 
+
+    //SJV: ONCE WE FIGURE OUT OUR SHOOTER ANGLE AND SPEED MAKE BOOLEAN FOR EACH OF THE SHOOTER SPEEDS AND PUT IT ON THE COMPETITION LOGGER
     @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 5, width = 5)
     public void setShooterSpeed(double targetVelocity) {
         shooterSpeed = targetVelocity;
