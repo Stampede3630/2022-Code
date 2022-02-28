@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -7,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -15,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class SwerveMap {
     public static AHRS GYRO;
+
     public static TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
     public static SimpleMotorFeedforward driveMotorFeedforward = new SimpleMotorFeedforward(Constants.kS, Constants.kV, Constants.kA);
     public static final SwerveModule FrontRightSwerveModule = new SwerveModule(
@@ -91,7 +94,8 @@ public class SwerveMap {
         public final SteeringMotor mSteeringMotor;
         public final SteeringSensor mSteeringSensor;
         public final DriveMotor mDriveMotor;
-
+        private boolean hasGoodCANCoderSeedingOccurred=false;
+        private boolean hasSwerveZeroingOccurred=false;
         public SwerveModule (DriveMotor _DriveMotor, SteeringMotor _SteeringMotor, SteeringSensor _SteeringSensor){
             mSteeringMotor = _SteeringMotor;
             mSteeringSensor = _SteeringSensor;
@@ -113,6 +117,7 @@ public class SwerveMap {
             mDriveMotor.config_IntegralZone(0, mDriveMotor.kGAINS.kIzone);
 
             //Setup the Steering Sensor
+            
             mSteeringSensor.configSensorDirection(false);
             mSteeringSensor.configMagnetOffset(mSteeringSensor.kOffsetDegrees);
             mSteeringSensor.setPositionToAbsolute();
@@ -144,8 +149,21 @@ public class SwerveMap {
         }
 
         public void zeroSwerveAngle() {
-            mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getAbsolutePosition(),0,Constants.kDefaultTimeout);
+            if(!hasGoodCANCoderSeedingOccurred || mSteeringSensor.configGetSensorInitializationStrategy(Constants.kDefaultTimeout) == SensorInitializationStrategy.BootToZero){
+                mSteeringSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition,Constants.kDefaultTimeout);
+                if(mSteeringSensor.getLastError()==ErrorCode.OK){
+                    hasGoodCANCoderSeedingOccurred = true;
+                } else {
+                    System.out.println("Couldn't zero swerve module");
+                }
+            } else if(!hasSwerveZeroingOccurred){
+                mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,Constants.kDefaultTimeout);
+                if(mSteeringMotor.getLastError()==ErrorCode.OK){
+                    hasSwerveZeroingOccurred = true;
+                }
+            }
         }
+
         public void REzeroSwerveAngle() {
             mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getAbsolutePosition()-mSteeringMotor.getSelectedSensorPosition(),0,Constants.kDefaultTimeout);
         }
@@ -203,11 +221,7 @@ public class SwerveMap {
               
             mSteeringMotor.set(ControlMode.Position, newAngleDemand );
         }
-        
-        public double getSteeringAngle(){
-            return mSteeringSensor.getAbsolutePosition();
-        }
-
+      
         public static SwerveModuleState optimize(
             SwerveModuleState desiredState, Rotation2d currentAngle) {
           var delta = desiredState.angle.minus(currentAngle);
