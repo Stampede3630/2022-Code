@@ -150,13 +150,14 @@ public class SwerveMap {
         public void zeroSwerveAngle() {
             if( mSteeringSensor.configGetSensorInitializationStrategy(Constants.kDefaultTimeout).value == SensorInitializationStrategy.BootToZero.value) {
                 if(mSteeringSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition,100).value!=ErrorCode.OK.value) {
-                    System.out.println("WARNING: COULDN'T SET THE INITIALIZATION STRATEGY");
+                    System.out.println("ERROR: COULDN'T SET THE INITIALIZATION STRATEGY! CANCODER: " + mSteeringSensor.getDeviceID());
+                } else {
+                    System.out.println("ERROR: INITIALIZATION STRATEGY SET! REBOOT ROBOT! CANCODER: " + mSteeringSensor.getDeviceID());
                 }
-                System.out.println("WARNING: INITIALIZATION STRATEGY SET! REBOOT ROBOT!!");
             } else if(hasSwerveZeroingOccurred || mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,100).value==0){
                 hasSwerveZeroingOccurred = true;
             } else {
-                System.out.println("WARNING: COULDNT ZERO MODULE: " + mSteeringMotor.getDeviceID());
+                System.out.println("ERROR: COULDNT ZERO MODULE: " + mSteeringMotor.getDeviceID());
             }   
             
         }
