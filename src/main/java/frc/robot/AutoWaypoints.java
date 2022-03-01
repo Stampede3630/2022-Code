@@ -17,7 +17,8 @@ public class AutoWaypoints implements Loggable {
 
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
-
+    public Waypoint[] chosenWaypoints;
+    public int currentWaypointNumber = 0;
     private double stateStartTime;
     private double currentX;
     private double currentY;
@@ -44,7 +45,7 @@ public class AutoWaypoints implements Loggable {
     public void autoPeriodic() {
         currentX = Robot.SWERVEDRIVE.getXPos();
         currentY = Robot.SWERVEDRIVE.getYPos();
-        autoRunner("");
+        waypointRunner(chosenWaypoints);
     }
 
     @Log
@@ -63,155 +64,60 @@ public class AutoWaypoints implements Loggable {
     public SendableChooser<AutoPoses> m_autoChooser = new SendableChooser<>();
 
     public enum AutoPoses {
-        FENDERFOURBALLAUTO(7.80, 1.68, -84.69),
-        FENDERTWOBALLAUTO(6.09, 5.23, 43.78);
+        FENDERFOURBALLAUTO(7.80, 1.68, -84.69, SINGLE_INSTANCE.FenderFourBallAutoWPs),
+        FENDERTWOBALLAUTO(6.09, 5.23, 43.78, SINGLE_INSTANCE.FenderTwoBallAutoWPs);
 
         public double thisX;
         public double thisY;
         public double thisRot;
+        public Waypoint[] thisWPset;
 
-        AutoPoses(double _x, double _y, double _rot){
+        AutoPoses(double _x, double _y, double _rot, Waypoint[] _WP){
             thisX = _x;
             thisY = _y;
             thisRot = _rot;
+            thisWPset = _WP;
 
         }
-  
     }
+
     public void chooserBuilder(){
         //SJV: DESIGN A DEFAULT AUTO WHICH SHOOTS A BALL AND MOVES OFF THE TARMAC
        for (AutoPoses myAutoPose : AutoPoses.values()){
            
         SINGLE_INSTANCE.m_autoChooser.addOption(myAutoPose.toString(), myAutoPose);
        }
-        
     }
-
-    interface AutoState {
-        public Runnable getAction();
-        public String getNextState();
-    }
-
-    public enum FourBallAuto implements AutoState {
-        BALL1TRANSITION(SINGLE_INSTANCE::intakeBall, 7.801, 1.678, "SHOOT1TRANSITION"),
-        SHOOT1TRANSITION(SINGLE_INSTANCE::shoot, 7.882, 2.952, "BALL2TRANSITION"),
-        BALL2TRANSITION(SINGLE_INSTANCE::intakeBall, 5.278, 2.014, "BALL3TRANSITION"),
-        BALL3TRANSITION(SINGLE_INSTANCE::intakeBall, 1.273, 1.215,"SHOOT2TRANSITION"),
-        SHOOT2TRANSITION(SINGLE_INSTANCE::shoot, 7.581, 3.033, "SHOOT2TRANSITION");
-        
-        private Runnable action;
-        private String nextState;
-        private double posX, posY;
-
-        FourBallAuto(Runnable _action, double _posX, double _posY, String _nextState){
-            action = _action;
-            nextState = _nextState;
-            posX = _posX;
-            posY = _posY;
-
-        }
-
-        public Runnable getAction() {
-            return action;
-        }
-
-        public String getNextState() {
-            return nextState;
-        }
-    }
-
-    public enum TwoBallAuto implements AutoState {
-        TWOBALLTRANSITION1(SINGLE_INSTANCE::twoBallIntake1, "TWOBALLTRANSITION2"),
-        TWOBALLTRANSITION2(SINGLE_INSTANCE::twoBallShoot, "TWOBALLTRANSITION2");
-
-    
-        private Runnable action;
-        private String nextState;
-
-        TwoBallAuto(Runnable _action, String _nextState){
-            action = _action;
-            nextState = _nextState;
-        }
-
-        public Runnable getAction() {
-            return action;
-        }
-
-        public String getNextState() {
-            return nextState;
-        }
-
-    }
-
-    // enum chosenState as parameter?
-    public void autoRunner(String _startingState){
-        if (_startingState != "" && StartingStateOverride){
-            CurrentState = _startingState;
-            StartingStateOverride = false;
-        } 
-       
-        if (CurrentState == "") {
-            //SJV: MAKE THIS TAKE THE CHOSEN PATH FROM THE CHOOSER SO YOU DONT NEED AN AUTO RUNNER FOR EACH AUTO
-            CurrentState = FourBallAuto.values()[0].toString();
-        }
-
-         // If we made one round with the state, we have successfully initialized
-         if (!StateHasInitialized) {StateHasInitialized = true;}
-         FourBallAuto.valueOf(CurrentState).getAction().run();
-         if (StateHasFinished){
-             CurrentState = FourBallAuto.valueOf(CurrentState).getNextState();
-             StateHasFinished = false; 
-             StateHasInitialized = false;
-         }
-    }
-        
 
     private void intakeBall() {
-        FourBallAuto _state = FourBallAuto.valueOf(CurrentState);
         //SJV: NEED TO TURN INTAKE OFF WHEN STATE IS FINISHED, NEED TO PROLLY LOWER THE DISTANCE FROM HALF A METER TO LESS (TEST PLEASE)
-        if (getDistance(currentX, currentY, _state.posX, _state.posY) < 0.5) {
+        if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
             Robot.INTAKE.intakeNow = true;
 
-            if (getDistance(currentX, currentY, _state.posX, _state.posY) > 0.5) {
+            if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
                 StateHasFinished = true;
                 Robot.INTAKE.intakeNow = false;
             }
         }
-
-        
     }
 
     private void shoot() {
-        FourBallAuto _state = FourBallAuto.valueOf(CurrentState);
-        if (getDistance(currentX, currentY, _state.posX, _state.posY) < 0.5) {
+       
+        if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
             Robot.INTAKE.shootNow = true;
 
-            if (getDistance(currentX, currentY, _state.posX, _state.posY) > 0.5) {
+            if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
                 Robot.INTAKE.shootNow = false;
                 StateHasFinished = true;
             }
         }
     }
-    
-    public void autoTwoBallRunner(String _startingState){
-        if (_startingState != "" && StartingStateOverride){
-            CurrentState = _startingState;
-            StartingStateOverride = false;
-        } 
-        
-        if (CurrentState == "") {
-            CurrentState = FourBallAuto.values()[0].toString();
-        }
 
-        //if we made one round with the state, we have successfully initialized
-        FourBallAuto.valueOf(CurrentState).getAction().run();
-        if (!StateHasInitialized) {StateHasInitialized = true;}
-        if (StateHasFinished){
-            CurrentState = FourBallAuto.valueOf(CurrentState).getNextState();
-            StateHasFinished = false; 
-            StateHasInitialized = false;
-        }
+    public void done(){
+        //ADDED TO NOT GO OUT OF BOUNDS IN A ARRAY WAYPOINT RUNNER
+        //FEEL FREE TO ADD THING TO THE DONE STATE
     }
+
 
     //TWO BALL AUTO METHODS HERE
     //SJV: CONVERT THESE TO THE REAL TWOBALL AUTO AND FOLLOW FORMAT ON FOURBALLAUTO
@@ -240,5 +146,42 @@ public class AutoWaypoints implements Loggable {
         double distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
         return distance;
     }
- 
+
+    public class Waypoint{
+        public Runnable action;
+        public double posX ;
+        public double posY;
+
+        public Waypoint(Runnable _action, double _x, double _y) {
+            action = _action;
+            posX=_x;
+            posY=_y;
+        }
+    }
+
+    public Waypoint[] FenderTwoBallAutoWPs = new Waypoint[] {
+        new Waypoint(SINGLE_INSTANCE::intakeBall, 7.65, .060),
+        new Waypoint(SINGLE_INSTANCE::shoot, 7.88, 2.86),
+        new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
+    };
+
+    public Waypoint[] FenderFourBallAutoWPs = new Waypoint[] {
+        new Waypoint(SINGLE_INSTANCE::intakeBall, 7.801, 1.678),
+        new Waypoint(SINGLE_INSTANCE::shoot, 7.882, 2.952),
+        new Waypoint(SINGLE_INSTANCE::intakeBall, 5.278, 2.014),
+        new Waypoint(SINGLE_INSTANCE::intakeBall, 1.273, 1.215),
+        new Waypoint(SINGLE_INSTANCE::shoot, 7.581, 3.033),
+        new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
+    };
+
+    public void waypointRunner(Waypoint[] chosenWaypoints){
+        // If we made one round with the state, we have successfully initialized
+        if (!StateHasInitialized) {StateHasInitialized = true;}
+            chosenWaypoints[currentWaypointNumber].action.run();
+        if (StateHasFinished){
+            currentWaypointNumber++;
+            StateHasFinished = false; 
+            StateHasInitialized = false;
+        }
+    }
 }
