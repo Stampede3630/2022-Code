@@ -117,12 +117,8 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     
     AUTOWAYPOINTS.autoPeriodic();
-    AUTOWAYPOINTS.loadAutoPaths();
-    // SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
-    // if(RUN_TRAJECTORY){
-    // SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
-    // }
-
+    SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.chosenPath.thisPathPLan, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    
     INTAKE.intakePeriodic();
     SHOOTER.shooterPeriodic();
 

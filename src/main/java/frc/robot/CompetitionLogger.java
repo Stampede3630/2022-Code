@@ -55,9 +55,6 @@ public class CompetitionLogger implements Loggable {
     }
 
     @Log
-    public SendableChooser<AutoPoses> autoChooser = Robot.AUTOWAYPOINTS.m_autoChooser;
-
-    @Log
     public float getPitch(){
       return SwerveMap.GYRO.getPitch();
     }
