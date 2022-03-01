@@ -78,8 +78,8 @@ public class Robot extends TimedRobot {
     
 
     // // *****test climber method starts here*****
-    // CLIMBER = Climber.getInstance();
-    // CLIMBER.init();
+    CLIMBER = Climber.getInstance();
+    CLIMBER.init();
 
 
 
@@ -150,7 +150,7 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.swervePeriodic();
       //intake code for teleop
 
-   // CLIMBER.periodic();
+   CLIMBER.periodic();
 
     INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
