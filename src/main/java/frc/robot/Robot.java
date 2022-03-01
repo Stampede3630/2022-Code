@@ -81,7 +81,7 @@ public class Robot extends TimedRobot {
     // It's a lot easier to use than standard shuffleboard syntax
 
     COMPETITIONLOGGER = CompetitionLogger.getInstance();
-    
+    Logger.setCycleWarningsEnabled(false);
     Logger.configureLoggingAndConfig(this, false);
   }
 

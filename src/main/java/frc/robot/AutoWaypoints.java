@@ -33,7 +33,12 @@ public class AutoWaypoints implements Loggable {
 
     public void init() {
         SwerveMap.GYRO.reset();
-        chosenPath = AutoPoses.valueOf(m_autoChooser.getSelected().toString());
+        if (m_autoChooser.getSelected()==null){
+            chosenPath = AutoPoses.FENDERFOURBALLAUTO;
+        } else {
+            chosenPath = AutoPoses.valueOf(m_autoChooser.getSelected().toString());
+        }
+        
         chosenWaypoints = chosenPath.thisWPset;
         SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
         Robot.SHOOTER.homocideTheBattery = true;
