@@ -1,12 +1,5 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
-import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.AutoWaypoints.AutoPoses;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -21,9 +14,9 @@ public class CompetitionLogger implements Loggable {
     public boolean beginClimb = false;
 
 
-    
+    //KEEP THIS INSTANTIATION IT'S FOR LOGGING
     private SwerveDriveDB mySwerveDrivebuttons = new SwerveDriveDB();
-   // private String autoChooser;
+   
     public class SwerveDriveDB implements Loggable {
         
         
@@ -51,6 +44,13 @@ public class CompetitionLogger implements Loggable {
                 beginClimb = true;
                 }
             }
+        @Log
+        public boolean allZeroedModules(){
+        return SwerveMap.BackLeftSwerveModule.hasSwerveZeroingOccurred &&
+               SwerveMap.BackRightSwerveModule.hasSwerveZeroingOccurred &&
+               SwerveMap.FrontLeftSwerveModule.hasSwerveZeroingOccurred &&
+               SwerveMap.FrontRightSwerveModule.hasSwerveZeroingOccurred;
+    }
 
     }
 
@@ -58,5 +58,6 @@ public class CompetitionLogger implements Loggable {
     public float getPitch(){
       return SwerveMap.GYRO.getPitch();
     }
+
 
 }

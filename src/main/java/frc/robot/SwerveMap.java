@@ -94,8 +94,7 @@ public class SwerveMap {
         public final SteeringMotor mSteeringMotor;
         public final SteeringSensor mSteeringSensor;
         public final DriveMotor mDriveMotor;
-        private boolean hasGoodCANCoderSeedingOccurred=false;
-        private boolean hasSwerveZeroingOccurred=false;
+        public boolean hasSwerveZeroingOccurred=false;
         public SwerveModule (DriveMotor _DriveMotor, SteeringMotor _SteeringMotor, SteeringSensor _SteeringSensor){
             mSteeringMotor = _SteeringMotor;
             mSteeringSensor = _SteeringSensor;
@@ -151,12 +150,13 @@ public class SwerveMap {
         public void zeroSwerveAngle() {
             if( mSteeringSensor.configGetSensorInitializationStrategy(Constants.kDefaultTimeout).value == SensorInitializationStrategy.BootToZero.value) {
                 if(mSteeringSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition,100).value!=ErrorCode.OK.value) {
-                    System.out.println("Couldn't zero swerve module!!!");
+                    System.out.println("WARNING: COULDN'T SET THE INITIALIZATION STRATEGY");
                 }
-            } else if(!hasSwerveZeroingOccurred || mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,100).value==0){
+                System.out.println("WARNING: INITIALIZATION STRATEGY SET! REBOOT ROBOT!!");
+            } else if(hasSwerveZeroingOccurred || mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,100).value==0){
                 hasSwerveZeroingOccurred = true;
             } else {
-                System.out.println("Couldn't zero swerve module!!!2");
+                System.out.println("WARNING: COULDNT ZERO MODULE: " + mSteeringMotor.getDeviceID());
             }   
             
         }

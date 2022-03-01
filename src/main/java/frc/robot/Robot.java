@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.fasterxml.jackson.databind.ser.std.StdArraySerializers.IntArraySerializer;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
@@ -34,7 +33,6 @@ public class Robot extends TimedRobot {
 
   public static XboxController xbox = new XboxController(0);
 
-  // public static PathPlannerTrajectory examplePath; 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -97,13 +95,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
      SWERVEDRIVE.updateOdometry();
-    Logger.updateEntries();
+     Logger.updateEntries();
   }
 
   @Override
   public void autonomousInit() {
-     SWERVEDRIVE.setToBrake();
-
+    SWERVEDRIVE.setToBrake();
     AUTOWAYPOINTS.init();
      
 
