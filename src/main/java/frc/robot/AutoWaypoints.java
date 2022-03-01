@@ -24,7 +24,6 @@ public class AutoWaypoints implements Loggable {
     public Boolean StateHasInitialized = false;
     @Log(tabName = "CompetitionLogger")
     public double distance = 0;
-    
     @Log(tabName = "CompetitionLogger")
     public SendableChooser<AutoPoses> m_autoChooser = new SendableChooser<>();
  
