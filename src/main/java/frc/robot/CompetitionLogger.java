@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.robot.AutoWaypoints.AutoPoses;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -53,8 +54,12 @@ public class CompetitionLogger implements Loggable {
 
     }
 
-    // @Log
-    // SendableChooser autoChooser = Robot.AUTOWAYPOINTS.m_autoChooser;
+    @Log
+    public SendableChooser<AutoPoses> autoChooser = Robot.AUTOWAYPOINTS.m_autoChooser;
 
+    @Log
+    public float getPitch(){
+      return SwerveMap.GYRO.getPitch();
+    }
 
 }

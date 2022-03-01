@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.nio.file.Path;
+
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
@@ -14,22 +16,29 @@ public class AutoWaypoints implements Loggable {
     private static AutoWaypoints SINGLE_INSTANCE = new AutoWaypoints();
 
     public PathPlannerTrajectory fourBallAutoPath;
+    public PathPlannerTrajectory twoBallAutoPath;
 
     private double stateStartTime;
     private double currentX;
     private double currentY;
+    private AutoPoses chosenPath;
  
     public static AutoWaypoints getInstance() {
         return SINGLE_INSTANCE;
     }
 
     public void init() {
-        //SJV: PUT ALL PATH PLANNER PATH LOADS INTO A SEPARATE METHOD AND EXECUTE AT ROBOTINIT
-        fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 3, 2.5);
         SwerveMap.GYRO.reset();
-        ///SJV: SET THIS ANGLE ACCORDING TO THE CHOSEN PATH IN COMPETITION
-        SwerveMap.GYRO.setAngleAdjustment(-90);
+        chosenPath = AutoPoses.valueOf(Robot.COMPETITIONLOGGER.autoChooser.getSelected().toString());
+        // PathPlanner.loadPath("blueAutoTest", 3, 2.5);
+        SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
+        Robot.SHOOTER.homocideTheBattery = true;
+    }
+
+    public void loadAutoPaths(){
         chooserBuilder();
+        fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 3, 2.5);
+        twoBallAutoPath = PathPlanner.loadPath("twoBallAuto", 3, 2.5);
     }
 
     public void autoPeriodic() {
@@ -54,37 +63,18 @@ public class AutoWaypoints implements Loggable {
     public SendableChooser<AutoPoses> m_autoChooser = new SendableChooser<>();
 
     public enum AutoPoses {
-        //SJV: NAME THESE SOMETHING SIMILAR TO THE PATH IN PATH PLANNER FOR READABILITY SAKES
-        STARTINGPOINTFBA(7.80, 1.68, 0.00, "STARTINGPOINTFBA"),
-        STARTINGPOINTTBA(6.09, 5.23, -43.78, "STARTINGPOINTTBA");
+        FENDERFOURBALLAUTO(7.80, 1.68, -84.69),
+        FENDERTWOBALLAUTO(6.09, 5.23, 43.78);
 
-        private double thisX;
-        private double thisY;
-        private double thisRot;
-        //SJV: I DONT THINK YOU NEED THIS YOU CAN GET THE NAME OF THE ENUM BY DOING "toString()"
-        private String thisStartPoint;
+        public double thisX;
+        public double thisY;
+        public double thisRot;
 
-        AutoPoses(double _x, double _y, double _rot, String _startPoint){
+        AutoPoses(double _x, double _y, double _rot){
             thisX = _x;
             thisY = _y;
             thisRot = _rot;
-            thisStartPoint = _startPoint;
 
-        }
-
-        public double getThisX(){
-            return thisX;
-        }
-
-        public double getThisY(){
-            return thisY;
-        }
-        public double getThisRot(){
-            return thisRot;
-        }
-
-        public String getStartPoint(){
-            return thisStartPoint;
         }
   
     }
@@ -97,18 +87,12 @@ public class AutoWaypoints implements Loggable {
         
     }
 
-    //SJV: EVALUATE WHETHER OR NOT WE NEED THIS?
-    public void startPointRunner(String _startPoint){
-        if(_startPoint != ""){
-            CurrentStartPoint = _startPoint;
-        }
-        if (CurrentStartPoint == "") {
-            CurrentStartPoint = AutoPoses.values()[0].toString();
-        }
-
+    interface AutoState {
+        public Runnable getAction();
+        public String getNextState();
     }
 
-    public enum FourBallAuto {
+    public enum FourBallAuto implements AutoState {
         BALL1TRANSITION(SINGLE_INSTANCE::intakeBall, 7.801, 1.678, "SHOOT1TRANSITION"),
         SHOOT1TRANSITION(SINGLE_INSTANCE::shoot, 7.882, 2.952, "BALL2TRANSITION"),
         BALL2TRANSITION(SINGLE_INSTANCE::intakeBall, 5.278, 2.014, "BALL3TRANSITION"),
@@ -136,7 +120,7 @@ public class AutoWaypoints implements Loggable {
         }
     }
 
-    public enum TwoBallAuto {
+    public enum TwoBallAuto implements AutoState {
         TWOBALLTRANSITION1(SINGLE_INSTANCE::twoBallIntake1, "TWOBALLTRANSITION2"),
         TWOBALLTRANSITION2(SINGLE_INSTANCE::twoBallShoot, "TWOBALLTRANSITION2");
 
@@ -159,6 +143,7 @@ public class AutoWaypoints implements Loggable {
 
     }
 
+    // enum chosenState as parameter?
     public void autoRunner(String _startingState){
         if (_startingState != "" && StartingStateOverride){
             CurrentState = _startingState;
@@ -189,6 +174,7 @@ public class AutoWaypoints implements Loggable {
 
             if (getDistance(currentX, currentY, _state.posX, _state.posY) > 0.5) {
                 StateHasFinished = true;
+                Robot.INTAKE.intakeNow = false;
             }
         }
 
@@ -197,10 +183,13 @@ public class AutoWaypoints implements Loggable {
 
     private void shoot() {
         FourBallAuto _state = FourBallAuto.valueOf(CurrentState);
-        //SJV: TO ALLOW FOR SPINUP, WE MAY WANT TO SET KILL THE BATTERY EARLIER IN INIT OR HERE
         if (getDistance(currentX, currentY, _state.posX, _state.posY) < 0.5) {
             Robot.INTAKE.shootNow = true;
-            StateHasFinished = true;
+
+            if (getDistance(currentX, currentY, _state.posX, _state.posY) > 0.5) {
+                Robot.INTAKE.shootNow = false;
+                StateHasFinished = true;
+            }
         }
     }
     
@@ -251,26 +240,5 @@ public class AutoWaypoints implements Loggable {
         double distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
         return distance;
     }
- //SJV: I THINK THESE ARE NOW OBSOLETE, HAVING A SEPARATE BUTTON FOR EACH AUTO WILL MAKE OUR ROBOT SCHIZOPHRENIC
-    @Config.ToggleButton(name = "Four Ball Auto", defaultValue = false)
-    public void fbaStartButton(boolean _input, double thisX, double thisY, double thisRot){
-        if(_input){
-            _startPoint = "STARTINGPOINTFBA";
-            SwerveMap.GYRO.setAngleAdjustment(thisRot);
-            currentX = thisX;
-            currentY = thisY;
-            _input = false;
-        }
-    }
-
-        @Config.ToggleButton(name = "Two Ball Auto", defaultValue = false)
-    public void tbaStartButton(boolean _input, double thisX, double thisY, double thisRot){
-        if(_input){
-            _startPoint = "STARTINGPOINTTBA";
-            SwerveMap.GYRO.setAngleAdjustment(thisRot);
-            currentX = thisX;
-            currentY = thisY;
-            _input = false;
-        }
-    }
+ 
 }

@@ -58,21 +58,24 @@ public class Robot extends TimedRobot {
     INTAKE.init();
 
     //*** Auto Container method starts here***
-    // AUTOWAYPOINTS = AutoWaypoints.getInstance();
-    // AUTOWAYPOINTS.init();
+    AUTOWAYPOINTS = AutoWaypoints.getInstance();
+    // 
+    //loads the selected pathplanner path
+    AUTOWAYPOINTS.loadAutoPaths();
 
     // ****Shooter method starts here****
     SHOOTER = Shooter.getInstance();
     SHOOTER.init();
+    
 
     // // *****test climber method starts here*****
-    CLIMBER = Climber.getInstance();
-    CLIMBER.init();
+    // CLIMBER = Climber.getInstance();
+    // CLIMBER.init();
 
 
 
     // if(RUN_TRAJECTORY) {
-      // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
+    // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
       // examplePath = PathPlanner.loadPath("New Path", 1, .8);
     // }
     // Keep this statement on the BOTTOM of your robotInit
@@ -100,6 +103,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
      SWERVEDRIVE.setToBrake();
+
+    AUTOWAYPOINTS.init();
      
 
     // For Trajectory instructions go to SwerverTrajectory.java
@@ -111,13 +116,15 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     
-    // AUTOWAYPOINTS.autoPeriodic();
+    AUTOWAYPOINTS.autoPeriodic();
+    AUTOWAYPOINTS.loadAutoPaths();
+    // SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     // if(RUN_TRAJECTORY){
     // SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     // }
 
-    // INTAKE.intakePeriodic();
-    // SHOOTER.shoot();
+    INTAKE.intakePeriodic();
+    SHOOTER.shooterPeriodic();
 
   }
 
@@ -127,6 +134,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     SWERVEDRIVE.setToBrake();
     INTAKE.intakeNow = false;
+    
   }
 
   /** This function is called periodically during operator control. */
@@ -137,7 +145,7 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.swervePeriodic();
       //intake code for teleop
 
-    CLIMBER.periodic();
+   // CLIMBER.periodic();
 
     INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
