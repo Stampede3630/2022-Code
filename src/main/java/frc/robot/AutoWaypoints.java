@@ -1,4 +1,5 @@
 package frc.robot;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -40,7 +41,6 @@ public class AutoWaypoints implements Loggable {
         }
         
         chosenWaypoints = chosenPath.thisWPset;
-        SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
         Robot.SHOOTER.homocideTheBattery = true;
     }
 
@@ -60,14 +60,12 @@ public class AutoWaypoints implements Loggable {
             new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
         };
         chooserBuilder();
-        fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 3, 2.5);
-        twoBallAutoPath = PathPlanner.loadPath("twoBallAuto", 3, 2.5);
     }
 
     public void autoPeriodic() {
         currentX = Robot.SWERVEDRIVE.getXPos();
         currentY = Robot.SWERVEDRIVE.getYPos();
-        waypointRunner(chosenWaypoints);
+        waypointRunner(FenderFourBallAutoWPs);
     }
 
     public enum AutoPoses {
@@ -105,10 +103,12 @@ public class AutoWaypoints implements Loggable {
     private void shoot() {
        
         if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
-            Robot.INTAKE.shootNow = true;
+            Robot.INTAKE.indexTop.set(ControlMode.PercentOutput, -0.25);
+            Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, -0.25);
 
             if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
-                Robot.INTAKE.shootNow = false;
+            Robot.INTAKE.indexTop.set(ControlMode.PercentOutput, 0);
+            Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, 0);
                 StateHasFinished = true;
             }
         }

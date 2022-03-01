@@ -49,8 +49,9 @@ public class SwerveTrajectory implements Loggable {
     public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
         elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
         switch (trajectoryStatus) {
-            case "setup":
-                Robot.SWERVEDRIVE.resetOdometry(((PathPlannerState) _pathTraj.getInitialState()).poseMeters, ((PathPlannerState) _pathTraj.getInitialState()).poseMeters.getRotation()); 
+            case "setup":    
+            PathPlannerState helloPath =((PathPlannerState)_pathTraj.getInitialState());
+                Robot.SWERVEDRIVE.resetOdometry(helloPath.poseMeters, helloPath.poseMeters.getRotation()); 
                 timetrajectoryStarted = Timer.getFPGATimestamp();
                 trajectoryStatus = "execute";
                 break;

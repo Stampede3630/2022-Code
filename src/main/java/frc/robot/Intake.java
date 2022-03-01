@@ -17,10 +17,10 @@ public class Intake implements Loggable {
   
   private static Intake SINGLE_INSTANCE = new Intake();
   
-  private WPI_TalonFX intakeDrive;
-  private WPI_TalonFX indexBottom;
-  private WPI_TalonFX indexTop;
-  private DoubleSolenoid intakeSolenoid;
+  public WPI_TalonFX intakeDrive;
+  public WPI_TalonFX indexBottom;
+  public WPI_TalonFX indexTop;
+  public DoubleSolenoid intakeSolenoid;
   public DoubleSolenoid limelightSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
@@ -80,7 +80,7 @@ public class Intake implements Loggable {
         indexTop.set(ControlMode.PercentOutput, -0.2); // If there's only one ball being shot
       } else {
         indexTop.set(ControlMode.PercentOutput, -0.2); // If two balls are being shot
-        indexBottom.set(ControlMode.PercentOutput, -0.3);
+        indexBottom.set(ControlMode.PercentOutput, -0.25);
       }
     } else {
       indexerDrive(); // Defaults to state machine below
@@ -90,7 +90,7 @@ public class Intake implements Loggable {
   private void indexerDrive() {
       switch (indexManager()) {
         case "1 Ball": // Hold the ball at the top of tower
-          indexBottom.set(ControlMode.PercentOutput, -0.3);
+          indexBottom.set(ControlMode.PercentOutput, -0.25);
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
 
@@ -101,16 +101,16 @@ public class Intake implements Loggable {
 
         case "Cargo in Transit":  // Bring ball from intake to top of tower
           indexTop.set(ControlMode.PercentOutput, -0.2);
-          indexBottom.set(ControlMode.PercentOutput, -0.3);
+          indexBottom.set(ControlMode.PercentOutput, -0.25);
           break;
 
         case "Reverse Intake":  // Both intakes go backwards
           indexTop.set(ControlMode.PercentOutput, 0.2);
-          indexBottom.set(ControlMode.PercentOutput, 0.3);
+          indexBottom.set(ControlMode.PercentOutput, 0.25);
           break;
 
         case "Intake Ball": // Spins bottom intake while ball in being intaked
-          indexBottom.set(ControlMode.PercentOutput, -0.3);
+          indexBottom.set(ControlMode.PercentOutput, -0.25);
           break;
 
         default:  // Everything stops

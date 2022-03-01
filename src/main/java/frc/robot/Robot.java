@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import java.nio.file.Path;
+
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -31,6 +35,8 @@ public class Robot extends TimedRobot {
   public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
+  public static PathPlannerTrajectory fourBallAutoPath;
+  public static PathPlannerTrajectory twoBallAutoPath;
 
   public static XboxController xbox = new XboxController(0);
 
@@ -63,6 +69,9 @@ public class Robot extends TimedRobot {
     //loads the selected pathplanner path
     AUTOWAYPOINTS.loadAutoPaths();
 
+    fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 3, 2.5);
+    twoBallAutoPath = PathPlanner.loadPath("twoBallAuto", 3, 2.5);
+
     // ****Shooter method starts here****
     SHOOTER = Shooter.getInstance();
     SHOOTER.init();
@@ -75,7 +84,7 @@ public class Robot extends TimedRobot {
 
 
     // if(RUN_TRAJECTORY) {
-    // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
+    SWERVETRAJECTORY = SwerveTrajectory.getInstance();
       // examplePath = PathPlanner.loadPath("New Path", 1, .8);
     // }
     // Keep this statement on the BOTTOM of your robotInit
@@ -102,6 +111,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    SwerveMap.GYRO.setAngleAdjustment(-93.18);
     SWERVEDRIVE.setToBrake();
     AUTOWAYPOINTS.init();
      
@@ -116,7 +126,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     
     AUTOWAYPOINTS.autoPeriodic();
-    SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.chosenPath.thisPathPLan, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    SwerveTrajectory.PathPlannerRunner(fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     
     INTAKE.intakePeriodic();
     SHOOTER.shooterPeriodic();
