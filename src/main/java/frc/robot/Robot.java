@@ -9,6 +9,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import io.github.oblarg.oblog.Logger;
 
  /*For starting a new Stampede swerve project
@@ -41,15 +42,16 @@ public class Robot extends TimedRobot {
    // --- INIT METHOD ---
   @Override
   public void robotInit() {
-     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
-     SwerveMap.driveRobotInit();
-     SwerveMap.GYRO.reset();
+    LiveWindow.setEnabled(false);
+    SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+    SwerveMap.driveRobotInit();
+    SwerveMap.GYRO.reset();
     // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
 
     //*Swerve method starts here*
-     SWERVEDRIVE = SwerveDrive.getInstance();
-     SWERVEDRIVE.init();
-     SWERVEDRIVE.zeroSwerveDrive();
+    SWERVEDRIVE = SwerveDrive.getInstance();
+    SWERVEDRIVE.init();
+    SWERVEDRIVE.zeroSwerveDrive();
 
     //**Intake method starts here**
     INTAKE = Intake.getInstance();
@@ -94,8 +96,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-     SWERVEDRIVE.updateOdometry();
-     Logger.updateEntries();
+    SWERVEDRIVE.updateOdometry();
+    Logger.updateEntries();
   }
 
   @Override
@@ -105,7 +107,7 @@ public class Robot extends TimedRobot {
      
 
     // For Trajectory instructions go to SwerverTrajectory.java
-     if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
+    if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
 
   }
 
