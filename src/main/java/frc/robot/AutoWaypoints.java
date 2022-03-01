@@ -1,14 +1,8 @@
 package frc.robot;
-
-import java.nio.file.Path;
-
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
 public class AutoWaypoints implements Loggable {
@@ -19,10 +13,9 @@ public class AutoWaypoints implements Loggable {
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
     public int currentWaypointNumber = 0;
-    private double stateStartTime;
     private double currentX;
     private double currentY;
-    private AutoPoses chosenPath;
+    public AutoPoses chosenPath;
  
     public static AutoWaypoints getInstance() {
         return SINGLE_INSTANCE;
@@ -30,8 +23,8 @@ public class AutoWaypoints implements Loggable {
 
     public void init() {
         SwerveMap.GYRO.reset();
-        chosenPath = AutoPoses.valueOf(Robot.COMPETITIONLOGGER.autoChooser.getSelected().toString());
-        // PathPlanner.loadPath("blueAutoTest", 3, 2.5);
+        chosenPath = AutoPoses.valueOf(m_autoChooser.getSelected().toString());
+        chosenWaypoints = chosenPath.thisWPset;
         SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
         Robot.SHOOTER.homocideTheBattery = true;
     }
@@ -52,42 +45,44 @@ public class AutoWaypoints implements Loggable {
     boolean StateHasFinished = false;
     @Log
     Boolean StateHasInitialized = false;
-    @Log
-    String CurrentState = "";
-    boolean StartingStateOverride;
-    SwerveDriveOdometry a_odometry;
-
-    String _startPoint;
-    String CurrentStartPoint;
-
     
+    @Log(tabName = "CompetitionLogger")
     public SendableChooser<AutoPoses> m_autoChooser = new SendableChooser<>();
 
     public enum AutoPoses {
-        FENDERFOURBALLAUTO(7.80, 1.68, -84.69, SINGLE_INSTANCE.FenderFourBallAutoWPs),
-        FENDERTWOBALLAUTO(6.09, 5.23, 43.78, SINGLE_INSTANCE.FenderTwoBallAutoWPs);
+        FENDERFOURBALLAUTO(7.80, 1.68, -84.69, SINGLE_INSTANCE.FenderFourBallAutoWPs,SINGLE_INSTANCE.fourBallAutoPath),
+        FENDERTWOBALLAUTO(6.09, 5.23, 43.78, SINGLE_INSTANCE.FenderTwoBallAutoWPs, SINGLE_INSTANCE.twoBallAutoPath);
 
         public double thisX;
         public double thisY;
         public double thisRot;
         public Waypoint[] thisWPset;
+        public PathPlannerTrajectory thisPathPLan;
 
-        AutoPoses(double _x, double _y, double _rot, Waypoint[] _WP){
+        AutoPoses(double _x, double _y, double _rot, Waypoint[] _WP, PathPlannerTrajectory _PPT){
             thisX = _x;
             thisY = _y;
             thisRot = _rot;
             thisWPset = _WP;
+            thisPathPLan = _PPT;
 
         }
     }
 
-    public void chooserBuilder(){
-        //SJV: DESIGN A DEFAULT AUTO WHICH SHOOTS A BALL AND MOVES OFF THE TARMAC
-       for (AutoPoses myAutoPose : AutoPoses.values()){
-           
-        SINGLE_INSTANCE.m_autoChooser.addOption(myAutoPose.toString(), myAutoPose);
-       }
-    }
+    public Waypoint[] FenderTwoBallAutoWPs = new Waypoint[] {
+        new Waypoint(SINGLE_INSTANCE::intakeBall, 7.65, .060),
+        new Waypoint(SINGLE_INSTANCE::shoot, 7.88, 2.86),
+        new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
+    };
+
+    public Waypoint[] FenderFourBallAutoWPs = new Waypoint[] {
+        new Waypoint(SINGLE_INSTANCE::intakeBall, 7.801, 1.678),
+        new Waypoint(SINGLE_INSTANCE::shoot, 7.882, 2.952),
+        new Waypoint(SINGLE_INSTANCE::intakeBall, 5.278, 2.014),
+        new Waypoint(SINGLE_INSTANCE::intakeBall, 1.273, 1.215),
+        new Waypoint(SINGLE_INSTANCE::shoot, 7.581, 3.033),
+        new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
+    };
 
     private void intakeBall() {
         //SJV: NEED TO TURN INTAKE OFF WHEN STATE IS FINISHED, NEED TO PROLLY LOWER THE DISTANCE FROM HALF A METER TO LESS (TEST PLEASE)
@@ -118,29 +113,13 @@ public class AutoWaypoints implements Loggable {
         //FEEL FREE TO ADD THING TO THE DONE STATE
     }
 
-
-    //TWO BALL AUTO METHODS HERE
-    //SJV: CONVERT THESE TO THE REAL TWOBALL AUTO AND FOLLOW FORMAT ON FOURBALLAUTO
-    private void twoBallIntake1() {
-        double ballX = 7.65;
-        double ballY = 0.60;
-
-        if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            StateHasFinished = true;
-        }
+    public void chooserBuilder(){
+        //SJV: DESIGN A DEFAULT AUTO WHICH SHOOTS A BALL AND MOVES OFF THE TARMAC
+       for (AutoPoses myAutoPose : AutoPoses.values()){
+           
+        SINGLE_INSTANCE.m_autoChooser.addOption(myAutoPose.toString(), myAutoPose);
+       }
     }
-
-    private void twoBallShoot() {
-        double ballX = 7.88;
-        double ballY = 2.86;
-
-        if (getDistance(currentX, currentY, ballX, ballY) < 0.5) {
-            StateHasFinished = true;
-        }
-    }
-
-    //FOUR BALL AUTO METHODS HERE
-    
 
     private double getDistance(double X1, double Y1, double X2, double Y2) { //just the distance formula - uses current x and y positions
         double distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
@@ -159,25 +138,10 @@ public class AutoWaypoints implements Loggable {
         }
     }
 
-    public Waypoint[] FenderTwoBallAutoWPs = new Waypoint[] {
-        new Waypoint(SINGLE_INSTANCE::intakeBall, 7.65, .060),
-        new Waypoint(SINGLE_INSTANCE::shoot, 7.88, 2.86),
-        new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
-    };
-
-    public Waypoint[] FenderFourBallAutoWPs = new Waypoint[] {
-        new Waypoint(SINGLE_INSTANCE::intakeBall, 7.801, 1.678),
-        new Waypoint(SINGLE_INSTANCE::shoot, 7.882, 2.952),
-        new Waypoint(SINGLE_INSTANCE::intakeBall, 5.278, 2.014),
-        new Waypoint(SINGLE_INSTANCE::intakeBall, 1.273, 1.215),
-        new Waypoint(SINGLE_INSTANCE::shoot, 7.581, 3.033),
-        new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
-    };
-
-    public void waypointRunner(Waypoint[] chosenWaypoints){
+    public void waypointRunner(Waypoint[] thisWaypointSet){
         // If we made one round with the state, we have successfully initialized
         if (!StateHasInitialized) {StateHasInitialized = true;}
-            chosenWaypoints[currentWaypointNumber].action.run();
+        thisWaypointSet[currentWaypointNumber].action.run();
         if (StateHasFinished){
             currentWaypointNumber++;
             StateHasFinished = false; 
