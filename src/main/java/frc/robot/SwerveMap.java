@@ -149,21 +149,16 @@ public class SwerveMap {
         }
 
         public void zeroSwerveAngle() {
-            if(!hasGoodCANCoderSeedingOccurred || mSteeringSensor.configGetSensorInitializationStrategy(Constants.kDefaultTimeout) == SensorInitializationStrategy.BootToZero){
-                mSteeringSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition,Constants.kDefaultTimeout);
-                if(mSteeringSensor.getLastError()==ErrorCode.OK){
-                    hasGoodCANCoderSeedingOccurred = true;
-                } else {
+            if( mSteeringSensor.configGetSensorInitializationStrategy(Constants.kDefaultTimeout).value == SensorInitializationStrategy.BootToZero.value) {
+                if(mSteeringSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition,100).value!=ErrorCode.OK.value) {
                     System.out.println("Couldn't zero swerve module!!!");
                 }
-            } else if(!hasSwerveZeroingOccurred){
-                mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,Constants.kDefaultTimeout);
-                if(mSteeringMotor.getLastError()==ErrorCode.OK){
-                    hasSwerveZeroingOccurred = true;
-                } else {
-                    System.out.println("Couldn't zero swerve module!!!2");
-                }
-            }
+            } else if(!hasSwerveZeroingOccurred || mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,100).value==0){
+                hasSwerveZeroingOccurred = true;
+            } else {
+                System.out.println("Couldn't zero swerve module!!!2");
+            }   
+            
         }
 
         public void REzeroSwerveAngle() {
