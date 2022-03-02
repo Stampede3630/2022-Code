@@ -148,13 +148,13 @@ public class SwerveMap {
         }
 
         public void zeroSwerveAngle() {
-            if( mSteeringSensor.configGetSensorInitializationStrategy(Constants.kDefaultTimeout).value == SensorInitializationStrategy.BootToZero.value) {
-                if(mSteeringSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition,100).value!=ErrorCode.OK.value) {
+            if( mSteeringSensor.configGetSensorInitializationStrategy(1000).value == SensorInitializationStrategy.BootToZero.value) {
+                if(mSteeringSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition,1000).value!=ErrorCode.OK.value) {
                     System.out.println("ERROR: COULDN'T SET THE INITIALIZATION STRATEGY! CANCODER: " + mSteeringSensor.getDeviceID());
                 } else {
                     System.out.println("ERROR: INITIALIZATION STRATEGY SET! REBOOT ROBOT! CANCODER: " + mSteeringSensor.getDeviceID());
                 }
-            } else if(hasSwerveZeroingOccurred || mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,100).value==0){
+            } else if(hasSwerveZeroingOccurred || mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,1000).value==0){
                 hasSwerveZeroingOccurred = true;
                 System.out.println("ZEROED SENSOR VALUES FOR CANCODER " + mSteeringSensor.getDeviceID() + mSteeringSensor.getPosition() + " " + mSteeringSensor.getAbsolutePosition());
             } else {
