@@ -35,9 +35,6 @@ public class Robot extends TimedRobot {
   public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
-  public static PathPlannerTrajectory fourBallAutoPath;
-  public static PathPlannerTrajectory twoBallAutoPath;
-
   public static XboxController xbox = new XboxController(0);
 
   /**
@@ -69,8 +66,7 @@ public class Robot extends TimedRobot {
     //loads the selected pathplanner path
     AUTOWAYPOINTS.loadAutoPaths();
 
-    fourBallAutoPath = PathPlanner.loadPath("blueAutoTest", 3, 2.5);
-    twoBallAutoPath = PathPlanner.loadPath("twoBallAuto", 3, 2.5);
+
 
     // ****Shooter method starts here****
     SHOOTER = Shooter.getInstance();
@@ -111,7 +107,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    SwerveMap.GYRO.setAngleAdjustment(-93.18);
     SWERVEDRIVE.setToBrake();
     AUTOWAYPOINTS.init();
      
@@ -126,7 +121,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     
     AUTOWAYPOINTS.autoPeriodic();
-    SwerveTrajectory.PathPlannerRunner(fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.chosenPath.thisPathPLan,  SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     
     INTAKE.intakePeriodic();
     SHOOTER.shooterPeriodic();

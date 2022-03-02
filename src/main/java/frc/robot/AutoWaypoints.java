@@ -17,7 +17,8 @@ public class AutoWaypoints implements Loggable {
     public int currentWaypointNumber = 0;
     private double currentX;
     private double currentY;
-    public AutoPoses chosenPath;
+    public AutoPose chosenPath;
+    public AutoPose[] myAutoContainer;
 
     @Log
     public boolean StateHasFinished = false;
@@ -26,7 +27,7 @@ public class AutoWaypoints implements Loggable {
     @Log(tabName = "CompetitionLogger")
     public double distance = 0;
     @Log(tabName = "CompetitionLogger")
-    public SendableChooser<AutoPoses> m_autoChooser = new SendableChooser<>();
+    public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
  
     public static AutoWaypoints getInstance() {
         return SINGLE_INSTANCE;
@@ -35,16 +36,17 @@ public class AutoWaypoints implements Loggable {
     public void init() {
         SwerveMap.GYRO.reset();
         if (m_autoChooser.getSelected()==null){
-            chosenPath = AutoPoses.FENDERFOURBALLAUTO;
+            chosenPath = myAutoContainer[0];
         } else {
-            chosenPath = AutoPoses.valueOf(m_autoChooser.getSelected().toString());
+            chosenPath = m_autoChooser.getSelected();
         }
-        
         chosenWaypoints = chosenPath.thisWPset;
+        SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
         Robot.SHOOTER.homocideTheBattery = true;
     }
 
     public void loadAutoPaths(){
+
        FenderTwoBallAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::intakeBall, 7.65, .060),
             new Waypoint(SINGLE_INSTANCE::shoot, 7.88, 2.86),
@@ -59,33 +61,19 @@ public class AutoWaypoints implements Loggable {
             new Waypoint(SINGLE_INSTANCE::shoot, 7.581, 3.033),
             new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
         };
-        chooserBuilder();
+        myAutoContainer = new AutoPose[] {
+            new AutoPose("FenderFourBallAutoWPs", 7.80, 1.68, -84.69, FenderFourBallAutoWPs, PathPlanner.loadPath("blueAutoTest", 3, 2.5)),
+            new AutoPose("FenderTwoBallAutoWPs", 6.09, 5.23, 43.78, FenderTwoBallAutoWPs, PathPlanner.loadPath("twoBallAuto", 3, 2.5))};
+        for (AutoPose myAutoPose : myAutoContainer ){
+            m_autoChooser.addOption(myAutoPose.name, myAutoPose);
+        }
+
     }
 
     public void autoPeriodic() {
         currentX = Robot.SWERVEDRIVE.getXPos();
         currentY = Robot.SWERVEDRIVE.getYPos();
         waypointRunner(FenderFourBallAutoWPs);
-    }
-
-    public enum AutoPoses {
-        FENDERFOURBALLAUTO(7.80, 1.68, -84.69, SINGLE_INSTANCE.FenderFourBallAutoWPs,SINGLE_INSTANCE.fourBallAutoPath),
-        FENDERTWOBALLAUTO(6.09, 5.23, 43.78, SINGLE_INSTANCE.FenderTwoBallAutoWPs, SINGLE_INSTANCE.twoBallAutoPath);
-
-        public double thisX;
-        public double thisY;
-        public double thisRot;
-        public Waypoint[] thisWPset;
-        public PathPlannerTrajectory thisPathPLan;
-
-        AutoPoses(double _x, double _y, double _rot, Waypoint[] _WP, PathPlannerTrajectory _PPT){
-            thisX = _x;
-            thisY = _y;
-            thisRot = _rot;
-            thisWPset = _WP;
-            thisPathPLan = _PPT;
-
-        }
     }
 
     private void intakeBall() {
@@ -119,13 +107,7 @@ public class AutoWaypoints implements Loggable {
         //FEEL FREE TO ADD THING TO THE DONE STATE
     }
 
-    public void chooserBuilder(){
-        //SJV: DESIGN A DEFAULT AUTO WHICH SHOOTS A BALL AND MOVES OFF THE TARMAC
-       for (AutoPoses myAutoPose : AutoPoses.values()){
-           
-        SINGLE_INSTANCE.m_autoChooser.addOption(myAutoPose.toString(), myAutoPose);
-       }
-    }
+
 
     public double getDistance(double X1, double Y1, double X2, double Y2) { //just the distance formula - uses current x and y positions
         distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
@@ -141,6 +123,27 @@ public class AutoWaypoints implements Loggable {
             action = _action;
             posX=_x;
             posY=_y;
+        }
+    }
+
+    public class AutoPose {
+
+
+        public double thisX;
+        public double thisY;
+        public double thisRot;
+        public Waypoint[] thisWPset;
+        public PathPlannerTrajectory thisPathPLan;
+        public String name;
+
+        AutoPose(String _S, double _x, double _y, double _rot, Waypoint[] _WP, PathPlannerTrajectory _PPT){
+            thisX = _x;
+            thisY = _y;
+            thisRot = _rot;
+            thisWPset = _WP;
+            thisPathPLan = _PPT;
+            name = _S;
+
         }
     }
 
