@@ -53,13 +53,20 @@ public class Intake implements Loggable {
   private void intake() {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       intakeSolenoid.set(Value.kReverse);
-      intakeDrive.set(ControlMode.PercentOutput, .3);
+      intakeDrive.set(ControlMode.PercentOutput, calculateIntakeSpeed(Robot.SWERVEDRIVE.getCurrentSpeed()));
       turnToIntake();
 
     } else { 
       intakeSolenoid.set(Value.kForward); // Pulls intake back up and stops spinning
       intakeDrive.set(ControlMode.PercentOutput, 0);
     }
+  }
+
+  // Made this linear for now, can make more complex equation in the future
+  private double calculateIntakeSpeed(double robotSpeed) {
+    // y = 0.2x + 0.3
+    double intakeSpeed = 0.2*(robotSpeed) + 0.3;
+    return intakeSpeed;
   }
 
   private void shootIndexManager() {

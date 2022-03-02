@@ -39,7 +39,6 @@ public class Shooter implements Loggable {
         } else {
             return false;
         }
-
     }
 
     public void shoot() {
@@ -49,6 +48,22 @@ public class Shooter implements Loggable {
         } else {
             shooterDrive.set(0);
         }
+    }
+
+    // Find shooter angle based on distance from hub
+    private double calculateShooterAngle() {
+        double distanceToHub = Robot.SWERVEDRIVE.limelightTX();
+        // placeholder equation
+        // double shooterAngle: y = m(distanceToHub) + b
+        return 0;
+    }
+
+    // Find shooter speed based on shooter angle
+    private double calculateShooterSpeed(double shooterAngle) {
+        // placeholder equation
+        // double shooterSpeed: y = m(shooterAngle) + b
+        // shooterSpeed * ticks (for converting to ticks)
+        return 0;
     }
 
     public void turnToShooter() {
