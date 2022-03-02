@@ -156,6 +156,7 @@ public class SwerveMap {
                 }
             } else if(hasSwerveZeroingOccurred || mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,100).value==0){
                 hasSwerveZeroingOccurred = true;
+                System.out.println("ZEROED SENSOR VALUES FOR CANCODER " + mSteeringSensor.getDeviceID() + mSteeringSensor.getPosition() + " " + mSteeringSensor.getAbsolutePosition());
             } else {
                 System.out.println("ERROR: COULDNT ZERO MODULE: " + mSteeringMotor.getDeviceID());
             }   
