@@ -25,11 +25,13 @@ public class Shooter implements Loggable {
         shooterDrive = new WPI_TalonFX(10);
         shooterDrive.setInverted(TalonFXInvertType.Clockwise);
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
+
         shooterDrive.config_kF(0,
                 1023 * 0.94 / 18000, 20);
 
         shooterDrive.config_kP(0,
                 0.075, 20);
+        
 
         homocideTheBattery = false;
     }
