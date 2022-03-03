@@ -105,7 +105,7 @@ public class SwerveMap {
         public void swerveRobotInit(){
 
             //Setup the drive motor, but first set EVERYTHING to DEFAULT
-            mDriveMotor.configFactoryDefault();
+            //mDriveMotor.configFactoryDefault();
             
             mDriveMotor.setInverted(mDriveMotor.kWheelDirectionType);
             mDriveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, Constants.kDefaultTimeout);

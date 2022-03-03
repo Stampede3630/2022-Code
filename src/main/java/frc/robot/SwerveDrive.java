@@ -92,9 +92,9 @@ public class SwerveDrive implements Loggable {
     }
   /**This ONLY saves speeds.  You must also call the drive method */  
   public void joystickDrive(){
-    double x = Robot.xbox.getLeftY();
-    double y = Robot.xbox.getLeftX();
-    double rot = Robot.xbox.getRightX();
+    double x = -Robot.xbox.getLeftY();
+    double y = -Robot.xbox.getLeftX();
+    double rot = -Robot.xbox.getRightX();
 
     SDxSpeed = convertToMetersPerSecond(deadband(x))*joystickDriveGovernor;
     SDySpeed = convertToMetersPerSecond(deadband(y))*joystickDriveGovernor;

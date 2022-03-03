@@ -27,8 +27,8 @@ public class Climber implements Loggable{
     boolean tiltArms = false;
     
     final double TICKSPERREVOLUTION=2048;
-    final double TICKSATTOP=1;
-    final double INCHESATTOP=1;
+    final double TICKSATTOP=(283675-1475);
+    final double INCHESATTOP=27;
     final double TICKSPERINCH=TICKSATTOP/INCHESATTOP;
     final int FULLEXTEND = 27;
     final int HALFEXTEND = 12;
@@ -52,7 +52,7 @@ public class Climber implements Loggable{
         climberTalon.setSelectedSensorPosition(0,0,20);
         climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
         climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 3);
-        climberTalon.config_kP(0, 750, 20);
+        climberTalon.config_kP(0, 1000, 20);
         atOrigin = false;
         upOne = false;
 
@@ -64,11 +64,10 @@ public class Climber implements Loggable{
     public void periodic() {
         manualClimberSolenoid();
         manualClimberMotor();
-        if(atOrigin && Robot.COMPETITIONLOGGER.beginClimb) {
-          climberRunner("");
-        } else{
-            reZero();
-           
+        if (!atOrigin) {
+          reZero();
+        } else if (Robot.COMPETITIONLOGGER.beginClimb) {
+            climberRunner("");
         }
         
     }
@@ -101,16 +100,16 @@ public class Climber implements Loggable{
         LOWERARM1(SINGLE_INSTANCE::lowerArm28, "USERINPUT2"), // Change back to lower28 when done (hasn't been tested yet)
         USERINPUT2(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND1"), 
         RAISEANDEXTEND1(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT3"), 
-        USERINPUT3(SINGLE_INSTANCE::getUserInput, "OPENSOLENOID2"),
+        USERINPUT3(SINGLE_INSTANCE::getAltUserInput, "OPENSOLENOID2"),
         OPENSOLENOID2(SINGLE_INSTANCE::openSolenoid, "USERINPUT4"),
-        USERINPUT4(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND2"), 
+        USERINPUT4(SINGLE_INSTANCE::getAltUserInput, "RAISEANDEXTEND2"), 
         RAISEANDEXTEND2(SINGLE_INSTANCE::lowerArm28, "USERINPUT5"),
         USERINPUT5(SINGLE_INSTANCE::getUserInput, "USERINPUT6"),
         USERINPUT6(SINGLE_INSTANCE::getUserInput, "LOWERARM2"),
         LOWERARM2(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT7"),
         USERINPUT7(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND3"), 
         RAISEANDEXTEND3(SINGLE_INSTANCE::openSolenoid, "USERINPUT8"), 
-        USERINPUT8(SINGLE_INSTANCE::getUserInput, "OPENSOLENOID3"),
+        USERINPUT8(SINGLE_INSTANCE::getAltUserInput, "OPENSOLENOID3"),
         OPENSOLENOID3(SINGLE_INSTANCE::lowerArm28, "USERINPUT9"),
         USERINPUT9(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND4"), 
         RAISEANDEXTEND4(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT10"),
@@ -178,18 +177,17 @@ public class Climber implements Loggable{
             climberTalon.set(ControlMode.Position, 12.0);
         } else if (climberTalon.getSelectedSensorPosition(0) >= 10.0) {
             climberSolenoid.set(Value.kReverse);
-            climberTalon.set(ControlMode.Position, 28.5);
-            
-            if (climberTalon.getSelectedSensorPosition(0) >= 28.5) {
+            climberTalon.set(ControlMode.Position, 26.0);
+            if (climberTalon.getSelectedSensorPosition(0) >= 26.0) {
                 StateHasFinished = true;
             }
         }
     }
 
     public void raiseArm28() {
-        climberTalon.set(ControlMode.Position, 28.5);
+        climberTalon.set(ControlMode.Position, 25.0);
 
-        if (climberTalon.getSelectedSensorPosition(0) >= 28.0) {
+        if (climberTalon.getSelectedSensorPosition(0) >= 25.0) {
             StateHasFinished  = true;
         }
     }
@@ -228,6 +226,11 @@ public class Climber implements Loggable{
 
     public void getUserInput() {
         if(Robot.xbox.getAButton()){
+            StateHasFinished =true;
+        }
+    }
+    public void getAltUserInput() {
+        if(Robot.xbox.getXButton()){
             StateHasFinished =true;
         }
     }

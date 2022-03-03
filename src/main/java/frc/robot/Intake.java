@@ -55,7 +55,7 @@ public class Intake implements Loggable {
                 1023 * 0.35 / 18000 * 0.35, 20);
 
         intakeDrive.config_kP(0,
-                0.075, 20);
+                0.055, 20);
   }
   public void intakePeriodic(){
     intake();

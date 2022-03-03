@@ -14,12 +14,14 @@ public class AutoWaypoints implements Loggable {
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
+    @Log
     public int currentWaypointNumber = 0;
     private double currentX;
     private double currentY;
+    @Log
     public AutoPose chosenPath;
     public AutoPose[] myAutoContainer;
-
+    
     @Log
     public boolean StateHasFinished = false;
     @Log
@@ -28,7 +30,7 @@ public class AutoWaypoints implements Loggable {
     public double distance = 0;
     @Log(tabName = "CompetitionLogger")
     public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
- 
+
     public static AutoWaypoints getInstance() {
         return SINGLE_INSTANCE;
     }
@@ -43,6 +45,7 @@ public class AutoWaypoints implements Loggable {
         chosenWaypoints = chosenPath.thisWPset;
         SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
         Robot.SHOOTER.homocideTheBattery = true;
+        currentWaypointNumber = 0;
     }
 
     public void loadAutoPaths(){
@@ -77,6 +80,7 @@ public class AutoWaypoints implements Loggable {
     }
 
     private void intakeBall() {
+        
         //SJV: NEED TO TURN INTAKE OFF WHEN STATE IS FINISHED, NEED TO PROLLY LOWER THE DISTANCE FROM HALF A METER TO LESS (TEST PLEASE)
         if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
             Robot.INTAKE.intakeNow = true;
@@ -84,12 +88,12 @@ public class AutoWaypoints implements Loggable {
             if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
                 StateHasFinished = true;
                 Robot.INTAKE.intakeNow = false;
+                
             }
         }
     }
 
     private void shoot() {
-       
         if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
             Robot.INTAKE.indexTop.set(ControlMode.PercentOutput, -0.25);
             Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, -0.25);
