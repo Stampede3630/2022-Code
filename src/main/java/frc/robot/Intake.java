@@ -131,7 +131,7 @@ public class Intake implements Loggable {
     } else if (!topLimitSwitch.get()) { //top switch pressed
       cargoInTransit = false;
       return "1 Ball";
-    } else if (bottomLimitSwitch.get() && Robot.xbox.getRightTriggerAxis() > 0) { // Right trigger held AND nothing pressing the bottom switch
+    } else if (bottomLimitSwitch.get() && (Robot.xbox.getRightTriggerAxis() > 0 || shootNow)) { // Right trigger held AND nothing pressing the bottom switch
       return "Intake Ball";
     } else {
       return "default";
