@@ -1,6 +1,8 @@
 package frc.robot;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -17,10 +19,10 @@ public class Intake implements Loggable {
   
   private static Intake SINGLE_INSTANCE = new Intake();
   
-  private WPI_TalonFX intakeDrive;
-  private WPI_TalonFX indexBottom;
-  private WPI_TalonFX indexTop;
-  private DoubleSolenoid intakeSolenoid;
+  public WPI_TalonFX intakeDrive;
+  public WPI_TalonFX indexBottom;
+  public WPI_TalonFX indexTop;
+  public DoubleSolenoid intakeSolenoid;
   public DoubleSolenoid limelightSolenoid;
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
@@ -56,7 +58,7 @@ public class Intake implements Loggable {
                 1023 * 0.35 / 18000 * 0.35, 20);
 
         intakeDrive.config_kP(0,
-                0.075, 20);
+                0.055, 20);
   }
   public void intakePeriodic(){
     intake();
@@ -70,6 +72,7 @@ public class Intake implements Loggable {
       }
       
       intakeDrive.set(ControlMode.Velocity, -12000);
+
       turnToIntake();
 
     } else {
@@ -87,7 +90,7 @@ public class Intake implements Loggable {
         indexTop.set(ControlMode.PercentOutput, -0.2); // If there's only one ball being shot
       } else {
         indexTop.set(ControlMode.PercentOutput, -0.2); // If two balls are being shot
-        indexBottom.set(ControlMode.PercentOutput, -0.3);
+        indexBottom.set(ControlMode.PercentOutput, -0.2);
       }
     } else {
       indexerDrive(); // Defaults to state machine below
@@ -97,7 +100,7 @@ public class Intake implements Loggable {
   private void indexerDrive() {
       switch (indexManager()) {
         case "1 Ball": // Hold the ball at the top of tower
-          indexBottom.set(ControlMode.PercentOutput, -0.3);
+          indexBottom.set(ControlMode.PercentOutput, -0.25);
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
 
@@ -108,16 +111,16 @@ public class Intake implements Loggable {
 
         case "Cargo in Transit":  // Bring ball from intake to top of tower
           indexTop.set(ControlMode.PercentOutput, -0.2);
-          indexBottom.set(ControlMode.PercentOutput, -0.3);
+          indexBottom.set(ControlMode.PercentOutput, -0.2);
           break;
 
         case "Reverse Intake":  // Both intakes go backwards
           indexTop.set(ControlMode.PercentOutput, 0.2);
-          indexBottom.set(ControlMode.PercentOutput, 0.3);
+          indexBottom.set(ControlMode.PercentOutput, 0.2);
           break;
 
         case "Intake Ball": // Spins bottom intake while ball in being intaked
-          indexBottom.set(ControlMode.PercentOutput, -0.3);
+          indexBottom.set(ControlMode.PercentOutput, -0.2);
           break;
 
         default:  // Everything stops
@@ -138,7 +141,7 @@ public class Intake implements Loggable {
     } else if (!topLimitSwitch.get()) { //top switch pressed
       cargoInTransit = false;
       return "1 Ball";
-    } else if (bottomLimitSwitch.get() && Robot.xbox.getRightTriggerAxis() > 0) { // Right trigger held AND nothing pressing the bottom switch
+    } else if (bottomLimitSwitch.get() && (Robot.xbox.getRightTriggerAxis() > 0 || shootNow)) { // Right trigger held AND nothing pressing the bottom switch
       return "Intake Ball";
     } else {
       return "default";
@@ -155,6 +158,55 @@ public class Intake implements Loggable {
     limelightIsOpen = false;
     // ^^^
   }
+
+  public void checkAndSetIntakeCANStatus() {
+    if(indexBottom.hasResetOccurred()){
+      int mycounter=0;
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;};
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      System.out.println("RESET DETECTED FOR TALONFX " + indexBottom.getDeviceID() + " Errors: " + mycounter);
+    }
+
+    if(intakeDrive.hasResetOccurred()){
+      int mycounter=0;
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
+      //mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      System.out.println("RESET DETECTED FOR TALONFX " + intakeDrive.getDeviceID() + " Errors: " + mycounter);
+    }
+
+    if(indexTop.hasResetOccurred()){
+      int mycounter=0;
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      System.out.println("RESET DETECTED FOR TALONFX " + indexTop.getDeviceID() + " Errors:" + mycounter);
+    }
+  }
+
+
 
   @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
   public boolean getBottomLimitSwitch() {

@@ -6,11 +6,11 @@ public class Constants {
     public static final double XBOXDEADBAND = .1;
     
     //SWERVE MODULE CHARACTERISTICS
-    public static final double WHEEL_RADIUS_METERS = .05138;
+    public static final double WHEEL_RADIUS_METERS = .10033/2;
     public static final double WHEEL_BASE_METERS = 24.125 * 2.54/100; //18 inch wheel base to meters track width is 24in and wheel base is 22.5 in
     public static final double MAX_SPEED_TICKSper100MS = 21900;
     public static final double STEERING_MOTOR_GEARING = 150.0/7.0; //12.8
-    public static final double DRIVE_MOTOR_GEARING = 8.56; //6.86 CHECK THE .56!!!
+    public static final double DRIVE_MOTOR_GEARING = 57.0/7.0; // 1/(14/50*25/19*15/45)
     public static final double SPEED_GOVERNOR = .51; //.11 is a good safe start. Unlock it to "1" when you're confident with the robot
     public static final double TRACK_WIDE = 24.685 * 2.54/100;
     
@@ -43,19 +43,19 @@ public class Constants {
     //CHANGE TO 0 first, reset the sensor, 
     //PHYSICALLY zero out the motor 
     //place the OPPOSITE of the value
-    public static double FRSensorOffset = -325.986;
-    public static double FLSensorOffset = -32.607;
-    public static double BRSensorOffset = 123.125;
-    public static double BLSensorOffset = -240.381;
+    public static double FRSensorOffset = -327.129;
+    public static double FLSensorOffset = -41.133;
+    public static double BRSensorOffset = 124.980;
+    public static double BLSensorOffset = -243.721;
 
 
     //Give a positive input on the joystick or phoenix tuner
     //Switch this if it goes opposite the desired direction
     //Because of the gearing the convention could be reversed (GUESS AND CHECK)
-    public static TalonFXInvertType FRInvertType = TalonFXInvertType.CounterClockwise;
-    public static TalonFXInvertType FLInvertType = TalonFXInvertType.Clockwise;
-    public static TalonFXInvertType BRInvertType = TalonFXInvertType.CounterClockwise;
-    public static TalonFXInvertType BLInvertType = TalonFXInvertType.Clockwise;
+    public static TalonFXInvertType FRInvertType = TalonFXInvertType.Clockwise;
+    public static TalonFXInvertType FLInvertType = TalonFXInvertType.CounterClockwise;
+    public static TalonFXInvertType BRInvertType = TalonFXInvertType.Clockwise;
+    public static TalonFXInvertType BLInvertType = TalonFXInvertType.CounterClockwise;
 
     //Swerve Steering PIDs (kP, kI, kD)
     public static Gains FRSteerGains = new Gains(25, 0, 0);
@@ -69,10 +69,10 @@ public class Constants {
     public static Gains FLDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
     public static Gains BRDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
     public static Gains BLDriveGains = new Gains(0.07, 0, 0, 1023.0/20660.0);
-    public static final double kS = 0.4438;//0.60968;
-    public static final double kV = 2.337;//2.2691;
-    public static final double kA = 0.29114;//0.19335;
-    public static final double kP = 3.325;
+    public static final double kS = 0.4148;//0.60968;
+    public static final double kV = 2.55;//2.2691;
+    public static final double kA = 3.4537;//0.19335;
+    public static final double kP = 4.4561;
 
     //CTRE CAN-based constants (shouldn't need to change these)
     public static final int kDefaultPIDSlotID = 0;

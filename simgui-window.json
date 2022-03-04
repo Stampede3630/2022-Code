@@ -2,12 +2,12 @@
   "MainWindow": {
     "GLOBAL": {
       "height": "720",
-      "maximized": "0",
+      "maximized": "1",
       "style": "0",
       "userScale": "2",
       "width": "1280",
-      "xpos": "122",
-      "ypos": "395"
+      "xpos": "0",
+      "ypos": "23"
     }
   },
   "Window": {
@@ -23,7 +23,7 @@
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "250,278",
+      "Pos": "1302,228",
       "Size": "750,185"
     },
     "###Other Devices": {
