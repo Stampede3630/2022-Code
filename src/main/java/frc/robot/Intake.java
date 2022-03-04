@@ -65,7 +65,7 @@ public class Intake implements Loggable {
   private void intake() {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       intakeSolenoid.set(Value.kReverse);
-      intakeDrive.set(ControlMode.Velocity, -12000);
+      intakeDrive.set(ControlMode.Velocity, -15000);
       turnToIntake();
 
     } else { 
@@ -80,7 +80,7 @@ public class Intake implements Loggable {
         indexTop.set(ControlMode.PercentOutput, -0.2); // If there's only one ball being shot
       } else {
         indexTop.set(ControlMode.PercentOutput, -0.2); // If two balls are being shot
-        indexBottom.set(ControlMode.PercentOutput, -0.25);
+        indexBottom.set(ControlMode.PercentOutput, -0.2);
       }
     } else {
       indexerDrive(); // Defaults to state machine below
@@ -101,16 +101,16 @@ public class Intake implements Loggable {
 
         case "Cargo in Transit":  // Bring ball from intake to top of tower
           indexTop.set(ControlMode.PercentOutput, -0.2);
-          indexBottom.set(ControlMode.PercentOutput, -0.25);
+          indexBottom.set(ControlMode.PercentOutput, -0.2);
           break;
 
         case "Reverse Intake":  // Both intakes go backwards
           indexTop.set(ControlMode.PercentOutput, 0.2);
-          indexBottom.set(ControlMode.PercentOutput, 0.25);
+          indexBottom.set(ControlMode.PercentOutput, 0.2);
           break;
 
         case "Intake Ball": // Spins bottom intake while ball in being intaked
-          indexBottom.set(ControlMode.PercentOutput, -0.25);
+          indexBottom.set(ControlMode.PercentOutput, -0.2);
           break;
 
         default:  // Everything stops

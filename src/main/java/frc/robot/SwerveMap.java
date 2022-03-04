@@ -122,7 +122,6 @@ public class SwerveMap {
             mSteeringSensor.setPositionToAbsolute();
             //Setup the the closed-loop PID for the steering module loop
             
-            mSteeringMotor.configFactoryDefault();
             mSteeringMotor.setInverted(TalonFXInvertType.Clockwise);
             mSteeringMotor.configFeedbackNotContinuous(false, Constants.kDefaultTimeout);
             mSteeringMotor.configSelectedFeedbackCoefficient(1/Constants.TICKSperTALONFX_DEGREE,0,Constants.kDefaultTimeout);
@@ -153,7 +152,8 @@ public class SwerveMap {
                     System.out.println("ERROR: COULDN'T SET THE INITIALIZATION STRATEGY! CANCODER: " + mSteeringSensor.getDeviceID());
                 } else {
                     System.out.println("ERROR: INITIALIZATION STRATEGY SET! REBOOT ROBOT! CANCODER: " + mSteeringSensor.getDeviceID());
-                    mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getAbsolutePosition(),0,1000);
+                    mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,1000);
+                    System.out.println("ZEROED SENSOR VALUES FOR CANCODER " + mSteeringSensor.getDeviceID() + mSteeringSensor.getPosition() + " " + mSteeringSensor.getAbsolutePosition());
                 }
             } else if(hasSwerveZeroingOccurred || mSteeringMotor.setSelectedSensorPosition(mSteeringSensor.getPosition(),0,1000).value==0){
                 hasSwerveZeroingOccurred = true;

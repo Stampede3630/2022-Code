@@ -82,29 +82,26 @@ public class AutoWaypoints implements Loggable {
     private void intakeBall() {
         
         //SJV: NEED TO TURN INTAKE OFF WHEN STATE IS FINISHED, NEED TO PROLLY LOWER THE DISTANCE FROM HALF A METER TO LESS (TEST PLEASE)
-        if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
+        if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 1.5) {
             Robot.INTAKE.intakeNow = true;
-
-            if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
+        } else if (Robot.INTAKE.intakeNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 1.5) {
                 StateHasFinished = true;
                 Robot.INTAKE.intakeNow = false;
                 
-            }
         }
     }
 
     private void shoot() {
         if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
-            Robot.INTAKE.indexTop.set(ControlMode.PercentOutput, -0.25);
-            Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, -0.25);
+            Robot.INTAKE.shootNow = true;
+            // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, -0.25);
 
-            if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
-            Robot.INTAKE.indexTop.set(ControlMode.PercentOutput, 0);
-            Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, 0);
+        }else if (Robot.INTAKE.shootNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
+            Robot.INTAKE.shootNow = false;
+            // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, 0);
                 StateHasFinished = true;
             }
         }
-    }
 
     public void done(){
         //ADDED TO NOT GO OUT OF BOUNDS IN A ARRAY WAYPOINT RUNNER

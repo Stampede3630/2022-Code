@@ -46,7 +46,7 @@ public class Constants {
     public static double FRSensorOffset = -327.129;
     public static double FLSensorOffset = -41.133;
     public static double BRSensorOffset = 124.980;
-    public static double BLSensorOffset = 116.543;
+    public static double BLSensorOffset = -243.721;
 
 
     //Give a positive input on the joystick or phoenix tuner
