@@ -5,6 +5,11 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 public class Constants {
     public static final double XBOXDEADBAND = .1;
     
+    // LIMELIGHT CONSTANTS
+    // TODO: find and set them
+    public static final double HORIZONTAL_FOV = 0;
+    public static final double VERTICAL_FOV = 0;
+
     //SWERVE MODULE CHARACTERISTICS
     public static final double WHEEL_RADIUS_METERS = .05138;
     public static final double WHEEL_BASE_METERS = 22.5 * 2.54/100; //18 inch wheel base to meters track width is 24in and wheel base is 22.5 in
@@ -73,6 +78,9 @@ public class Constants {
     public static final double kV = 2.337;//2.2691;
     public static final double kA = 0.29114;//0.19335;
     public static final double kP = 3.325;
+
+    // Field piece constants TODO: actually set them
+    public static final double UPPER_GOAL_HEIGHT = 0;
 
     //CTRE CAN-based constants (shouldn't need to change these)
     public static final int kDefaultPIDSlotID = 0;

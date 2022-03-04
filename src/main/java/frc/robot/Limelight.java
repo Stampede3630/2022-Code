@@ -8,13 +8,20 @@ public class Limelight { // There are currently no comments explaining how this 
     private static Limelight SINGLE_INSTANCE = new Limelight();
 
     private static NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
-    private static double camAngle; // CRITICAL: get camAngle from servo for limelight
-    private static final double camHeight = 0; // CRITICAL: measure height of limelight from the ground
+    private static final double CAM_HEIGHT = 0; // TODO: measure height of limelight from the ground
+    private static final double X_FOV = Constants.HORIZONTAL_FOV;
+    private static final double Y_FOV = Constants.VERTICAL_FOV;
+    
+    private static double camAngle; // TODO: set this to periodically get current rotation for limelight
 
-    public static boolean isLimelightOpen = false;
+    public boolean isLimelightOpen = false;
 
     public static Limelight getInstance() {
         return SINGLE_INSTANCE;
+    }
+
+    public void init() {
+        Hub.reset();
     }
 
     // methods for vision processing and LED aren't currently implemented
@@ -23,83 +30,41 @@ public class Limelight { // There are currently no comments explaining how this 
     }
 
     public static class Hub {
+        private static final double HEIGHT = Constants.UPPER_GOAL_HEIGHT;
 
-        public enum TargetType {
-            UNDEFINED, UPPERGOAL
-        }
-
-        private static double xDistance;
-        private static double yDistance;
+        private static double xDistance; // Horizontal distance from robot to hub
         private static double xVelocity;
         private static double yVelocity;
-        private static double angle;
+        // private static double angle; <--- probably don't need this, but don't delete
 
-        private static boolean valid;
+        private static boolean validTarget;
 
-        private static TargetType trackedTargetType = TargetType.UNDEFINED;
+        public static void lockOnUpperGoal() {
+            if (validTarget) {
+                xDistance = (HEIGHT - CAM_HEIGHT) / Math.tan(camAngle);
+            }
 
-        public static void reset() {
+            // TODO: set x and y velocity of hub in relation to robot?
+        }
+
+        // TODO: add a function that validates whether target can be found based on FOV of limelight? ---> just in case we solely target hub/ball
+        private static boolean isTargetValid() {
+            // *** Placeholder Code ***
+            return false;
+        }
+
+        private static void reset() {
             xDistance = 0;
-            yDistance = 0;
             xVelocity = 0;
             yVelocity = 0;
-            angle = 0;
-            valid = false;
-            trackedTargetType = TargetType.UNDEFINED;
+            validTarget = false;
         }
-
-        public static boolean trackHub(TargetType targetType) {
-            if (trackedTargetType != targetType) {
-                reset();
-            }
-
-            switch (targetType) {
-                case UNDEFINED:
-                    break;
-            
-                case UPPERGOAL:
-                    getPosition(camAngle, camHeight);
-                    break;
-            }
-
-            return isValid();
-        }
-
-        private static void getPosition(double camAngle, double camHeight) {
-            double yAngle = 90 + camAngle + Limelight.getTY();
-
-            if (!Limelight.isTargetValid() || (camHeight < 0 && yAngle > 89.99) || (camHeight > 0 && yAngle < 89.99)) {
-                valid = false;
-                return;
-            }
-
-            double newX = Math.tan(Math.toRadians(Limelight.getTX())) * yDistance + camHeight;
-            double newY = Math.tan(Math.toRadians(yAngle)) * -camHeight;
-
-            if (valid) {
-                xVelocity = newX - xDistance;
-                yVelocity = newY - yDistance;
-            } else {
-                xVelocity = 0;
-                yVelocity = 0;
-            }
-
-            valid = true;
-            xDistance = newX;
-            yDistance = newY;
-            angle = Math.atan2(xDistance, yDistance) / Math.PI * 180;
-        }
-
+   
         // --- Hub Getters ---
 
         // Gets the x distance from the robot to the hub
         public static double getxDistance() {
             return xDistance;
-        }
-
-        // Gets the y distance from the robot to the hub
-        public static double getyDistance() {
-            return yDistance;
         }
 
         // Get the x velocity from the robot to the hub (doesn't take into account robot speed)
@@ -113,18 +78,13 @@ public class Limelight { // There are currently no comments explaining how this 
         }
 
         // Get the angle from the robot to the hub
-        public static double getAngle() {
-            return angle;
-        }
+        // public static double getAngle() {
+        //     return angle;
+        // }
 
         // Get whether hub can be detected within FOV of limelight
         public static boolean isValid() {
-            return valid;
-        }
-
-        // Get whether hub is detected
-        public static TargetType getTrackedTargetType() {
-            return trackedTargetType;
+            return validTarget;
         }
         
     }
