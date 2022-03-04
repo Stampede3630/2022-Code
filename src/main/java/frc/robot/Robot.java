@@ -47,7 +47,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     LiveWindow.setEnabled(false);
     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
-    SwerveMap.driveRobotInit();
+    SwerveMap.checkAndSetSwerveCANStatus();
+    
     SwerveMap.GYRO.reset();
     // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
 
@@ -59,6 +60,7 @@ public class Robot extends TimedRobot {
     //**Intake method starts here**
     INTAKE = Intake.getInstance();
     INTAKE.init();
+    INTAKE.checkAndSetIntakeCANStatus();
 
     //*** Auto Container method starts here***
     AUTOWAYPOINTS = AutoWaypoints.getInstance();
@@ -71,12 +73,12 @@ public class Robot extends TimedRobot {
     // ****Shooter method starts here****
     SHOOTER = Shooter.getInstance();
     SHOOTER.init();
-    
+    SHOOTER.checkAndSetShooterCANStatus();
 
     // // *****test climber method starts here*****
     CLIMBER = Climber.getInstance();
     CLIMBER.init();
-
+    CLIMBER.checkAndSetClimberCANStatus();
 
 
     // if(RUN_TRAJECTORY) {
@@ -86,7 +88,7 @@ public class Robot extends TimedRobot {
     // Keep this statement on the BOTTOM of your robotInit
     // It's responsible for all the shuffleboard outputs.  
     // It's a lot easier to use than standard shuffleboard syntax
-
+    SwerveMap.driveRobotInit();
     COMPETITIONLOGGER = CompetitionLogger.getInstance();
     Logger.setCycleWarningsEnabled(false);
     Logger.configureLoggingAndConfig(this, false);
@@ -102,6 +104,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     SWERVEDRIVE.updateOdometry();
+    SwerveMap.checkAndSetSwerveCANStatus();
+    INTAKE.checkAndSetIntakeCANStatus();
+    SHOOTER.checkAndSetShooterCANStatus();
+    CLIMBER.checkAndSetClimberCANStatus();
+
     Logger.updateEntries();
   }
 

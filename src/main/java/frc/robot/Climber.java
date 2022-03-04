@@ -1,6 +1,8 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
@@ -74,9 +76,9 @@ public class Climber implements Loggable{
 
     private void manualClimberMotor(){
         if (Robot.xbox.getPOV()==0){
-            climberTalon.set(ControlMode.PercentOutput, 1); // Set faster climb speed for auto
+            climberTalon.set(ControlMode.PercentOutput, 1); //SJV:MAYBE PUT SOME SAFETY HERE TOO?!?!
         }
-        else if (Robot.xbox.getPOV()==180){
+        else if (Robot.xbox.getPOV()==180){//SJV Put some safety in here?!?!
             climberTalon.set(ControlMode.PercentOutput, -1);
         } else {
             climberTalon.set(ControlMode.PercentOutput, 0);
@@ -175,6 +177,8 @@ public class Climber implements Loggable{
     public void raiseAndExtend()  {
         if (climberTalon.getSelectedSensorPosition(0) < 10.0) {
             climberTalon.set(ControlMode.Position, 12.0);
+            //(ControlMode.Position, DemandType.ArbitraryFeedForward, -.15);
+
         } else if (climberTalon.getSelectedSensorPosition(0) >= 10.0) {
             climberSolenoid.set(Value.kReverse);
             climberTalon.set(ControlMode.Position, 26.0);
@@ -197,7 +201,7 @@ public class Climber implements Loggable{
 
         // **** Add fault tolerance for arms ****
         if ((climberHomeLeft.get() || climberHomeRight.get()) && climberTalon.getSelectedSensorPosition(0) <= 2) {
-            climberTalon.setSelectedSensorPosition(0, 0, 20);
+            climberTalon.setSelectedSensorPosition(0, 0, 20);//SJV THIS IS BAD CODE
             climberTalon.set(ControlMode.PercentOutput, 0);
             StateHasFinished  = true;
         }
@@ -237,6 +241,22 @@ public class Climber implements Loggable{
 
     public void DoneAction() {
     } 
+
+    public void checkAndSetClimberCANStatus() {
+        if(climberTalon.hasResetOccurred()){
+          System.out.println("RESET DETECTED FOR TALONFX " + climberTalon.getDeviceID());
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100);
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,100); //WE ARE CHECKING VELOCITY SO KEEP IT AT 10
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100);
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100);
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100);
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100);
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100);
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
+          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100);
+        }
+    }
 
     @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
     public boolean getClimberHomeLeft() {

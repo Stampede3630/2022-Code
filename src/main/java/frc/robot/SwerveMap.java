@@ -4,10 +4,13 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -40,6 +43,13 @@ public class SwerveMap {
     public static Rotation2d getRobotAngle(){
         return GYRO.getRotation2d();
         //return new Rotation2d(-Math.toRadians(GYRO.getAngle()));
+    }
+    //SJV MAYBE DESIGN A METHOD THAT SETS IT TO CANCODER DRIVING?
+    public static void checkAndSetSwerveCANStatus(){
+        FrontRightSwerveModule.setSWERVEMODULECANStatusFrames();
+        BackRightSwerveModule.setSWERVEMODULECANStatusFrames();
+        FrontLeftSwerveModule.setSWERVEMODULECANStatusFrames();
+        BackLeftSwerveModule.setSWERVEMODULECANStatusFrames();
     }
     public static void driveRobotInit() {
         FrontRightSwerveModule.swerveRobotInit();
@@ -137,6 +147,40 @@ public class SwerveMap {
             mSteeringMotor.config_kD(Constants.kDefaultPIDSlotID, mSteeringMotor.kGAINS.kD, Constants.kDefaultTimeout);  
             zeroSwerveAngle();
         }
+
+        public void setSWERVEMODULECANStatusFrames(){
+            if(mDriveMotor.hasResetOccurred()){
+                System.out.println("RESET DETECTED FOR TALONFX " + mDriveMotor.getDeviceID());
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100);
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100);
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100);
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100);
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100);
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100);
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100);
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
+                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100);
+            }
+            if(mSteeringMotor.hasResetOccurred()){
+                System.out.println("RESET DETECTED FOR TALONFX " + mSteeringMotor.getDeviceID());
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100);
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100);
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100);
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100);
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100);
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100);
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100);
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
+                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100);
+            }
+            if(mSteeringSensor.hasResetOccurred()){
+                System.out.println("RESET DETECTED FOR TALONFX " + mSteeringSensor.getDeviceID());
+                mSteeringSensor.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 1000, 100);
+            }
+        }
+
         public void swerveDisabledInit(){
             mDriveMotor.setNeutralMode(NeutralMode.Coast);
             mSteeringMotor.setNeutralMode(NeutralMode.Coast);

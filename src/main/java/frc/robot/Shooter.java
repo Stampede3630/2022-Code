@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -62,6 +63,21 @@ public class Shooter implements Loggable {
         // Figure out which way later
     }
 
+    public void checkAndSetShooterCANStatus() {
+        if(shooterDrive.hasResetOccurred()){
+          System.out.println("RESET DETECTED FOR TALONFX " + shooterDrive.getDeviceID());
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100);
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,100); //WE ARE CHECKING VELOCITY SO KEEP IT AT 10
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100);
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100);
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100);
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100);
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100);
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
+          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100);
+        }
+    }
 
     //SJV: ONCE WE FIGURE OUT OUR SHOOTER ANGLE AND SPEED MAKE BOOLEAN FOR EACH OF THE SHOOTER SPEEDS AND PUT IT ON THE COMPETITION LOGGER
     @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 5, width = 5)
