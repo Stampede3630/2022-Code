@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
@@ -65,17 +66,18 @@ public class Shooter implements Loggable {
 
     public void checkAndSetShooterCANStatus() {
         if(shooterDrive.hasResetOccurred()){
-          System.out.println("RESET DETECTED FOR TALONFX " + shooterDrive.getDeviceID());
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100);
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,100); //WE ARE CHECKING VELOCITY SO KEEP IT AT 10
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100);
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100);
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100);
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100);
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100);
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
-          shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100);
+          int mycounter = 0;
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,100) !=ErrorCode.OK) {mycounter++;} //WE ARE CHECKING VELOCITY SO KEEP IT AT 10
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          System.out.println("RESET DETECTED FOR TALONFX " + shooterDrive.getDeviceID() + " Errors: " + mycounter );
         }
     }
 

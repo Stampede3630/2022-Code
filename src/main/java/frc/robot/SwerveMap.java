@@ -150,34 +150,40 @@ public class SwerveMap {
 
         public void setSWERVEMODULECANStatusFrames(){
             if(mDriveMotor.hasResetOccurred()){
-                System.out.println("RESET DETECTED FOR TALONFX " + mDriveMotor.getDeviceID());
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100);
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100);
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100);
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100);
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100);
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100);
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100);
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
-                mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100);
+                int mycounter = 0;
+                
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                System.out.println("RESET DETECTED FOR TALONFX " + mDriveMotor.getDeviceID() + " Errors: " + mycounter);
             }
             if(mSteeringMotor.hasResetOccurred()){
-                System.out.println("RESET DETECTED FOR TALONFX " + mSteeringMotor.getDeviceID());
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100);
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100);
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100);
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100);
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100);
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100);
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100);
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
-                mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100);
+                int mycounter = 0;
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                System.out.println("RESET DETECTED FOR TALONFX " + mSteeringMotor.getDeviceID()+ " Errors: " + mycounter);
             }
             if(mSteeringSensor.hasResetOccurred()){
-                System.out.println("RESET DETECTED FOR TALONFX " + mSteeringSensor.getDeviceID());
-                mSteeringSensor.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 1000, 100);
+                int mycounter = 0;
+                
+                if(mSteeringSensor.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 1000, 100)!=ErrorCode.OK) {mycounter++;}
+                System.out.println("RESET DETECTED FOR CANCODER " + mSteeringSensor.getDeviceID()+ " Errors: " + mycounter);
+                
             }
         }
 

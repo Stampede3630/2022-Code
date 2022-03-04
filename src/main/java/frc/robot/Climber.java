@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
@@ -244,17 +245,19 @@ public class Climber implements Loggable{
 
     public void checkAndSetClimberCANStatus() {
         if(climberTalon.hasResetOccurred()){
-          System.out.println("RESET DETECTED FOR TALONFX " + climberTalon.getDeviceID());
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100);
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,100); //WE ARE CHECKING VELOCITY SO KEEP IT AT 10
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100);
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100);
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100);
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100);
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100);
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100);
-          climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100);
+            int mycounter = 0;
+          
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,100) !=ErrorCode.OK) {mycounter++;} //WE ARE CHECKING VELOCITY SO KEEP IT AT 10
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          System.out.println("RESET DETECTED FOR TALONFX " + climberTalon.getDeviceID() + " Errors: " + mycounter);
         }
     }
 
