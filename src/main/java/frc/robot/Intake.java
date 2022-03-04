@@ -30,6 +30,7 @@ public class Intake implements Loggable {
   public boolean intakeNow = false;
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
+  public boolean intakeIsOut = false;
 
   public static Intake getInstance() {
     return SINGLE_INSTANCE;
@@ -64,12 +65,18 @@ public class Intake implements Loggable {
 //SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
   private void intake() {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
-      intakeSolenoid.set(Value.kReverse);
+      if (!intakeIsOut) {
+        intakeSolenoid.set(Value.kReverse);
+      }
+      
       intakeDrive.set(ControlMode.Velocity, -12000);
       turnToIntake();
 
-    } else { 
-      intakeSolenoid.set(Value.kForward); // Pulls intake back up and stops spinning
+    } else {
+      if (intakeIsOut) {
+        intakeSolenoid.set(Value.kForward); // Pulls intake back up and stops spinning
+      } 
+
       intakeDrive.set(ControlMode.PercentOutput, 0);
     }
   }
@@ -139,7 +146,9 @@ public class Intake implements Loggable {
   }
 
   public void turnToIntake() {
-    limelightSolenoid.set(Value.kReverse);
+    if (limelightIsOpen) {
+      limelightSolenoid.set(Value.kReverse);
+    }
     // Make intake pipeline
     //SJV: time to make those pipe lines
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);

@@ -53,7 +53,9 @@ public class Shooter implements Loggable {
     }
 
     public void turnToShooter() {
-        Robot.INTAKE.limelightSolenoid.set(Value.kForward);
+        if (!Robot.INTAKE.limelightIsOpen) {
+            Robot.INTAKE.limelightSolenoid.set(Value.kForward);
+        }
         //Make shooter pipeline
         NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
         Robot.INTAKE.limelightIsOpen = true;
