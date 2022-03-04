@@ -8,6 +8,7 @@ public class Limelight { // There are currently no comments explaining how this 
     private static double camAngle; // CRITICAL: get camAngle from servo for limelight
     private static final double camHeight = 0; // CRITICAL: measure height of limelight from the ground
 
+    // methods for vision processing and LED aren't currently implemented
     public void limelightPeriodic() {
 
     }
@@ -38,6 +39,7 @@ public class Limelight { // There are currently no comments explaining how this 
             trackedTargetType = TargetType.UNDEFINED;
         }
 
+        // unfinished
         public static void getPosition(double camAngle, double camHeight) {
             double yAngle = 90 + camAngle + Limelight.getTY();
         }
@@ -83,7 +85,7 @@ public class Limelight { // There are currently no comments explaining how this 
 
     // ------ Limelight Getters ------
 
-    private static double getEntry(String entry) { // methods for vision processing and LED aren't currently implemented
+    private static double getEntry(String entry) {
         return limelight.getEntry(entry).getDouble(0);
     }
 
