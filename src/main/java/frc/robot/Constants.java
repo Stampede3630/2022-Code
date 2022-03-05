@@ -96,7 +96,7 @@ public class Constants {
         public final double kI;
         public final double kD;
         public final double kF;
-        public final int kIzone;
+        public final double kIzone;
         public final double kPeakOutput;
         /**
          * @param _kP
