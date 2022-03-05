@@ -40,7 +40,7 @@ public class Limelight { // There are currently no comments explaining how this 
         private static boolean validTarget;
 
         public static void lockOnUpperGoal() {
-            if (validTarget) {
+            if (validateTarget()) {
                 angle = camAngle + Limelight.getTY();
                 xDistance = (HEIGHT - CAM_HEIGHT) / Math.tan(angle);
             }
