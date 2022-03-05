@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
@@ -44,6 +45,9 @@ public class Intake implements Loggable {
     indexBottom = new WPI_TalonFX(6);
     indexTop = new WPI_TalonFX(9);
 
+    indexBottom.setNeutralMode(NeutralMode.Brake);
+    indexTop.setNeutralMode(NeutralMode.Brake);
+
     intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 5);
 
     limelightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
@@ -69,6 +73,7 @@ public class Intake implements Loggable {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       if (!intakeIsOut) {
         intakeSolenoid.set(Value.kReverse);
+        intakeIsOut = true;
       }
       
       intakeDrive.set(ControlMode.Velocity, -12000);
@@ -77,7 +82,8 @@ public class Intake implements Loggable {
 
     } else {
       if (intakeIsOut) {
-        intakeSolenoid.set(Value.kForward); // Pulls intake back up and stops spinning
+        intakeSolenoid.set(Value.kForward);
+        intakeIsOut = false; // Pulls intake back up and stops spinning
       } 
 
       intakeDrive.set(ControlMode.PercentOutput, 0);
