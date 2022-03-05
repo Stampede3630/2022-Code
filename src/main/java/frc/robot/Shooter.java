@@ -30,6 +30,7 @@ public class Shooter implements Loggable {
         shooterDrive.config_kP(0,
                 0.075, 20);
 
+
         homocideTheBattery = false;
     }
 
