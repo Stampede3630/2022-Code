@@ -53,9 +53,11 @@ public class Shooter implements Loggable {
     // Find shooter angle based on distance from hub
     private double calculateShooterAngle() {
         double distance = Limelight.Hub.getxDistance();
+        double shooterAngle = 0;
         // placeholder equation
         // double shooterAngle: y = m(distanceToHub) + b
-        return 0;
+
+        return shooterAngle;
     }
 
     // Find shooter speed based on shooter angle
