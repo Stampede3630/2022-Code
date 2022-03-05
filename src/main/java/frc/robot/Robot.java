@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
+  public static Limelight LIMELIGHT;
   public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
@@ -68,7 +69,7 @@ public class Robot extends TimedRobot {
     // CLIMBER = Climber.getInstance();
     // CLIMBER.init();
 
-
+    LIMELIGHT = Limelight.getInstance();
 
     // if(RUN_TRAJECTORY) {
       // SWERVETRAJECTORY = SwerveTrajectory.getInstance();

@@ -52,7 +52,7 @@ public class Shooter implements Loggable {
 
     // Find shooter angle based on distance from hub
     private double calculateShooterAngle() {
-        double distanceToHub = Robot.SWERVEDRIVE.limelightTX();
+        double distance = Limelight.Hub.getxDistance();
         // placeholder equation
         // double shooterAngle: y = m(distanceToHub) + b
         return 0;
