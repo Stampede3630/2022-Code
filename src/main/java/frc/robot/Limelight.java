@@ -49,9 +49,10 @@ public class Limelight { // There are currently no comments explaining how this 
         }
 
         // TODO: add a function that validates whether target can be found based on FOV of limelight? ---> just in case we solely target hub/ball
-        private static boolean isTargetValid() {
+        private static boolean validateTarget() {
             // *** Placeholder Code ***
-            return false;
+            validTarget = Limelight.isTargetValid();
+            return validTarget;
         }
 
         private static void reset() {
