@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
@@ -27,6 +28,7 @@ public class Shooter implements Loggable {
         shooterDrive = new WPI_TalonFX(10);
         shooterDrive.setInverted(TalonFXInvertType.Clockwise);
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
+        shooterDrive.setNeutralMode(NeutralMode.Coast);
 
         shooterDrive.config_kF(0,
                 1023 * 0.94 / 18000, 20);
