@@ -65,7 +65,7 @@ public class Intake implements Loggable {
   // Made this linear for now, can make more complex equation in the future
   private double calculateIntakeSpeed(double robotSpeed) {
     // y = 0.2x + 0.3
-    double intakeSpeed = 0.2*(robotSpeed) + 0.3;
+    double intakeSpeed = 0.2*(Math.abs(robotSpeed)) + 0.3;
     return intakeSpeed;
   }
 

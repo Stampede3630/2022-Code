@@ -35,13 +35,14 @@ public class Limelight { // There are currently no comments explaining how this 
         private static double xDistance; // Horizontal distance from robot to hub
         private static double xVelocity;
         private static double yVelocity;
-        // private static double angle; <--- probably don't need this, but don't delete
+        private static double angle;
 
         private static boolean validTarget;
 
         public static void lockOnUpperGoal() {
             if (validTarget) {
-                xDistance = (HEIGHT - CAM_HEIGHT) / Math.tan(camAngle);
+                angle = camAngle + Limelight.getTY();
+                xDistance = (HEIGHT - CAM_HEIGHT) / Math.tan(angle);
             }
 
             // TODO: set x and y velocity of hub in relation to robot?
@@ -78,9 +79,9 @@ public class Limelight { // There are currently no comments explaining how this 
         }
 
         // Get the angle from the robot to the hub
-        // public static double getAngle() {
-        //     return angle;
-        // }
+        public static double getAngle() {
+            return angle;
+        }
 
         // Get whether hub can be detected within FOV of limelight
         public static boolean isValid() {
