@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Timer;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -34,6 +35,10 @@ public class Intake implements Loggable {
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
+  public static boolean temporaryStartIntake = false;
+
+  private double startTime;
+  private double elapsedTime = 0.0;
 
   public static Intake getInstance() {
     return SINGLE_INSTANCE;
@@ -76,8 +81,7 @@ public class Intake implements Loggable {
         intakeIsOut = true;
       }
       
-      intakeDrive.set(ControlMode.Velocity, -12000);
-
+      intakeDrive.set(ControlMode.Velocity, -16000);
       turnToIntake();
 
     } else {
@@ -89,7 +93,24 @@ public class Intake implements Loggable {
       intakeDrive.set(ControlMode.PercentOutput, 0);
     }
   }
-
+  
+  // Literal hell, please send to the void as soon as possible
+  private boolean temporaryTimerBS() {
+    // System.out.println(elapsedTime + "my start time: " + startTime);
+    if (Robot.xbox.getRightTriggerAxis() > 0.0) {
+      System.out.println("reset");
+    }
+    elapsedTime = Timer.getFPGATimestamp() - startTime;
+        
+    if (elapsedTime >= 5.0) {
+      return temporaryStartIntake = false;
+    } else {
+      return temporaryStartIntake = true;
+      
+    }
+  }
+  
+  
   private void shootIndexManager() {
     if (Robot.SHOOTER.shooterAtSpeed() && (Robot.xbox.getLeftTriggerAxis() > 0 || shootNow)) {  // Once shooter gets up to speed AND left trigger held, balls fed to shooter
       if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) {
@@ -104,40 +125,46 @@ public class Intake implements Loggable {
   }
   //SJV: DOES INDEXER NEED TO BE RUN FASTER?
   private void indexerDrive() {
-      switch (indexManager()) {
-        case "1 Ball": // Hold the ball at the top of tower
-          indexBottom.set(ControlMode.PercentOutput, -0.25);
-          indexTop.set(ControlMode.PercentOutput, 0);
-          break;
-
-        case "2 Balls": // Indexer full
-          indexBottom.set(ControlMode.PercentOutput, 0); 
-          indexTop.set(ControlMode.PercentOutput, 0);
-          break;
-
-        case "Cargo in Transit":  // Bring ball from intake to top of tower
+    switch (indexManager()) {
+      case "1 Ball": // Hold the ball at the top of tower
+      if (temporaryTimerBS()) {
+        indexBottom.set(ControlMode.PercentOutput, -0.25);
+        indexTop.set(ControlMode.PercentOutput, 0);
+      } else {
+        indexBottom.set(ControlMode.PercentOutput, 0);
+        indexTop.set(ControlMode.PercentOutput, 0);
+      }
+      break;
+      
+      case "2 Balls": // Indexer full
+      indexBottom.set(ControlMode.PercentOutput, 0); 
+      indexTop.set(ControlMode.PercentOutput, 0);
+      break;
+      
+      case "Cargo in Transit":  // Bring ball from intake to top of tower
           indexTop.set(ControlMode.PercentOutput, -0.2);
           indexBottom.set(ControlMode.PercentOutput, -0.2);
           break;
 
         case "Reverse Intake":  // Both intakes go backwards
-          indexTop.set(ControlMode.PercentOutput, 0.2);
-          indexBottom.set(ControlMode.PercentOutput, 0.2);
-          break;
-
+        indexTop.set(ControlMode.PercentOutput, 0.2);
+        indexBottom.set(ControlMode.PercentOutput, 0.2);
+        intakeDrive.set(ControlMode.PercentOutput, -0.2);
+        break;
+        
         case "Intake Ball": // Spins bottom intake while ball in being intaked
-          indexBottom.set(ControlMode.PercentOutput, -0.2);
-          break;
-
+        indexBottom.set(ControlMode.PercentOutput, -0.2);
+        break;
+        
         default:  // Everything stops
-          indexBottom.set(ControlMode.PercentOutput, 0);
-          indexTop.set(ControlMode.PercentOutput, 0);
-          break;
+        indexBottom.set(ControlMode.PercentOutput, 0);
+        indexTop.set(ControlMode.PercentOutput, 0);
+        break;
       }
     } 
-
-  private String indexManager() {
-    if (Robot.xbox.getBButton()) {
+    
+    private String indexManager() {
+      if (Robot.xbox.getBButton()) {
       return "Reverse Intake";
     } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { // Both switches pressed
       return "2 Balls";
@@ -147,7 +174,8 @@ public class Intake implements Loggable {
     } else if (!topLimitSwitch.get()) { //top switch pressed
       cargoInTransit = false;
       return "1 Ball";
-    } else if (bottomLimitSwitch.get() && (Robot.xbox.getRightTriggerAxis() > 0 || shootNow)) { // Right trigger held AND nothing pressing the bottom switch
+    } else if (bottomLimitSwitch.get() && (Robot.xbox.getRightTriggerAxis() > 0 || shootNow || temporaryTimerBS())) { // Right trigger held AND nothing pressing the bottom switch
+      startTime = Timer.getFPGATimestamp();
       return "Intake Ball";
     } else {
       return "default";
@@ -168,46 +196,46 @@ public class Intake implements Loggable {
   public void checkAndSetIntakeCANStatus() {
     if(indexBottom.hasResetOccurred()){
       int mycounter=0;
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;};
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;};
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,100) !=ErrorCode.OK) {mycounter++;}
       System.out.println("RESET DETECTED FOR TALONFX " + indexBottom.getDeviceID() + " Errors: " + mycounter);
     }
 
     if(intakeDrive.hasResetOccurred()){
       int mycounter=0;
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,100) !=ErrorCode.OK) {mycounter++;}
       //mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,100) !=ErrorCode.OK) {mycounter++;}
       System.out.println("RESET DETECTED FOR TALONFX " + intakeDrive.getDeviceID() + " Errors: " + mycounter);
     }
 
     if(indexTop.hasResetOccurred()){
       int mycounter=0;
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,100) !=ErrorCode.OK) {mycounter++;}
       System.out.println("RESET DETECTED FOR TALONFX " + indexTop.getDeviceID() + " Errors:" + mycounter);
     }
   }

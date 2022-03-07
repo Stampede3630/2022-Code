@@ -203,12 +203,10 @@ public class Climber implements Loggable{
     }
 
     public void lowerArm28() {
-        climberTalon.set(ControlMode.PercentOutput, -0.50);
+        climberTalon.set(ControlMode.Position, 5, DemandType.ArbitraryFeedForward, -0.15);
 
         // **** Add fault tolerance for arms ****
-        if ((climberHomeLeft.get() || climberHomeRight.get()) && climberTalon.getSelectedSensorPosition(0) <= 2) {
-            climberTalon.setSelectedSensorPosition(0, 0, 20);//SJV THIS IS BAD CODE
-            climberTalon.set(ControlMode.PercentOutput, 0);
+        if ((climberHomeLeft.get() || climberHomeRight.get()) && climberTalon.getSelectedSensorPosition(0) <= 5) {
             StateHasFinished  = true;
         }
     }
