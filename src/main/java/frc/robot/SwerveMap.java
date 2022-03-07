@@ -137,7 +137,6 @@ public class SwerveMap {
             myCanCoderConfig.magnetOffsetDegrees = mSteeringSensor.kOffsetDegrees;
             myCanCoderConfig.sensorCoefficient = 360/4096;
             myCanCoderConfig.unitString = "deg";
-            myCanCoderConfig.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
             myCanCoderConfig.sensorTimeBase= SensorTimeBase.PerSecond;
             
             if(mSteeringSensor.configAllSettings(myCanCoderConfig,1000)==ErrorCode.OK){
