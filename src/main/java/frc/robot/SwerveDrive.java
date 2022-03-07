@@ -67,7 +67,7 @@ public class SwerveDrive implements Loggable {
   */
   @SuppressWarnings("ParameterName")
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
-    if (Robot.xbox.getRightStickButton()){
+    if (Robot.xbox.getRightBumper()){
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
       _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX())/360)*(2*Math.PI));
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
@@ -77,12 +77,6 @@ public class SwerveDrive implements Loggable {
     } else {
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
-    }
-    
-    if(Robot.xbox.getLeftStickButton()){
-      _fieldRelative = false;
-    } else {
-      _fieldRelative = true;
     }
     SwerveModuleState[] moduleStates =
       m_kinematics.toSwerveModuleStates( _fieldRelative ? 
