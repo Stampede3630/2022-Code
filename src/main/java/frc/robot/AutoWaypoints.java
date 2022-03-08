@@ -51,7 +51,8 @@ public class AutoWaypoints implements Loggable {
     public void loadAutoPaths(){
 
        FenderTwoBallAutoWPs = new Waypoint[] {
-            new Waypoint(SINGLE_INSTANCE::intakeBall, 7.65, .060),
+            new Waypoint(SINGLE_INSTANCE::shoot, 7.63, 1.00),
+            new Waypoint(SINGLE_INSTANCE::intakeBall, 7.64, 0.54),
             new Waypoint(SINGLE_INSTANCE::shoot, 7.88, 2.86),
             new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
         };
@@ -66,7 +67,7 @@ public class AutoWaypoints implements Loggable {
         };
         myAutoContainer = new AutoPose[] {
             new AutoPose("FenderFourBallAutoWPs", 7.80, 1.68, -84.69, FenderFourBallAutoWPs, PathPlanner.loadPath("blueAutoTest", 3, 2.5)),
-            new AutoPose("FenderTwoBallAutoWPs", 6.09, 5.23, 43.78, FenderTwoBallAutoWPs, PathPlanner.loadPath("twoBallAuto", 3, 2.5))};
+            new AutoPose("FenderTwoBallAutoWPs", 7.64, 1.83, -84.69, FenderTwoBallAutoWPs, PathPlanner.loadPath("twoBallAuto", 3, 1.0))};
         for (AutoPose myAutoPose : myAutoContainer ){
             m_autoChooser.addOption(myAutoPose.name, myAutoPose);
         }

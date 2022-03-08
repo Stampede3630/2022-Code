@@ -141,6 +141,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     SWERVEDRIVE.setToBrake();
     INTAKE.intakeNow = false;
+    INTAKE.shootNow = false;
     
   }
 

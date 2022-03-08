@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -177,32 +178,32 @@ public class SwerveMap {
                 if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,100)!=ErrorCode.OK) {mycounter++;}
                 if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100)!=ErrorCode.OK) {mycounter++;}
                 if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100)!=ErrorCode.OK) {mycounter++;}
-                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100)!=ErrorCode.OK) {mycounter++;}
-                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100)!=ErrorCode.OK) {mycounter++;}
-                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100)!=ErrorCode.OK) {mycounter++;}
-                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100)!=ErrorCode.OK) {mycounter++;}
-                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100)!=ErrorCode.OK) {mycounter++;}
-                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 255,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100)!=ErrorCode.OK) {mycounter++;}
+                if(mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,100)!=ErrorCode.OK) {mycounter++;}
                 System.out.println("RESET DETECTED FOR TALONFX " + mDriveMotor.getDeviceID() + " Errors: " + mycounter);
             }
             if(mSteeringMotor.hasResetOccurred()){
                 int mycounter = 0;
                 if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 10,100) !=ErrorCode.OK) {mycounter++;}
                 if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,100) !=ErrorCode.OK) {mycounter++;}
-                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
-                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
-                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
-                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
-                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
-                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
-                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 255,100) !=ErrorCode.OK) {mycounter++;}
+                if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
                 if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
                 System.out.println("RESET DETECTED FOR TALONFX " + mSteeringMotor.getDeviceID()+ " Errors: " + mycounter);
             }
             if(mSteeringSensor.hasResetOccurred()){
                 int mycounter = 0;
                 
-                if(mSteeringSensor.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 1000, 100)!=ErrorCode.OK) {mycounter++;}
+                if(mSteeringSensor.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255, 100)!=ErrorCode.OK) {mycounter++;}
                 System.out.println("RESET DETECTED FOR CANCODER " + mSteeringSensor.getDeviceID()+ " Errors: " + mycounter);
                 
             }
@@ -218,7 +219,7 @@ public class SwerveMap {
         }
 
         public void zeroSwerveAngle() {
-            if( mSteeringSensor.configGetSensorInitializationStrategy(1000).value == SensorInitializationStrategy.BootToZero.value) {
+            if((int) mSteeringSensor.configGetParameter(ParamEnum.eSensorInitStrategy,0, 1000) == SensorInitializationStrategy.BootToZero.value) {
                 if(mSteeringSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition,1000).value!=ErrorCode.OK.value) {
                     System.out.println("ERROR: COULDN'T SET THE INITIALIZATION STRATEGY! CANCODER: " + mSteeringSensor.getDeviceID());
                 } else {
