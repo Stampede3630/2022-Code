@@ -168,46 +168,58 @@ public class Intake implements Loggable {
   public void checkAndSetIntakeCANStatus() {
     if(indexBottom.hasResetOccurred()){
       int mycounter=0;
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;};
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,1000) !=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_6_Misc, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,1000)!=ErrorCode.OK) {mycounter++;}
       System.out.println("RESET DETECTED FOR TALONFX " + indexBottom.getDeviceID() + " Errors: " + mycounter);
     }
 
     if(intakeDrive.hasResetOccurred()){
       int mycounter=0;
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
-      //mDriveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,1000) !=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_6_Misc, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,1000)!=ErrorCode.OK) {mycounter++;}
       System.out.println("RESET DETECTED FOR TALONFX " + intakeDrive.getDeviceID() + " Errors: " + mycounter);
     }
 
     if(indexTop.hasResetOccurred()){
       int mycounter=0;
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100) !=ErrorCode.OK) {mycounter++;}
-      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,100) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,1000) !=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_6_Misc, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,1000)!=ErrorCode.OK) {mycounter++;}
+      if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,1000)!=ErrorCode.OK) {mycounter++;}
       System.out.println("RESET DETECTED FOR TALONFX " + indexTop.getDeviceID() + " Errors:" + mycounter);
     }
   }

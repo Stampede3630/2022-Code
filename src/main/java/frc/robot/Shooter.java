@@ -27,7 +27,7 @@ public class Shooter implements Loggable {
     public void init() { // TEST!!!!!
         shooterDrive = new WPI_TalonFX(10);
         shooterDrive.setInverted(TalonFXInvertType.Clockwise);
-        shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
+        shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 1000);
         shooterDrive.setNeutralMode(NeutralMode.Coast);
 
         shooterDrive.config_kF(0,
@@ -50,7 +50,7 @@ public class Shooter implements Loggable {
     }
     //SJV: I hope ur fine with me renaming this method
     public void shooterPeriodic() {
-        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) {
+        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
             shooterDrive.set(ControlMode.Velocity, shooterSpeed);
             turnToShooter();
         } else {
@@ -71,16 +71,20 @@ public class Shooter implements Loggable {
     public void checkAndSetShooterCANStatus() {
         if(shooterDrive.hasResetOccurred()){
           int mycounter = 0;
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 1000,100) !=ErrorCode.OK) {mycounter++;}
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,100) !=ErrorCode.OK) {mycounter++;} //WE ARE CHECKING VELOCITY SO KEEP IT AT 10
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000,100) !=ErrorCode.OK) {mycounter++;}
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 5000,100) !=ErrorCode.OK) {mycounter++;}
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 5000,100) !=ErrorCode.OK) {mycounter++;}
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 5000,100) !=ErrorCode.OK) {mycounter++;}
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 5000,100) !=ErrorCode.OK) {mycounter++;}
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 5000,100) !=ErrorCode.OK) {mycounter++;}
-          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000,100) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_6_Misc, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,1000) !=ErrorCode.OK) {mycounter++;}
+          if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,1000) !=ErrorCode.OK) {mycounter++;}
           System.out.println("RESET DETECTED FOR TALONFX " + shooterDrive.getDeviceID() + " Errors: " + mycounter );
         }
     }
