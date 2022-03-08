@@ -248,19 +248,19 @@ public class Climber implements Loggable{
             int mycounter = 0;
           
             if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,1000) !=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_6_Misc, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,1000)!=ErrorCode.OK) {mycounter++;}
-            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,1000)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_6_Misc, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_7_CommStatus, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 255,100)!=ErrorCode.OK) {mycounter++;}
+            if(climberTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,100)!=ErrorCode.OK) {mycounter++;}
           System.out.println("RESET DETECTED FOR TALONFX " + climberTalon.getDeviceID() + " Errors: " + mycounter);
         }
     }
