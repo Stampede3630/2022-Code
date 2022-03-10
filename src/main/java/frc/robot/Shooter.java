@@ -14,6 +14,7 @@ public class Shooter implements Loggable {
     private static Shooter SINGLE_INSTANCE = new Shooter();
     private double shooterSpeed = 5000;
     private WPI_TalonFX shooterDrive;
+    private WPI_TalonFX hoodMotor;
 
     public boolean homocideTheBattery;
 
@@ -30,6 +31,7 @@ public class Shooter implements Loggable {
         shooterDrive.config_kP(0,
                 0.075, 20);
 
+        hoodMotor = new WPI_TalonFX(279); // TODO: get actual ID
         homocideTheBattery = false;
     }
 
