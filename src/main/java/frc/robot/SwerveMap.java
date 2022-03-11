@@ -138,13 +138,15 @@ public class SwerveMap {
             myCanCoderConfig.sensorCoefficient = 360/4096;
             myCanCoderConfig.unitString = "deg";
             myCanCoderConfig.sensorTimeBase= SensorTimeBase.PerSecond;
-            myCanCoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+            myCanCoderConfig.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
+            
             
             if(mSteeringSensor.configAllSettings(myCanCoderConfig,1000)==ErrorCode.OK){
                 System.out.println("CANCoder " + mSteeringSensor.getDeviceID() + " configured.");
             } else {
                 System.out.println("WARNING! CANCoder " + mSteeringSensor.getDeviceID() + " NOT configured correctly!");
             }
+            mSteeringSensor.setPositionToAbsolute(1000);
 
             //Setup the the closed-loop PID for the steering module loop
             
@@ -300,7 +302,7 @@ public class SwerveMap {
         public static SwerveModuleState optimize(
             SwerveModuleState desiredState, Rotation2d currentAngle) {
           var delta = desiredState.angle.minus(currentAngle);
-          if (Math.abs(Math.IEEEremainder(delta.getDegrees(), 180)) > 90.0) {  //SJV: If this doesn'twork try 360
+          if (Math.abs(delta.getDegrees()) > 90.0) {  //SJV: If this doesn'twork try 360
             return new SwerveModuleState(
                 -desiredState.speedMetersPerSecond,
                 desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
