@@ -68,7 +68,7 @@ public class SwerveMap {
         public Constants.Gains kGAINS;
 
         public SteeringMotor(int _talonID, Constants.Gains _gains) {
-            super(_talonID);
+            super(_talonID, "Swerve CANIVORE");
             kGAINS = _gains;
         }
     }
@@ -77,7 +77,7 @@ public class SwerveMap {
         public TalonFXInvertType kWheelDirectionType;
         public Constants.Gains kGAINS;
         public DriveMotor (int _talonID, TalonFXInvertType _direction, Constants.Gains _gains){
-            super(_talonID, "swerve CANIVORE");
+            super(_talonID, "Swerve CANIVORE");
             kWheelDirectionType = _direction;
             kGAINS=_gains;
         }
@@ -87,7 +87,7 @@ public class SwerveMap {
         public double kOffsetDegrees;
 
         public SteeringSensor (int _sensorID, double _offsetDegrees){
-            super(_sensorID, "swerve CANIVORE");
+            super(_sensorID, "Swerve CANIVORE");
             kOffsetDegrees = _offsetDegrees;
          }       
     }

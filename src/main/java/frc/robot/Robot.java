@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
     SwerveMap.checkAndSetSwerveCANStatus();
     
-    SwerveMap.GYRO.reset();
+    SwerveMap.GYRO.reset(); 
     // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
 
     //*Swerve method starts here*

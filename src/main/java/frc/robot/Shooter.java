@@ -17,6 +17,7 @@ public class Shooter implements Loggable {
     private static Shooter SINGLE_INSTANCE = new Shooter();
     private double shooterSpeed = 5000;
     private WPI_TalonFX shooterDrive;
+    private WPI_TalonFX hoodMotor;
 
     public boolean homocideTheBattery;
 
@@ -36,7 +37,7 @@ public class Shooter implements Loggable {
         shooterDrive.config_kP(0,
                 0.075, 20);
         
-
+        hoodMotor = new WPI_TalonFX(49);
         homocideTheBattery = false;
     }
 
@@ -50,11 +51,20 @@ public class Shooter implements Loggable {
     }
     //SJV: I hope ur fine with me renaming this method
     public void shooterPeriodic() {
+        rotateHood();
         if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
             shooterDrive.set(ControlMode.Velocity, shooterSpeed);
             turnToShooter();
         } else {
             shooterDrive.set(0);
+        }
+    }
+
+    public void rotateHood() {
+        if (Robot.xbox.getLeftBumper()) {
+            hoodMotor.set(ControlMode.PercentOutput, 0.3);
+        } else if (Robot.xbox.getRightBumper()) {
+            hoodMotor.set(ControlMode.PercentOutput, -0.3);
         }
     }
 
