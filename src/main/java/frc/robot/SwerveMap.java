@@ -68,7 +68,7 @@ public class SwerveMap {
         public Constants.Gains kGAINS;
 
         public SteeringMotor(int _talonID, Constants.Gains _gains) {
-            super(_talonID, "Swerve CANIVORE");
+            super(_talonID, "Swerve");
             kGAINS = _gains;
         }
     }
@@ -77,7 +77,7 @@ public class SwerveMap {
         public TalonFXInvertType kWheelDirectionType;
         public Constants.Gains kGAINS;
         public DriveMotor (int _talonID, TalonFXInvertType _direction, Constants.Gains _gains){
-            super(_talonID, "Swerve CANIVORE");
+            super(_talonID, "Swerve");
             kWheelDirectionType = _direction;
             kGAINS=_gains;
         }
@@ -87,7 +87,7 @@ public class SwerveMap {
         public double kOffsetDegrees;
 
         public SteeringSensor (int _sensorID, double _offsetDegrees){
-            super(_sensorID, "Swerve CANIVORE");
+            super(_sensorID, "Swerve");
             kOffsetDegrees = _offsetDegrees;
          }       
     }
@@ -300,7 +300,7 @@ public class SwerveMap {
         public static SwerveModuleState optimize(
             SwerveModuleState desiredState, Rotation2d currentAngle) {
           var delta = desiredState.angle.minus(currentAngle);
-          if (Math.abs(delta.getDegrees()) > 90.0) {
+          if (Math.abs(Math.IEEEremainder(delta.getDegrees(), 180)) > 90.0) {  //SJV: If this doesn'twork try 360
             return new SwerveModuleState(
                 -desiredState.speedMetersPerSecond,
                 desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
