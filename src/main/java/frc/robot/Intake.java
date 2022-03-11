@@ -10,11 +10,14 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.networktables.NetworkTableInstance;
+
+import com.revrobotics.ColorSensorV3;
 
 public class Intake implements Loggable {
   
@@ -29,11 +32,14 @@ public class Intake implements Loggable {
   // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
   public DigitalInput bottomLimitSwitch;
   public DigitalInput topLimitSwitch;
+  public ColorSensorV3 colorSensor;
   private boolean cargoInTransit = false;
   public boolean intakeNow = false;
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
+  
+  public final I2C.Port i2cPort = I2C.Port.kMXP;
 
   public static Intake getInstance() {
     return SINGLE_INSTANCE;
@@ -55,6 +61,8 @@ public class Intake implements Loggable {
     bottomLimitSwitch = new DigitalInput(0);
     topLimitSwitch = new DigitalInput(1);
 
+    colorSensor = new ColorSensorV3(i2cPort);
+
     intakeDrive = new WPI_TalonFX(7);
         intakeDrive.setInverted(TalonFXInvertType.Clockwise);
         intakeDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
@@ -63,6 +71,7 @@ public class Intake implements Loggable {
 
         intakeDrive.config_kP(0,
                 0.055, 20);
+    
   }
   public void intakePeriodic(){
     intake();
@@ -164,7 +173,7 @@ public class Intake implements Loggable {
     limelightIsOpen = false;
     // ^^^
   }
-
+  
   public void checkAndSetIntakeCANStatus() {
     if(indexBottom.hasResetOccurred()){
       int mycounter=0;
@@ -184,7 +193,7 @@ public class Intake implements Loggable {
       if(indexBottom.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,1000)!=ErrorCode.OK) {mycounter++;}
       System.out.println("RESET DETECTED FOR TALONFX " + indexBottom.getDeviceID() + " Errors: " + mycounter);
     }
-
+    
     if(intakeDrive.hasResetOccurred()){
       int mycounter=0;
       if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,1000) !=ErrorCode.OK) {mycounter++;}
@@ -203,7 +212,7 @@ public class Intake implements Loggable {
       if(intakeDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,100)!=ErrorCode.OK) {mycounter++;}
       System.out.println("RESET DETECTED FOR TALONFX " + intakeDrive.getDeviceID() + " Errors: " + mycounter);
     }
-
+    
     if(indexTop.hasResetOccurred()){
       int mycounter=0;
       if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,1000) !=ErrorCode.OK) {mycounter++;}
@@ -223,16 +232,34 @@ public class Intake implements Loggable {
       System.out.println("RESET DETECTED FOR TALONFX " + indexTop.getDeviceID() + " Errors:" + mycounter);
     }
   }
+  //I think that matters... not SURE THOWRONG WRONG WATCH OBLOG WANTS DOUBLES i THINK
+  @Log
+  public double getRedColor() {
+    return (double) colorSensor.getRed();
+    
+  }
 
+  @Log
+  public double getBlueColor() {
+    return (double) colorSensor.getBlue();
+    
+  }
 
-
+  @Log
+  public double getGreenColor() {
+    return (double) colorSensor.getGreen();
+    
+  }
+  
   @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
   public boolean getBottomLimitSwitch() {
     return bottomLimitSwitch.get();
   }
-
+  
   @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
   public boolean getTopLimitSwitch() {
     return topLimitSwitch.get();
   }
+  
+  
 }

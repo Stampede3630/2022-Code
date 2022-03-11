@@ -9,16 +9,22 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
+import io.github.oblarg.oblog.annotations.Log;
 
 public class Shooter implements Loggable {
     private static Shooter SINGLE_INSTANCE = new Shooter();
     private double shooterSpeed = 5000;
     private WPI_TalonFX shooterDrive;
     private WPI_TalonFX hoodMotor;
-
+    private DigitalInput leftHoodSwitch;
+    private DigitalInput rightHoodSwitch;
+    
+    private boolean hoodAtOrigin = false;
+    private boolean rotComplete = false;
     public boolean homocideTheBattery;
 
     public static Shooter getInstance() {
@@ -38,7 +44,17 @@ public class Shooter implements Loggable {
                 0.075, 20);
         
         hoodMotor = new WPI_TalonFX(49);
+
+        hoodMotor.config_kP(0,
+                .07625, 20);
+        
+
         homocideTheBattery = false;
+
+        leftHoodSwitch = new DigitalInput(4);
+        rightHoodSwitch = new DigitalInput(5);
+
+        rezeroHood();
     }
 
     public boolean shooterAtSpeed() {
@@ -65,6 +81,21 @@ public class Shooter implements Loggable {
             hoodMotor.set(ControlMode.PercentOutput, 0.3);
         } else if (Robot.xbox.getRightBumper()) {
             hoodMotor.set(ControlMode.PercentOutput, -0.3);
+        }
+    }
+
+    private void rezeroHood() { // check default on hood switches
+        if (leftHoodSwitch.get() || rightHoodSwitch.get()) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
+            hoodAtOrigin = true;
+            hoodMotor.set(ControlMode.PercentOutput, 0);
+            hoodMotor.setSelectedSensorPosition(0, 0, 20);
+        } else if (!hoodAtOrigin && !rotComplete) {
+            hoodMotor.set(ControlMode.Position, 5000);
+            if (hoodMotor.getSelectedSensorPosition(0) >= 4000) {
+                rotComplete = true;
+            }
+        } else if (!hoodAtOrigin && rotComplete) {
+            hoodMotor.set(ControlMode.PercentOutput, -0.1);
         }
     }
 
@@ -109,5 +140,15 @@ public class Shooter implements Loggable {
     @Config.ToggleButton(name = "kill battery?", defaultValue = false, rowIndex = 1, columnIndex = 0)
     public void killTheBattery(boolean _input) {
         homocideTheBattery = _input;
+    }
+
+    @Log
+    public boolean getLeftHoodLimit() {
+        return leftHoodSwitch.get();
+    }
+
+    @Log
+    public boolean getRightHoodLimit() {
+        return rightHoodSwitch.get();
     }
 }
