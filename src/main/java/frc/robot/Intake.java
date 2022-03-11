@@ -76,7 +76,7 @@ public class Intake implements Loggable {
         intakeIsOut = true;
       }
       
-      intakeDrive.set(ControlMode.Velocity, -10500);
+      intakeDrive.set(ControlMode.Velocity, -7500);
 
       turnToIntake();
 
@@ -106,7 +106,7 @@ public class Intake implements Loggable {
   private void indexerDrive() {
       switch (indexManager()) {
         case "1 Ball": // Hold the ball at the top of tower
-          indexBottom.set(ControlMode.PercentOutput, -0.25);
+          indexBottom.set(ControlMode.PercentOutput, -0.5);
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
 
@@ -116,17 +116,17 @@ public class Intake implements Loggable {
           break;
 
         case "Cargo in Transit":  // Bring ball from intake to top of tower
-          indexTop.set(ControlMode.PercentOutput, -0.2);
-          indexBottom.set(ControlMode.PercentOutput, -0.2);
+          indexTop.set(ControlMode.PercentOutput, -0.5);
+          indexBottom.set(ControlMode.PercentOutput, -0.5);
           break;
 
         case "Reverse Intake":  // Both intakes go backwards
-          indexTop.set(ControlMode.PercentOutput, 0.2);
-          indexBottom.set(ControlMode.PercentOutput, 0.2);
+          indexTop.set(ControlMode.PercentOutput, 0.8);
+          indexBottom.set(ControlMode.PercentOutput, 0.8);
           break;
 
         case "Intake Ball": // Spins bottom intake while ball in being intaked
-          indexBottom.set(ControlMode.PercentOutput, -0.2);
+          indexBottom.set(ControlMode.PercentOutput, -0.5);
           break;
 
         default:  // Everything stops
