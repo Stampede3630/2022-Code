@@ -79,7 +79,7 @@ public class Climber implements Loggable{
         if (Robot.xbox.getPOV()==0){
             climberTalon.set(ControlMode.PercentOutput, 1); //SJV:MAYBE PUT SOME SAFETY HERE TOO?!?!
         }
-        else if (Robot.xbox.getPOV()==180){//SJV Put some safety in here?!?!
+        else if (Robot.xbox.getPOV()==180 & !(climberHomeLeft.get() || climberHomeRight.get())){
             climberTalon.set(ControlMode.PercentOutput, -1);
         } else {
             climberTalon.set(ControlMode.PercentOutput, 0);
@@ -161,7 +161,7 @@ public class Climber implements Loggable{
 
     public void reZero() { 
 
-        if (climberHomeLeft.get() || climberHomeRight.get()) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
+        if (climberHomeLeft.get() || climberHomeRight.get() || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) <-.5 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
             atOrigin = true;
             climberTalon.set(ControlMode.PercentOutput, 0);
             climberTalon.setSelectedSensorPosition(0, 0, 20);
@@ -198,11 +198,10 @@ public class Climber implements Loggable{
     }
 
     public void lowerArm28() {
-        climberTalon.set(ControlMode.PercentOutput, -0.50);
+        climberTalon.set(ControlMode.Position, 3, DemandType.ArbitraryFeedForward, -.15);
 
         // **** Add fault tolerance for arms ****
-        if ((climberHomeLeft.get() || climberHomeRight.get()) && climberTalon.getSelectedSensorPosition(0) <= 2) {
-            climberTalon.setSelectedSensorPosition(0, 0, 20);//SJV THIS IS BAD CODE
+        if (climberHomeLeft.get() || climberHomeRight.get() || climberTalon.getSelectedSensorPosition(0) <=3.5 ) {
             climberTalon.set(ControlMode.PercentOutput, 0);
             StateHasFinished  = true;
         }

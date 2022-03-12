@@ -37,16 +37,13 @@ public class Shooter implements Loggable {
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 1000);
         shooterDrive.setNeutralMode(NeutralMode.Coast);
 
-        shooterDrive.config_kF(0,
-                1023 * 0.94 / 18000, 20);
+        shooterDrive.config_kF(0, 1023 * 0.94 / 18000, 100);
 
-        shooterDrive.config_kP(0,
-                0.075, 20);
+        shooterDrive.config_kP(0, 0.075, 100);
         
         hoodMotor = new WPI_TalonFX(49);
 
-        hoodMotor.config_kP(0,
-                .07625, 20);
+        hoodMotor.config_kP(0, .07625, 100);
         
 
         homocideTheBattery = false;
@@ -54,17 +51,19 @@ public class Shooter implements Loggable {
         leftHoodSwitch = new DigitalInput(4);
         rightHoodSwitch = new DigitalInput(5);
 
-        rezeroHood();
+        rezeroHood();//SJV this code needs to be in a periodic function look at climber periodic for inspiration
+
+
     }
 
     public boolean shooterAtSpeed() {
-        if (shooterDrive.getSelectedSensorVelocity(0) >= shooterSpeed * 0.95) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
+        if (Math.abs(shooterDrive.getSelectedSensorVelocity(0) - shooterSpeed) <= shooterSpeed * 0.05) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
             return true;
         } else {
             return false;
         }
-
     }
+    
     //SJV: I hope ur fine with me renaming this method
     public void shooterPeriodic() {
         rotateHood();
