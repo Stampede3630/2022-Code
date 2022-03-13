@@ -105,6 +105,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     SWERVEDRIVE.updateOdometry();
     SwerveMap.checkAndSetSwerveCANStatus();
+    SwerveMap.checkAndZeroSwerveAngle();
     INTAKE.checkAndSetIntakeCANStatus();
     SHOOTER.checkAndSetShooterCANStatus();
     CLIMBER.checkAndSetClimberCANStatus();
