@@ -161,7 +161,8 @@ public class Climber implements Loggable{
 
     public void reZero() { 
 
-        if (climberHomeLeft.get() || climberHomeRight.get() || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) <-.5 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
+        if (climberHomeLeft.get() || climberHomeRight.get() 
+        || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) >-.5 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
             atOrigin = true;
             climberTalon.set(ControlMode.PercentOutput, 0);
             climberTalon.setSelectedSensorPosition(0, 0, 20);

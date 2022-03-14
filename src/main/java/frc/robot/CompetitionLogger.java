@@ -1,5 +1,10 @@
 package frc.robot;
 
+import javax.print.attribute.standard.Compression;
+
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -12,6 +17,7 @@ public class CompetitionLogger implements Loggable {
     }
 
     public boolean beginClimb = false;
+    public Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
 
 
     //KEEP THIS INSTANTIATION IT'S FOR LOGGING
@@ -57,6 +63,26 @@ public class CompetitionLogger implements Loggable {
     @Log
     public float getPitch(){
       return SwerveMap.GYRO.getPitch();
+    }
+
+    @Log
+    public float navXData() {
+        return SwerveMap.GYRO.getDisplacementX();
+    }
+
+    @Log
+    public float navYData() {
+        return SwerveMap.GYRO.getDisplacementY();
+    }
+
+    @Log
+    public double getPressure() {
+        return compressor.getPressure();
+    }
+
+    @Log
+    public Field2d field2022(){
+        return Robot.SWERVEDRIVE.field;
     }
 
 

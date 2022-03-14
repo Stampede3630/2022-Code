@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
@@ -18,8 +19,11 @@ import io.github.oblarg.oblog.annotations.Log;
 public class Shooter implements Loggable {
     private static Shooter SINGLE_INSTANCE = new Shooter();
     private double shooterSpeed = 5000;
+    private double hoodAngle = 0;
     private WPI_TalonFX shooterDrive;
     private WPI_TalonFX hoodMotor;
+    // SWITCHES DEFAULT TO TRUE WHEN NOT PRESSED
+    // TRUE = SHOOTER NOT AT HOME, FALSE = SHOOTER AT HOME
     private DigitalInput leftHoodSwitch;
     private DigitalInput rightHoodSwitch;
     
@@ -37,12 +41,11 @@ public class Shooter implements Loggable {
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 1000);
         shooterDrive.setNeutralMode(NeutralMode.Coast);
 
-        shooterDrive.config_kF(0, 1023 * 0.94 / 18000, 100);
+        shooterDrive.config_kF(0, 1023 * .94 / 18000, 100);
 
-        shooterDrive.config_kP(0, 0.075, 100);
+        shooterDrive.config_kP(0, .12, 100);
         
         hoodMotor = new WPI_TalonFX(49);
-
         hoodMotor.config_kP(0, .07625, 100);
         
 
@@ -50,12 +53,25 @@ public class Shooter implements Loggable {
 
         leftHoodSwitch = new DigitalInput(4);
         rightHoodSwitch = new DigitalInput(5);
-
-        rezeroHood();//SJV this code needs to be in a periodic function look at climber periodic for inspiration
-
-
     }
 
+    
+    //SJV: I hope ur fine with me renaming this method
+    public void shooterPeriodic() {
+        // if (!hoodAtOrigin) {
+        //     rezeroHood();
+        // } else if (hoodAtOrigin) {
+        //     rotateHood();
+        // }
+        
+        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
+            shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, 0.1);
+            turnToShooter();
+        } else {
+            shooterDrive.set(0);
+        }
+    }
+    
     public boolean shooterAtSpeed() {
         if (Math.abs(shooterDrive.getSelectedSensorVelocity(0) - shooterSpeed) <= shooterSpeed * 0.05) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
             return true;
@@ -63,34 +79,20 @@ public class Shooter implements Loggable {
             return false;
         }
     }
-    
-    //SJV: I hope ur fine with me renaming this method
-    public void shooterPeriodic() {
-        rotateHood();
-        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
-            shooterDrive.set(ControlMode.Velocity, shooterSpeed);
-            turnToShooter();
-        } else {
-            shooterDrive.set(0);
-        }
-    }
 
     public void rotateHood() {
-        if (Robot.xbox.getLeftBumper()) {
-            hoodMotor.set(ControlMode.PercentOutput, 0.3);
-        } else if (Robot.xbox.getRightBumper()) {
-            hoodMotor.set(ControlMode.PercentOutput, -0.3);
-        }
+        hoodMotor.set(ControlMode.Position, hoodAngle);
     }
 
     private void rezeroHood() { // check default on hood switches
-        if (leftHoodSwitch.get() || rightHoodSwitch.get()) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
+        if (!leftHoodSwitch.get() || !rightHoodSwitch.get()
+        || (rotComplete && hoodMotor.getSelectedSensorPosition(0) < 1000 && hoodMotor.getSelectedSensorVelocity(0) >-600 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
             hoodAtOrigin = true;
             hoodMotor.set(ControlMode.PercentOutput, 0);
             hoodMotor.setSelectedSensorPosition(0, 0, 20);
         } else if (!hoodAtOrigin && !rotComplete) {
-            hoodMotor.set(ControlMode.Position, 5000);
-            if (hoodMotor.getSelectedSensorPosition(0) >= 4000) {
+            hoodMotor.set(ControlMode.Position, 2000);
+            if (hoodMotor.getSelectedSensorPosition(0) >= 1500) {
                 rotComplete = true;
             }
         } else if (!hoodAtOrigin && rotComplete) {
@@ -129,8 +131,13 @@ public class Shooter implements Loggable {
         }
     }
 
+    @Config.NumberSlider(name = "Set Shooter Angle", defaultValue = 0, min = 0, max = 23000, blockIncrement = 1000, rowIndex = 4, columnIndex = 2, height = 2, width = 2)
+    public void setHoodAngle(double targetAngle) {
+        hoodAngle = targetAngle;
+    }
+
     //SJV: ONCE WE FIGURE OUT OUR SHOOTER ANGLE AND SPEED MAKE BOOLEAN FOR EACH OF THE SHOOTER SPEEDS AND PUT IT ON THE COMPETITION LOGGER
-    @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 5, width = 5)
+    @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 2, width = 2)
     public void setShooterSpeed(double targetVelocity) {
         shooterSpeed = targetVelocity;
 
@@ -150,4 +157,5 @@ public class Shooter implements Loggable {
     public boolean getRightHoodLimit() {
         return rightHoodSwitch.get();
     }
+
 }
