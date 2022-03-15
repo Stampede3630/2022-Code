@@ -40,8 +40,9 @@ public class Shooter implements Loggable {
         shooterDrive.setInverted(TalonFXInvertType.Clockwise);
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 1000);
         shooterDrive.setNeutralMode(NeutralMode.Coast);
+        shooterDrive.enableVoltageCompensation(true);
 
-        shooterDrive.config_kF(0, 1023 * .94 / 18000, 100);
+        shooterDrive.config_kF(0, 1023 * .80 / 18000, 100);
 
         shooterDrive.config_kP(0, .12, 100);
         
@@ -104,8 +105,8 @@ public class Shooter implements Loggable {
         if (!Robot.INTAKE.limelightIsOpen) {
             Robot.INTAKE.limelightSolenoid.set(Value.kForward);
         }
-        //Make shooter pipeline
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+        //Make shoot er pipeline
+        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
         Robot.INTAKE.limelightIsOpen = true;
         // Figure out which way later
     }

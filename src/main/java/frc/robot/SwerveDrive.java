@@ -76,12 +76,13 @@ public class SwerveDrive implements Loggable {
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
       _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX())/360)*(2*Math.PI));
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
+      System.out.println(limelightTX());
     // } else if (_rot == 0 && holdRobotAngleEnabled){
     //   _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
     //   NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
     } else {
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
-      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
     }
     SwerveModuleState[] moduleStates =
       m_kinematics.toSwerveModuleStates( _fieldRelative ? 

@@ -85,7 +85,7 @@ public class Intake implements Loggable {
         intakeIsOut = true;
       }
       
-      intakeDrive.set(ControlMode.Velocity, -10000);
+      intakeDrive.set(ControlMode.Velocity, -15000);
 
       turnToIntake();
 
@@ -156,7 +156,7 @@ public class Intake implements Loggable {
     } else if (!topLimitSwitch.get()) { //top switch pressed
       cargoInTransit = false;
       return "1 Ball";
-    } else if (bottomLimitSwitch.get() && (Robot.xbox.getRightTriggerAxis() > 0 || shootNow)) { // Right trigger held AND nothing pressing the bottom switch
+    } else if (bottomLimitSwitch.get() && (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow )) { // Right trigger held AND nothing pressing the bottom switch
       return "Intake Ball";
     } else {
       return "default";
@@ -165,11 +165,11 @@ public class Intake implements Loggable {
 
   public void turnToIntake() {
     if (limelightIsOpen) {
-      limelightSolenoid.set(Value.kReverse);
+      //limelightSolenoid.set(Value.kReverse);
     }
     // Make intake pipeline
     //SJV: time to make those pipe lines
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
     limelightIsOpen = false;
     // ^^^
   }

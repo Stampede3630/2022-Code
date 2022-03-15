@@ -16,7 +16,7 @@ public class Constants {
     
     
     //SWERVE Drive Default Values
-    public static final double ROBOTHoldAngleKP = 15; //Start at .7 and see where you go from there
+    public static final double ROBOTHoldAngleKP = 10; //Start at .7 and see where you go from there
     public static final boolean DEFAULT_HOLD_ROBOT_ANGLE = false;
 	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = false;
 	public static final double DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT = 0; 

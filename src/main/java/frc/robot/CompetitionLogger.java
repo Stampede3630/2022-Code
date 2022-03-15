@@ -50,6 +50,12 @@ public class CompetitionLogger implements Loggable {
                 beginClimb = true;
                 }
             }
+
+        @Config
+        public void resetDisplacement(boolean _input){
+            SwerveMap.GYRO.resetDisplacement();
+        }
+
         @Log
         public boolean allZeroedModules(){
         return SwerveMap.BackLeftSwerveModule.hasSwerveZeroingOccurred &&
