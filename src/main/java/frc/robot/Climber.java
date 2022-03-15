@@ -52,7 +52,7 @@ public class Climber implements Loggable{
         climberHomeLeft = new DigitalInput(2);
         climberHomeRight = new DigitalInput(3);
         climberTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
-        climberTalon.setSelectedSensorPosition(0,0,20);
+        climberTalon.setSelectedSensorPosition(0,0,200);
         climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
         climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 3);
         climberTalon.config_kP(0, 1000, 20);

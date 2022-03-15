@@ -48,6 +48,12 @@ public class Shooter implements Loggable {
         
         hoodMotor = new WPI_TalonFX(49);
         hoodMotor.config_kP(0, .07625, 100);
+        hoodMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 1000);
+        hoodMotor.setSelectedSensorPosition(0, 0, 200);
+        hoodMotor.setNeutralMode(NeutralMode.Brake);
+
+        rotComplete = false;
+        hoodAtOrigin = false;
         
 
         homocideTheBattery = false;
@@ -59,11 +65,11 @@ public class Shooter implements Loggable {
     
     //SJV: I hope ur fine with me renaming this method
     public void shooterPeriodic() {
-        // if (!hoodAtOrigin) {
-        //     rezeroHood();
-        // } else if (hoodAtOrigin) {
-        //     rotateHood();
-        // }
+        if (!hoodAtOrigin) {
+            rezeroHood();
+        } else if (hoodAtOrigin) {
+            rotateHood();
+        }
         
         if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
             shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, 0.1);
@@ -86,20 +92,35 @@ public class Shooter implements Loggable {
     }
 
     private void rezeroHood() { // check default on hood switches
-        if (!leftHoodSwitch.get() || !rightHoodSwitch.get()
-        || (rotComplete && hoodMotor.getSelectedSensorPosition(0) < 1000 && hoodMotor.getSelectedSensorVelocity(0) >-600 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
-            hoodAtOrigin = true;
+        // if (!leftHoodSwitch.get()
+        // ) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
+        //     hoodAtOrigin = true;
+        //     hoodMotor.set(ControlMode.PercentOutput, 0);
+        //     hoodMotor.setSelectedSensorPosition(0, 0, 20);
+        // } else if (!hoodAtOrigin && !rotComplete) {
+        //     hoodMotor.set(ControlMode.Position, 5000);
+        //     if (hoodMotor.getSelectedSensorPosition(0) >= 4500) {
+        //         rotComplete = true;
+        //     }
+        // } else if (!hoodAtOrigin && rotComplete) {
+        //     hoodMotor.set(ControlMode.PercentOutput, -0.1);
+        // }
+
+        if (!leftHoodSwitch.get()){     //this code works, but i've left the previous code in jic -e 
+            hoodAtOrigin = true;        //**this is also gross bc nested if statements 
             hoodMotor.set(ControlMode.PercentOutput, 0);
             hoodMotor.setSelectedSensorPosition(0, 0, 20);
-        } else if (!hoodAtOrigin && !rotComplete) {
-            hoodMotor.set(ControlMode.Position, 2000);
-            if (hoodMotor.getSelectedSensorPosition(0) >= 1500) {
-                rotComplete = true;
-            }
-        } else if (!hoodAtOrigin && rotComplete) {
-            hoodMotor.set(ControlMode.PercentOutput, -0.1);
+        } else if (leftHoodSwitch.get() && !hoodAtOrigin && !rotComplete){
+            hoodMotor.set(ControlMode.Position, 3000);
+                if (hoodMotor.getSelectedSensorPosition(0) >= 2300){
+                    rotComplete = true; 
+                        if (rotComplete){
+                            hoodMotor.set(ControlMode.PercentOutput, -0.1);
+                        }
+                }
         }
     }
+
 
     public void turnToShooter() {
         if (!Robot.INTAKE.limelightIsOpen) {
