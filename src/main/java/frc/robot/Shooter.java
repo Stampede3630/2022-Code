@@ -40,6 +40,7 @@ public class Shooter implements Loggable {
         shooterDrive.setInverted(TalonFXInvertType.Clockwise);
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 1000);
         shooterDrive.setNeutralMode(NeutralMode.Coast);
+        shooterDrive.configVoltageCompSaturation(12.0,100);
         shooterDrive.enableVoltageCompensation(true);
 
         shooterDrive.config_kF(0, 1023 * .80 / 18000, 100);
