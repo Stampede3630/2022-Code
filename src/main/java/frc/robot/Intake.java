@@ -74,7 +74,7 @@ public class Intake implements Loggable {
     
   }
   public void intakePeriodic(){
-    intake();
+    // intake();
     shootIndexManager();
   }
 //SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
@@ -115,7 +115,7 @@ public class Intake implements Loggable {
   private void indexerDrive() {
       switch (indexManager()) {
         case "1 Ball": // Hold the ball at the top of tower
-          indexBottom.set(ControlMode.PercentOutput, -0.4);
+          indexBottom.set(ControlMode.PercentOutput, -0.34);
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
 

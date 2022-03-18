@@ -85,7 +85,7 @@ public class Constants {
     public static final int kDefaultClosedLoopError = 1; //degrees 
 
     // Field piece constants TODO: actually set them
-    public static final double UPPER_GOAL_HEIGHT = 0;
+    public static final double UPPER_GOAL_HEIGHT = 103;
     
     //Constants for conversion maths (RARELY THESE SHOULD BE CHANGED)
     public static final double SECONDSper100MS = .1;

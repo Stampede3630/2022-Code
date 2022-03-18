@@ -26,7 +26,6 @@ public class Shooter implements Loggable {
     // TRUE = SHOOTER NOT AT HOME, FALSE = SHOOTER AT HOME
     private DigitalInput leftHoodSwitch;
     private DigitalInput rightHoodSwitch;
-    
     private boolean hoodAtOrigin = false;
     private boolean rotComplete = false;
     public boolean homocideTheBattery;
@@ -72,7 +71,8 @@ public class Shooter implements Loggable {
             rotateHood();
         }
         
-        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
+        // if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
+        if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, 0.1);
             turnToShooter();
         } else {
@@ -86,6 +86,30 @@ public class Shooter implements Loggable {
         } else {
             return false;
         }
+    }
+
+    // Find shooter angle based on distance from hub
+    @Log
+    public double calculateShooterAngle() { 
+        double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+        double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
+        // placeholder equation
+        // double shooterAngle: y = m(distanceToHub) + b
+        double shooterAngle = 11270 - 3726 * distance + 497.7 * (Math.pow(distance, 2)) - 14.75 * (Math.pow(distance, 3));
+
+        return shooterAngle;
+    }
+
+    // Find shooter speed based on shooter angle
+    @Log
+    public double calculateShooterSpeed() {
+        double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+        double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
+        // placeholder equation
+        // double shooterSpeed: y = m(shooterAngle) + b
+        // shooterSpeed * ticks (for converting to ticks)
+        double shooterSpeed = 18110 - 1196 * (distance) + 116.5 * (Math.pow(distance, 2)) - 2.846 * (Math.pow(distance, 3));
+        return shooterSpeed;
     }
 
     public void rotateHood() {
@@ -129,8 +153,11 @@ public class Shooter implements Loggable {
         }
         //Make shoot er pipeline
         NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
-        Robot.INTAKE.limelightIsOpen = true;
+        // Robot.INTAKE.limelightIsOpen = true;
         // Figure out which way later
+
+        hoodAngle = calculateShooterAngle();
+        shooterSpeed = calculateShooterSpeed();
     }
 
     public void checkAndSetShooterCANStatus() {

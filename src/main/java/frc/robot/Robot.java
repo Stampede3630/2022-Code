@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Log;
 
  /*For starting a new Stampede swerve project
   * 1. Zero out the following constants: ks, kv
@@ -35,6 +36,7 @@ public class Robot extends TimedRobot {
   public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
+  public static Limelight LIMELIGHT;
   public static XboxController xbox = new XboxController(0);
 
   /**
@@ -63,10 +65,10 @@ public class Robot extends TimedRobot {
     INTAKE.checkAndSetIntakeCANStatus();
 
     //*** Auto Container method starts here***
-    AUTOWAYPOINTS = AutoWaypoints.getInstance();
+    // AUTOWAYPOINTS = AutoWaypoints.getInstance();
     // 
     //loads the selected pathplanner path
-    AUTOWAYPOINTS.loadAutoPaths();
+    // AUTOWAYPOINTS.loadAutoPaths();
 
 
 
@@ -92,6 +94,8 @@ public class Robot extends TimedRobot {
     COMPETITIONLOGGER = CompetitionLogger.getInstance();
     Logger.setCycleWarningsEnabled(false);
     Logger.configureLoggingAndConfig(this, false);
+    
+    Limelight.init();
   }
 
   /**
@@ -109,7 +113,6 @@ public class Robot extends TimedRobot {
     INTAKE.checkAndSetIntakeCANStatus();
     SHOOTER.checkAndSetShooterCANStatus();
     CLIMBER.checkAndSetClimberCANStatus();
-
     Logger.updateEntries();
   }
 
@@ -131,8 +134,8 @@ public class Robot extends TimedRobot {
     AUTOWAYPOINTS.autoPeriodic();
     SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.chosenPath.thisPathPLan,  SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     
-    INTAKE.intakePeriodic();
-    SHOOTER.shooterPeriodic();
+    // INTAKE.intakePeriodic();
+    // SHOOTER.shooterPeriodic();
 
   }
 
@@ -141,8 +144,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     SWERVEDRIVE.setToBrake();
-    INTAKE.intakeNow = false;
-    INTAKE.shootNow = false;
+    // INTAKE.intakeNow = false;
+    // INTAKE.shootNow = false;
     
   }
 
@@ -151,6 +154,9 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Joystick Drives stores values in X,Y,Z rotation
     // Drive actually sends those values to the swerve modules
+    Limelight.limelightPeriodic();
+    
+
     SWERVEDRIVE.swervePeriodic();
       //intake code for teleop
 

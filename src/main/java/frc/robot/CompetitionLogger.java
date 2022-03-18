@@ -15,14 +15,18 @@ public class CompetitionLogger implements Loggable {
     public static CompetitionLogger getInstance() {
         return SINGLE_INSTANCE;
     }
+    @Log
+    double distanceToHub = Limelight.Hub.getxDistance();
+
+    @Log
+    double shooterAngle = Robot.SHOOTER.calculateShooterAngle();
 
     public boolean beginClimb = false;
     public Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
 
-
     //KEEP THIS INSTANTIATION IT'S FOR LOGGING
     private SwerveDriveDB mySwerveDrivebuttons = new SwerveDriveDB();
-   
+    
     public class SwerveDriveDB implements Loggable {
         
         
@@ -48,48 +52,48 @@ public class CompetitionLogger implements Loggable {
         private void beginClimbing(boolean _input){
             if(_input){
                 beginClimb = true;
-                }
             }
-
+        }
+        
         @Config
         public void resetDisplacement(boolean _input){
             SwerveMap.GYRO.resetDisplacement();
         }
-
+        
         @Log
         public boolean allZeroedModules(){
-        return SwerveMap.BackLeftSwerveModule.hasSwerveZeroingOccurred &&
-               SwerveMap.BackRightSwerveModule.hasSwerveZeroingOccurred &&
-               SwerveMap.FrontLeftSwerveModule.hasSwerveZeroingOccurred &&
-               SwerveMap.FrontRightSwerveModule.hasSwerveZeroingOccurred;
+            return SwerveMap.BackLeftSwerveModule.hasSwerveZeroingOccurred &&
+            SwerveMap.BackRightSwerveModule.hasSwerveZeroingOccurred &&
+            SwerveMap.FrontLeftSwerveModule.hasSwerveZeroingOccurred &&
+            SwerveMap.FrontRightSwerveModule.hasSwerveZeroingOccurred;
+        }
+        
     }
-
-    }
-
+    
     @Log
     public float getPitch(){
-      return SwerveMap.GYRO.getPitch();
+        return SwerveMap.GYRO.getPitch();
     }
-
+    
     @Log
     public float navXData() {
         return SwerveMap.GYRO.getDisplacementX();
     }
-
+    
     @Log
     public float navYData() {
         return SwerveMap.GYRO.getDisplacementY();
     }
-
+    
     @Log
     public double getPressure() {
         return compressor.getPressure();
     }
-
+    
     @Log
     public Field2d field2022(){
         return Robot.SWERVEDRIVE.field;
     }
-
-
+    
+    
 }
