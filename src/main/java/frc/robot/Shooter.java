@@ -72,7 +72,9 @@ public class Shooter implements Loggable {
         if (!hoodAtOrigin) {
             rezeroHood();
         } else if (hoodAtOrigin) {
-            rotateHood();
+            rotateHood(hoodAngle);
+        } else {
+            System.out.println("The hood just tried to kill itself with a hood angle of: " + hoodAngle);
         }
         
         if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
@@ -100,11 +102,16 @@ public class Shooter implements Loggable {
             double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
         // placeholder equation
         // double shooterAngle: y = m(distanceToHub) + b
-            hoodAngle = 11270 - 3726 * distance + 497.7 * (Math.pow(distance, 2)) - 14.75 * (Math.pow(distance, 3));
+            angle = 11270 - 3726 * distance + 497.7 * (Math.pow(distance, 2)) - 14.75 * (Math.pow(distance, 3));
 
-            return hoodAngle;
+            if (angle < 32000) {
+                return angle;
+            } else {
+                return 0;
+            }
+
         } else {
-            return hoodAngle;
+            return 0;
         }
     }
 
@@ -124,8 +131,8 @@ public class Shooter implements Loggable {
         }
     }
 
-    public void rotateHood() {
-        hoodMotor.set(ControlMode.Position, hoodAngle);
+    public void rotateHood(double angle) {
+            hoodMotor.set(ControlMode.Position, angle);
     }
 
     private void rezeroHood() { // check default on hood switches
@@ -143,11 +150,11 @@ public class Shooter implements Loggable {
         //     hoodMotor.set(ControlMode.PercentOutput, -0.1);
         // }
 
-        if (!leftHoodSwitch.get()){     //this code works, but i've left the previous code in jic -e 
+        if (!leftHoodSwitch.get() || !rightHoodSwitch.get()){     //this code works, but i've left the previous code in jic -e 
             hoodAtOrigin = true;        //**this is also gross bc nested if statements 
             hoodMotor.set(ControlMode.PercentOutput, 0);
             hoodMotor.setSelectedSensorPosition(0, 0, 20);
-        } else if (leftHoodSwitch.get() && !hoodAtOrigin && !rotComplete){
+        } else if ((leftHoodSwitch.get() || rightHoodSwitch.get()) && !hoodAtOrigin && !rotComplete){
             hoodMotor.set(ControlMode.Position, 3000);
                 if (hoodMotor.getSelectedSensorPosition(0) >= 2300){
                     rotComplete = true; 
@@ -193,7 +200,7 @@ public class Shooter implements Loggable {
         }
     }
 
-    @Config.NumberSlider(name = "Set Shooter Angle", defaultValue = 0, min = 0, max = 23000, blockIncrement = 1000, rowIndex = 4, columnIndex = 2, height = 2, width = 2)
+    @Config.NumberSlider(name = "Set Shooter Angle", defaultValue = 0, min = 0, max = 32000, blockIncrement = 1000, rowIndex = 4, columnIndex = 2, height = 2, width = 2)
     public void setHoodAngle(double targetAngle) {
         hoodAngle = targetAngle;
     }

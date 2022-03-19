@@ -83,10 +83,10 @@ public class Robot extends TimedRobot {
     CLIMBER.checkAndSetClimberCANStatus();
 
 
-    // if(RUN_TRAJECTORY) {
-    // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
-    //   examplePath = PathPlanner.loadPath("New Path", 1, .8);
-    // }
+    if(RUN_TRAJECTORY) {
+    SWERVETRAJECTORY = SwerveTrajectory.getInstance();
+      // examplePath = PathPlanner.loadPath("New Path", 1, .8);
+    }
     // Keep this statement on the BOTTOM of your robotInit
     // It's responsible for all the shuffleboard outputs.  
     // It's a lot easier to use than standard shuffleboard syntax

@@ -85,7 +85,7 @@ public class Intake implements Loggable {
   private void intake() {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       if (!intakeIsOut) {
-        intakeSolenoid.set(Value.kReverse);
+        // intakeSolenoid.set(Value.kReverse);
         intakeIsOut = true;
       }
       
