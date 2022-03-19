@@ -4,10 +4,12 @@ import javax.print.attribute.standard.Compression;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
+import io.github.oblarg.oblog.annotations.Log.BooleanBox;
 
 public class CompetitionLogger implements Loggable {
     private static CompetitionLogger SINGLE_INSTANCE = new CompetitionLogger();
@@ -39,7 +41,7 @@ public class CompetitionLogger implements Loggable {
         public void HoldRobotAngle(boolean _input){
             Robot.SWERVEDRIVE.holdRobotAngleEnabled = _input;
         }
-        @Config
+        @Config(defaultValueBoolean = true)
         public void FieldRelativeDrive(boolean _input){
             Robot.SWERVEDRIVE.SDFieldRelative = _input;
         }
@@ -58,6 +60,11 @@ public class CompetitionLogger implements Loggable {
         @Config
         public void resetDisplacement(boolean _input){
             SwerveMap.GYRO.resetDisplacement();
+        }
+
+        @Config (defaultValueBoolean = true)
+        public void limelightAim(boolean _input){
+                Robot.SHOOTER.limelightShooting = _input;
         }
         
         @Log
@@ -95,5 +102,9 @@ public class CompetitionLogger implements Loggable {
         return Robot.SWERVEDRIVE.field;
     }
     
+    @Log
+    public double getMatchTimer() {
+        return Timer.getMatchTime();
+    }
     
 }

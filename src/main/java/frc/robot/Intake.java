@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -38,6 +39,7 @@ public class Intake implements Loggable {
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
+  public double intakeSpeed = 0;
   
   public final I2C.Port i2cPort = I2C.Port.kMXP;
 
@@ -71,10 +73,12 @@ public class Intake implements Loggable {
 
         intakeDrive.config_kP(0,
                 0.055, 20);
+
+
     
   }
   public void intakePeriodic(){
-    // intake();
+    intake();
     shootIndexManager();
   }
 //SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
@@ -85,7 +89,7 @@ public class Intake implements Loggable {
         intakeIsOut = true;
       }
       
-      intakeDrive.set(ControlMode.Velocity, -15000);
+      intakeDrive.set(ControlMode.Velocity, intakeSpeed); //-15000
 
       turnToIntake();
 
@@ -232,6 +236,7 @@ public class Intake implements Loggable {
       System.out.println("RESET DETECTED FOR TALONFX " + indexTop.getDeviceID() + " Errors:" + mycounter);
     }
   }
+
   //I think that matters... not SURE THOWRONG WRONG WATCH OBLOG WANTS DOUBLES i THINK
   @Log
   public double getRedColor() {
@@ -259,6 +264,12 @@ public class Intake implements Loggable {
   @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
   public boolean getTopLimitSwitch() {
     return topLimitSwitch.get();
+  }
+
+  @Config.NumberSlider(name = "Set Intake Speed", defaultValue = -15000, min = -20000, max = -2000, blockIncrement = 1000, rowIndex = 1, columnIndex = 0, height = 1, width = 3)
+  public void setIntakeSpeed(double targetIntakeVelocity) {
+      intakeSpeed = targetIntakeVelocity;
+
   }
   
   

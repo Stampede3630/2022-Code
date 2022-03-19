@@ -65,10 +65,10 @@ public class Robot extends TimedRobot {
     INTAKE.checkAndSetIntakeCANStatus();
 
     //*** Auto Container method starts here***
-    // AUTOWAYPOINTS = AutoWaypoints.getInstance();
+    AUTOWAYPOINTS = AutoWaypoints.getInstance();
     // 
     //loads the selected pathplanner path
-    // AUTOWAYPOINTS.loadAutoPaths();
+    AUTOWAYPOINTS.loadAutoPaths();
 
 
 
@@ -84,8 +84,8 @@ public class Robot extends TimedRobot {
 
 
     // if(RUN_TRAJECTORY) {
-    SWERVETRAJECTORY = SwerveTrajectory.getInstance();
-      // examplePath = PathPlanner.loadPath("New Path", 1, .8);
+    // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
+    //   examplePath = PathPlanner.loadPath("New Path", 1, .8);
     // }
     // Keep this statement on the BOTTOM of your robotInit
     // It's responsible for all the shuffleboard outputs.  
@@ -134,8 +134,8 @@ public class Robot extends TimedRobot {
     AUTOWAYPOINTS.autoPeriodic();
     SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.chosenPath.thisPathPLan,  SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
     
-    // INTAKE.intakePeriodic();
-    // SHOOTER.shooterPeriodic();
+    INTAKE.intakePeriodic();
+    SHOOTER.shooterPeriodic();
 
   }
 
@@ -144,8 +144,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     SWERVEDRIVE.setToBrake();
-    // INTAKE.intakeNow = false;
-    // INTAKE.shootNow = false;
+    INTAKE.intakeNow = false;
+    INTAKE.shootNow = false;
     
   }
 

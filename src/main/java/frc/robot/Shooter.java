@@ -29,6 +29,8 @@ public class Shooter implements Loggable {
     private boolean hoodAtOrigin = false;
     private boolean rotComplete = false;
     public boolean homocideTheBattery;
+    public boolean limelightShooting = true;
+    public boolean bloopShot;
 
     public static Shooter getInstance() {
         return SINGLE_INSTANCE;
@@ -41,6 +43,8 @@ public class Shooter implements Loggable {
         shooterDrive.setNeutralMode(NeutralMode.Coast);
         shooterDrive.configVoltageCompSaturation(12.0,100);
         shooterDrive.enableVoltageCompensation(true);
+
+        limelightShooting = true;
 
         shooterDrive.config_kF(0, 1023 * .80 / 18000, 100);
 
@@ -71,8 +75,8 @@ public class Shooter implements Loggable {
             rotateHood();
         }
         
-        // if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
-        if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
+        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
+        // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, 0.1);
             turnToShooter();
         } else {
@@ -91,18 +95,23 @@ public class Shooter implements Loggable {
     // Find shooter angle based on distance from hub
     @Log
     public double calculateShooterAngle() { 
-        double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-        double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
+        if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting){
+            double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+            double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
         // placeholder equation
         // double shooterAngle: y = m(distanceToHub) + b
-        double shooterAngle = 11270 - 3726 * distance + 497.7 * (Math.pow(distance, 2)) - 14.75 * (Math.pow(distance, 3));
+            hoodAngle = 11270 - 3726 * distance + 497.7 * (Math.pow(distance, 2)) - 14.75 * (Math.pow(distance, 3));
 
-        return shooterAngle;
+            return hoodAngle;
+        } else {
+            return hoodAngle;
+        }
     }
 
     // Find shooter speed based on shooter angle
     @Log
     public double calculateShooterSpeed() {
+        if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting && !bloopShot){
         double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
         double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
         // placeholder equation
@@ -110,6 +119,9 @@ public class Shooter implements Loggable {
         // shooterSpeed * ticks (for converting to ticks)
         double shooterSpeed = 18110 - 1196 * (distance) + 116.5 * (Math.pow(distance, 2)) - 2.846 * (Math.pow(distance, 3));
         return shooterSpeed;
+        } else {
+            return shooterSpeed;
+        }
     }
 
     public void rotateHood() {
