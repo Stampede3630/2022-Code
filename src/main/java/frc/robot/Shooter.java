@@ -20,8 +20,10 @@ import io.github.oblarg.oblog.annotations.Log;
 
 public class Shooter implements Loggable {
     private static Shooter SINGLE_INSTANCE = new Shooter();
+    @Log
     private double shooterSpeed = 5000;
     private double shooterSpeedOffset = 0;
+   @Log
     private double hoodAngle = 0;
     private double hoodAngleOffset = 0;
     private WPI_TalonFX shooterDrive;
@@ -34,7 +36,7 @@ public class Shooter implements Loggable {
     private boolean rotComplete = false;
     public boolean homocideTheBattery;
     public boolean limelightShooting = true;
-    public boolean bloopShot;
+    public boolean bloopShot = false;
 
     // public static SimpleMotorFeedforward shooterMotorFeedforward;
 
@@ -76,11 +78,12 @@ public class Shooter implements Loggable {
     }
 
     public void shooterPeriodic() {
-        System.out.println(shooterDrive.getSelectedSensorVelocity(0) + " " + shooterSpeed + " " + shooterAtSpeed());
+       // System.out.println(shooterDrive.getSelectedSensorVelocity(0) + " " + shooterSpeed + " " + shooterAtSpeed());
         if (!hoodAtOrigin) {
             rezeroHood();
         } else if (hoodAtOrigin) {
             hoodAngle = calculateShooterAngle();
+            shooterSpeed = calculateShooterSpeed();
             rotateHood(hoodAngle);
         }
 
@@ -111,8 +114,8 @@ public class Shooter implements Loggable {
     public double calculateShooterAngle() { 
         if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting){
             double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-            double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
-            
+            double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
+            // System.out.println(distance); 
             // angle = -14.75x^3 + 497.7x^2 -3726x + 11270, x = distance
             angle = -37840 + 10740 * distance - 686.3 * (Math.pow(distance, 2)) + 15.22 * (Math.pow(distance, 3));
 
@@ -132,8 +135,7 @@ public class Shooter implements Loggable {
     public double calculateShooterSpeed() {
         if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting && !bloopShot){
         double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-        double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
-
+        double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
         // shooterSpeed = -2.846x^3 + 116.5x^2 -1196x + 18110, x = distance
         double shooterSpeed = (358.7*distance) + 10960;
         return shooterSpeed;
