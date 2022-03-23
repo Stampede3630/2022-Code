@@ -152,6 +152,7 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.setToBrake();
     INTAKE.intakeNow = false;
     INTAKE.shootNow = false;
+    SHOOTER.homocideTheBattery = false;
     
   }
 

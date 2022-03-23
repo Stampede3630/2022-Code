@@ -91,7 +91,7 @@ public class Shooter implements Loggable {
         
 
         // DemandType.ArbitraryFeedForward, shooterMotorFeedforward.calculate(shooterSpeed) / 12
-        if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0  || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
+        if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0 || Robot.xbox.getLeftBumper() || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
         // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed);
         } else {
@@ -235,14 +235,14 @@ public class Shooter implements Loggable {
         homocideTheBattery = _input;
     }
  
-    @Log(rowIndex = 1, columnIndex = 0)
-    public boolean getLeftHoodLimit() {
-        return leftHoodSwitch.get();
-    }
+    // @Log(rowIndex = 1, columnIndex = 0)
+    // public boolean getLeftHoodLimit() {
+    //     return leftHoodSwitch.get();
+    // }
 
-    @Log(rowIndex = 1, columnIndex = 1)
-    public boolean getRightHoodLimit() {
-        return rightHoodSwitch.get();
-    }
+    // @Log(rowIndex = 1, columnIndex = 1)
+    // public boolean getRightHoodLimit() {
+    //     return rightHoodSwitch.get();
+    // }
 
 }

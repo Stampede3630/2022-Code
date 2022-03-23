@@ -37,13 +37,15 @@ public class Intake implements Loggable {
   public DigitalInput topLimitSwitch;
   public ColorSensorV3 colorSensor;
   private boolean cargoInTransit = false;
+  @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 3)
   public boolean intakeNow = false;
-  @Log(tabName = "CompetitionLogger")
+  @Log(tabName = "CompetitionLogger", rowIndex = 1, columnIndex = 3)
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
   public double intakeSpeed = -15000;
   public boolean ballReject = true;
+  public String indexState;
   
   public final I2C.Port i2cPort = I2C.Port.kMXP;
 
@@ -84,6 +86,7 @@ public class Intake implements Loggable {
   public void intakePeriodic(){
     intake();
     shootIndexManager();
+    indexState = indexManager();
   }
 //SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
   private void intake() {
@@ -121,7 +124,7 @@ public class Intake implements Loggable {
   }
   //SJV: DOES INDEXER NEED TO BE RUN FASTER?
   private void indexerDrive() {
-      switch (indexManager()) {
+      switch (indexState) {
         case "1 Ball": // Hold the ball at the top of tower
           indexBottom.set(ControlMode.PercentOutput, -0.34);
           indexTop.set(ControlMode.PercentOutput, 0);
@@ -148,6 +151,7 @@ public class Intake implements Loggable {
 
         case "Ball Reject": //Rejects ball if it's the wrong color
         indexBottom.set(ControlMode.PercentOutput, 0.8);
+          break;
 
         default:  // Everything stops
           indexBottom.set(ControlMode.PercentOutput, 0);
@@ -251,35 +255,35 @@ public class Intake implements Loggable {
   //I think that matters... not SURE THOWRONG WRONG WATCH OBLOG WANTS DOUBLES i THINK
 
   
-  @Log
-  public double getRedColor() {
-    return (double) colorSensor.getRed();
+  // @Log
+  // public double getRedColor() {
+  //   return (double) colorSensor.getRed();
     
-  }
+  // }
 
-  @Log
-  public double getBlueColor() {
-    return (double) colorSensor.getBlue();
+  // @Log
+  // public double getBlueColor() {
+  //   return (double) colorSensor.getBlue();
     
-  }
+  // }
 
-  @Log
-  public double getGreenColor() {
-    return (double) colorSensor.getGreen();
+  // @Log
+  // public double getGreenColor() {
+  //   return (double) colorSensor.getGreen();
     
-  }
+  // }
   
-  @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
-  public boolean getBottomLimitSwitch() {
-    return bottomLimitSwitch.get();
-  }
+  // @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
+  // public boolean getBottomLimitSwitch() {
+  //   return bottomLimitSwitch.get();
+  // }
   
-  @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
-  public boolean getTopLimitSwitch() {
-    return topLimitSwitch.get();
-  }
+  // @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
+  // public boolean getTopLimitSwitch() {
+  //   return topLimitSwitch.get();
+  // }
 
-  @Config(defaultValueBoolean = true)
+  @Config(tabName = "CompetitionLogger", defaultValueBoolean = true, rowIndex = 2, columnIndex = 3, height = 1, width = 2)
   public void setBallReject(boolean _input) {
     ballReject = _input;
   }

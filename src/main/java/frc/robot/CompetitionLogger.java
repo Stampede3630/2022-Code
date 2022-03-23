@@ -84,40 +84,40 @@ public class CompetitionLogger implements Loggable {
     //     return SwerveMap.GYRO.getPitch();
     // }
     
-    @Log
-    public float navXData() {
-        return SwerveMap.GYRO.getDisplacementX();
-    }
+    // @Log
+    // public float navXData() {
+    //     return SwerveMap.GYRO.getDisplacementX();
+    // }
     
-    @Log
-    public float navYData() {
-        return SwerveMap.GYRO.getDisplacementY();
-    }
+    // @Log
+    // public float navYData() {
+    //     return SwerveMap.GYRO.getDisplacementY();
+    // }
     
     @Log.NumberBar(min = 0, max = 140, rowIndex = 2, columnIndex = 2)
     public double getPressure() {
         return compressor.getPressure();
     }
     
-    @Log
-    public Field2d field2022(){
-        return Robot.SWERVEDRIVE.field;
-    }
+    // @Log
+    // public Field2d field2022(){
+    //     return Robot.SWERVEDRIVE.field;
+    // }
     
     @Log(rowIndex = 3, columnIndex = 2)
     public double getMatchTimer() {
         return Timer.getMatchTime();
     }
 
-    @Log
-    public double leftJoystickValues() {
-        return Robot.xbox.getLeftX();
-    }
+    // @Log
+    // public double leftJoystickValues() {
+    //     return Robot.xbox.getLeftX();
+    // }
 
-    @Log
-    public double rightJoystickValues() {
-        return Robot.xbox.getRightX();
-    }
+    // @Log
+    // public double rightJoystickValues() {
+    //     return Robot.xbox.getRightX();
+    // }
 
     @Log.NumberBar (min = 0, max = 14, rowIndex = 1, columnIndex = 2)
     public double batteryVoltage() {
