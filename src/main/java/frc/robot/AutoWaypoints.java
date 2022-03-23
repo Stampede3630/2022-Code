@@ -16,11 +16,10 @@ public class AutoWaypoints implements Loggable {
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
-    @Log
+    @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 5)
     public int currentWaypointNumber = 0;
     private double currentX;
     private double currentY;
-    @Log
     public AutoPose chosenPath;
     public AutoPose[] myAutoContainer;
     
@@ -28,9 +27,9 @@ public class AutoWaypoints implements Loggable {
     public boolean StateHasFinished = false;
     @Log
     public Boolean StateHasInitialized = false;
-    @Log(tabName = "CompetitionLogger")
+    @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 4)
     public double distance = 0;
-    @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3)
+    @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
     public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
 
     public static AutoWaypoints getInstance() {
@@ -46,7 +45,7 @@ public class AutoWaypoints implements Loggable {
         }
         chosenWaypoints = chosenPath.thisWPset;
         SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
-        Robot.SHOOTER.homocideTheBattery = false;
+        Robot.SHOOTER.homocideTheBattery = true;
         currentWaypointNumber = 0;
     }
     
@@ -105,7 +104,7 @@ public class AutoWaypoints implements Loggable {
             Robot.INTAKE.shootNow = false;
         } else if (Robot.INTAKE.intakeNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 1.5) {
             StateHasFinished = true;
-            Robot.INTAKE.intakeNow = false;
+
                 
         }
     }
@@ -113,6 +112,7 @@ public class AutoWaypoints implements Loggable {
     private void shoot() {
         if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
             Robot.INTAKE.shootNow = true;
+            Robot.INTAKE.intakeNow = false;
             // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, -0.25);
 
         } else if (Robot.INTAKE.shootNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
@@ -124,9 +124,15 @@ public class AutoWaypoints implements Loggable {
 
     private void shootAndIntake() {
         if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
-            Robot.INTAKE.intakeNow = true;
-            Robot.INTAKE.shootNow = true;
-        } else if (Robot.INTAKE.intakeNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 1.5) {
+
+            if(Robot.INTAKE.indexState.equals("2 Balls") || Robot.INTAKE.indexState.equals("1 Ball")){
+                Robot.INTAKE.intakeNow = false;
+                Robot.INTAKE.shootNow = true;  
+            } else {
+                Robot.INTAKE.intakeNow = true;
+                Robot.INTAKE.shootNow = false;  
+            }
+        } else if((Robot.INTAKE.intakeNow || Robot.INTAKE.shootNow) && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 1.5) {
 
             StateHasFinished = true;
         }
@@ -135,6 +141,8 @@ public class AutoWaypoints implements Loggable {
     public void done(){
         //ADDED TO NOT GO OUT OF BOUNDS IN A ARRAY WAYPOINT RUNNER
         //FEEL FREE TO ADD THING TO THE DONE STATE
+       
+
     }
 
     public double getDistance(double X1, double Y1, double X2, double Y2) { //just the distance formula - uses current x and y positions
