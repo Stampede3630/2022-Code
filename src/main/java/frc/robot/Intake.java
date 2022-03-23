@@ -39,7 +39,7 @@ public class Intake implements Loggable {
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
-  public double intakeSpeed = 0;
+  public double intakeSpeed = -15000;
   
   public final I2C.Port i2cPort = I2C.Port.kMXP;
 
@@ -85,7 +85,7 @@ public class Intake implements Loggable {
   private void intake() {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       if (!intakeIsOut) {
-        // intakeSolenoid.set(Value.kReverse);
+        intakeSolenoid.set(Value.kForward);
         intakeIsOut = true;
       }
       
@@ -95,7 +95,7 @@ public class Intake implements Loggable {
 
     } else {
       if (intakeIsOut) {
-        intakeSolenoid.set(Value.kForward);
+        intakeSolenoid.set(Value.kReverse);
         intakeIsOut = false; // Pulls intake back up and stops spinning
       } 
 
@@ -238,23 +238,25 @@ public class Intake implements Loggable {
   }
 
   //I think that matters... not SURE THOWRONG WRONG WATCH OBLOG WANTS DOUBLES i THINK
-  @Log
-  public double getRedColor() {
-    return (double) colorSensor.getRed();
-    
-  }
 
-  @Log
-  public double getBlueColor() {
-    return (double) colorSensor.getBlue();
+  
+  // @Log
+  // public double getRedColor() {
+  //   return (double) colorSensor.getRed();
     
-  }
+  // }
 
-  @Log
-  public double getGreenColor() {
-    return (double) colorSensor.getGreen();
+  // @Log
+  // public double getBlueColor() {
+  //   return (double) colorSensor.getBlue();
     
-  }
+  // }
+
+  // @Log
+  // public double getGreenColor() {
+  //   return (double) colorSensor.getGreen();
+    
+  // }
   
   @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
   public boolean getBottomLimitSwitch() {
@@ -266,11 +268,11 @@ public class Intake implements Loggable {
     return topLimitSwitch.get();
   }
 
-  @Config.NumberSlider(name = "Set Intake Speed", defaultValue = -15000, min = -20000, max = -2000, blockIncrement = 1000, rowIndex = 1, columnIndex = 0, height = 1, width = 3)
-  public void setIntakeSpeed(double targetIntakeVelocity) {
-      intakeSpeed = targetIntakeVelocity;
+  // @Config.NumberSlider(name = "Set Intake Speed", defaultValue = -15000, min = -20000, max = -2000, blockIncrement = 1000, rowIndex = 1, columnIndex = 0, height = 1, width = 3)
+  // public void setIntakeSpeed(double targetIntakeVelocity) {
+  //     intakeSpeed = targetIntakeVelocity;
 
-  }
+  // }
   
   
 }

@@ -11,6 +11,8 @@ public class AutoWaypoints implements Loggable {
     private static AutoWaypoints SINGLE_INSTANCE = new AutoWaypoints();
     public Waypoint[] FenderTwoBallAutoWPs;
     public Waypoint[] FenderFourBallAutoWPs; 
+    public Waypoint[] HighFiveBallAutoWPs;
+    public Waypoint[] HighTwoBallAutoWPs;
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
@@ -28,7 +30,7 @@ public class AutoWaypoints implements Loggable {
     public Boolean StateHasInitialized = false;
     @Log(tabName = "CompetitionLogger")
     public double distance = 0;
-    @Log(tabName = "CompetitionLogger")
+    @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3)
     public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
 
     public static AutoWaypoints getInstance() {
@@ -47,47 +49,62 @@ public class AutoWaypoints implements Loggable {
         Robot.SHOOTER.homocideTheBattery = true;
         currentWaypointNumber = 0;
     }
-
-    public void loadAutoPaths(){
-
-       FenderTwoBallAutoWPs = new Waypoint[] {
-            new Waypoint(SINGLE_INSTANCE::shoot, 7.63, 1.00),
-            new Waypoint(SINGLE_INSTANCE::intakeBall, 7.64, 0.54),
-            new Waypoint(SINGLE_INSTANCE::shoot, 7.88, 2.86),
-            new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
-        };
     
-        FenderFourBallAutoWPs = new Waypoint[] {
-            new Waypoint(SINGLE_INSTANCE::intakeBall, 7.62, 0.64),
-            new Waypoint(SINGLE_INSTANCE::shoot, 8.000, 2.67),
-            new Waypoint(SINGLE_INSTANCE::intakeBall, 5.278, 2.014),
-            new Waypoint(SINGLE_INSTANCE::intakeBall, 1.73, 1.33),
-            new Waypoint(SINGLE_INSTANCE::shoot, 7.521, 2.88),
-            new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
-        };
-        myAutoContainer = new AutoPose[] {
-            new AutoPose("FenderFourBallAutoWPs", 7.60, 1.78, -93.69, FenderFourBallAutoWPs, PathPlanner.loadPath("blueAutoTest", 4, 3)),
-            new AutoPose("FenderTwoBallAutoWPs", 7.64, 1.83, -84.69, FenderTwoBallAutoWPs, PathPlanner.loadPath("twoBallAuto", 3, 1.0))};
-        for (AutoPose myAutoPose : myAutoContainer ){
-            m_autoChooser.addOption(myAutoPose.name, myAutoPose);
-        }
-
-    }
-
     public void autoPeriodic() {
         currentX = Robot.SWERVEDRIVE.getXPos();
         currentY = Robot.SWERVEDRIVE.getYPos();
         waypointRunner(FenderFourBallAutoWPs);
     }
 
+    public void loadAutoPaths(){
+
+        HighTwoBallAutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.19, 6.03),
+            new Waypoint(SINGLE_INSTANCE::done, 0, 0)
+        };
+
+        HighFiveBallAutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::shoot, 7.62, 1.76),
+            new Waypoint(SINGLE_INSTANCE::intakeBall, 7.60, 0.53),
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.43, 2.13),
+            new Waypoint(SINGLE_INSTANCE::intakeBall, 1.40, 1.39),
+            new Waypoint(SINGLE_INSTANCE::shoot,5.87, 1.12),
+            new Waypoint(SINGLE_INSTANCE::done, 0, 0)
+        };
+
+       FenderTwoBallAutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::intakeBall, 5.19, 6.00),
+            new Waypoint(SINGLE_INSTANCE::shoot, 6.97, 4.44),
+            new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
+        };
+    
+        FenderFourBallAutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::intakeBall, 7.62, 0.51),
+            new Waypoint(SINGLE_INSTANCE::shoot, 7.88, 2.51),
+            new Waypoint(SINGLE_INSTANCE::intakeBall, 5.29, 1.93),
+            new Waypoint(SINGLE_INSTANCE::intakeBall, 1.38, 1.22),
+            new Waypoint(SINGLE_INSTANCE::shoot, 7.36, 2.75),
+            new Waypoint(SINGLE_INSTANCE::done, 0, 0) 
+        };
+        myAutoContainer = new AutoPose[] {
+            new AutoPose("FenderFourBallAutoWPs", 7.60, 1.78, -93.69, FenderFourBallAutoWPs, PathPlanner.loadPath("FourBallBloop", 2.5, 1.0)),
+            new AutoPose("FenderTwoBallAutoWPs", 7.64, 1.83, -84.69, FenderTwoBallAutoWPs, PathPlanner.loadPath("TwoBallBloop", 3, 1.0)),
+            new AutoPose("HighFiveBallAutoWPs", 7.62, 1.76, -90, HighFiveBallAutoWPs, PathPlanner.loadPath("FiveBallHigh", 2.5, 1.0)),
+            new AutoPose("HighTwoBallAutoWPs", 6.09, 5.19, 43.78, HighTwoBallAutoWPs, PathPlanner.loadPath("TwoBallHigh", 2.5, 1.0))
+        };
+        for (AutoPose myAutoPose : myAutoContainer ){
+            m_autoChooser.addOption(myAutoPose.name, myAutoPose);
+        }
+
+    }
+
     private void intakeBall() {
-        
         //SJV: NEED TO TURN INTAKE OFF WHEN STATE IS FINISHED, NEED TO PROLLY LOWER THE DISTANCE FROM HALF A METER TO LESS (TEST PLEASE)
         if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 1.5) {
             Robot.INTAKE.intakeNow = true;
         } else if (Robot.INTAKE.intakeNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 1.5) {
-                StateHasFinished = true;
-                Robot.INTAKE.intakeNow = false;
+            StateHasFinished = true;
+            Robot.INTAKE.intakeNow = false;
                 
         }
     }
@@ -97,19 +114,29 @@ public class AutoWaypoints implements Loggable {
             Robot.INTAKE.shootNow = true;
             // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, -0.25);
 
-        }else if (Robot.INTAKE.shootNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
+        } else if (Robot.INTAKE.shootNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
             Robot.INTAKE.shootNow = false;
             // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, 0);
                 StateHasFinished = true;
-            }
         }
+    }
+
+    private void shootAndIntake() {
+        if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 1.5) {
+            Robot.INTAKE.intakeNow = true;
+            Robot.INTAKE.shootNow = true;
+        } else if (Robot.INTAKE.intakeNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 1.5) {
+            StateHasFinished = true;
+            Robot.INTAKE.intakeNow = false;
+            Robot.INTAKE.shootNow = false;
+            StateHasFinished = true;
+        }
+    }
 
     public void done(){
         //ADDED TO NOT GO OUT OF BOUNDS IN A ARRAY WAYPOINT RUNNER
         //FEEL FREE TO ADD THING TO THE DONE STATE
     }
-
-
 
     public double getDistance(double X1, double Y1, double X2, double Y2) { //just the distance formula - uses current x and y positions
         distance = Math.sqrt(Math.pow((X2 - X1), 2) + Math.pow((Y2 - Y1), 2));
@@ -129,7 +156,6 @@ public class AutoWaypoints implements Loggable {
     }
 
     public class AutoPose {
-
 
         public double thisX;
         public double thisY;

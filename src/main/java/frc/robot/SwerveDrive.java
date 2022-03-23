@@ -1,5 +1,9 @@
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.kauailabs.navx.IMUProtocol.YPRUpdate;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -11,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -18,6 +23,10 @@ import io.github.oblarg.oblog.annotations.Log;
 
 
 public class SwerveDrive implements Loggable {
+  public double previousXDistance = 0;
+  public double previousYDistance = 0;
+  public double previousTimestamp = 0;
+  public List<Double> velocities = new ArrayList<>();
   private static SwerveDrive SINGLE_INSTANCE = new SwerveDrive();
   private double SDxSpeed=0;
   private double SDySpeed=0;
@@ -243,7 +252,20 @@ public class SwerveDrive implements Loggable {
     m_odometry.resetPosition(_Pose2d, _Rotation2d);
   }
 
-  @Log.NumberBar(name = "FL Speed", min=-5,max=5 , rowIndex = 2, columnIndex =4, height = 1, width = 1)
+  public void getVelocities() {
+    double _xVelocity = (getXPos() - previousXDistance) / (Timer.getFPGATimestamp() - previousTimestamp);
+    double _yVelocity = (getYPos() - previousYDistance) / (Timer.getFPGATimestamp() - previousTimestamp);
+
+    previousXDistance = getXPos();
+    previousYDistance = getYPos();
+    previousTimestamp = Timer.getFPGATimestamp();
+
+    velocities.set(0, _xVelocity);
+    velocities.set(1, _yVelocity);
+  }
+
+
+ /* @Log.NumberBar(name = "FL Speed", min=-5,max=5 , rowIndex = 2, columnIndex =4, height = 1, width = 1)
   public double getFrontLeftSpeed(){
     return SwerveMap.FrontLeftSwerveModule.getState().speedMetersPerSecond;
   }
@@ -279,7 +301,7 @@ public class SwerveDrive implements Loggable {
   public double getBackRightAngle(){
     return Math.IEEEremainder(SwerveMap.BackRightSwerveModule.getState().angle.getDegrees(),180);
   }
-  
+  */
   @Log(rowIndex = 0, columnIndex = 5, height = 1, width = 1)
   public double getXPos(){
     return m_odometry.getPoseMeters().getX();
@@ -288,6 +310,7 @@ public class SwerveDrive implements Loggable {
   public double getYPos(){
     return m_odometry.getPoseMeters().getY();
   }
+  /*
   @Log.BooleanBox(rowIndex = 1, columnIndex = 5)
   public boolean getGyroInterference(){
     return SwerveMap.GYRO.isMagneticDisturbance();
@@ -296,7 +319,7 @@ public class SwerveDrive implements Loggable {
   public void setJoystickGovernor(double _input){
     joystickDriveGovernor = _input;
   }
-
+*/
   @Config.ToggleButton(name="ResetGyroAndOdometry", defaultValue = false, rowIndex = 3, columnIndex = 0, height = 1, width = 2)
   public void resetGyroAndOdometry(boolean _input){
     if(_input){
@@ -318,5 +341,6 @@ public class SwerveDrive implements Loggable {
     _input = false;
     }
   }
+  
 
 }

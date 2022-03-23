@@ -10,6 +10,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -36,7 +37,6 @@ public class Robot extends TimedRobot {
   public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
-  public static Limelight LIMELIGHT;
   public static XboxController xbox = new XboxController(0);
 
   /**
@@ -48,16 +48,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     LiveWindow.setEnabled(false);
-    SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
-    SwerveMap.checkAndSetSwerveCANStatus();
-    
-    SwerveMap.GYRO.reset(); 
-    // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
 
-    //*Swerve method starts here*
-    SWERVEDRIVE = SwerveDrive.getInstance();
-    SWERVEDRIVE.init();
-    SWERVEDRIVE.zeroSwerveDrive();
 
     //**Intake method starts here**
     INTAKE = Intake.getInstance();
@@ -90,12 +81,25 @@ public class Robot extends TimedRobot {
     // Keep this statement on the BOTTOM of your robotInit
     // It's responsible for all the shuffleboard outputs.  
     // It's a lot easier to use than standard shuffleboard syntax
+    SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+    SwerveMap.checkAndSetSwerveCANStatus();
+    
+    SwerveMap.GYRO.reset(); 
+    // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
+
+    //*Swerve method starts here*
+    SWERVEDRIVE = SwerveDrive.getInstance();
+    SWERVEDRIVE.init();
+    SWERVEDRIVE.zeroSwerveDrive();
     SwerveMap.driveRobotInit();
+
+    NetworkTableInstance.getDefault().getTable("limelight-intake").getEntry("camMode").setNumber(1);
+
     COMPETITIONLOGGER = CompetitionLogger.getInstance();
     Logger.setCycleWarningsEnabled(false);
     Logger.configureLoggingAndConfig(this, false);
     
-    Limelight.init();
+
   }
 
   /**
@@ -154,7 +158,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Joystick Drives stores values in X,Y,Z rotation
     // Drive actually sends those values to the swerve modules
-    Limelight.limelightPeriodic();
+
     
 
     SWERVEDRIVE.swervePeriodic();

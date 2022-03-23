@@ -9,8 +9,10 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -19,7 +21,9 @@ import io.github.oblarg.oblog.annotations.Log;
 public class Shooter implements Loggable {
     private static Shooter SINGLE_INSTANCE = new Shooter();
     private double shooterSpeed = 5000;
+    private double shooterSpeedOffset = 0;
     private double hoodAngle = 0;
+    private double hoodAngleOffset = 0;
     private WPI_TalonFX shooterDrive;
     private WPI_TalonFX hoodMotor;
     // SWITCHES DEFAULT TO TRUE WHEN NOT PRESSED
@@ -31,6 +35,8 @@ public class Shooter implements Loggable {
     public boolean homocideTheBattery;
     public boolean limelightShooting = true;
     public boolean bloopShot;
+
+    // public static SimpleMotorFeedforward shooterMotorFeedforward;
 
     public static Shooter getInstance() {
         return SINGLE_INSTANCE;
@@ -46,12 +52,13 @@ public class Shooter implements Loggable {
 
         limelightShooting = true;
 
-        shooterDrive.config_kF(0, 1023 * .80 / 18000, 100);
-
-        shooterDrive.config_kP(0, .12, 100);
+        // Don't mess with this value, suck a big one Evan
+        shooterDrive.config_kF(0, (1023 * .8) / 20000, 100);
+        shooterDrive.config_kD(0, 15, 100);
+        shooterDrive.config_kP(0, 0.45, 100);
         
         hoodMotor = new WPI_TalonFX(49);
-        hoodMotor.config_kP(0, .07625, 100);
+        hoodMotor.config_kP(0, 0.07625, 100);
         hoodMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 1000);
         hoodMotor.setSelectedSensorPosition(0, 0, 200);
         hoodMotor.setNeutralMode(NeutralMode.Brake);
@@ -64,54 +71,59 @@ public class Shooter implements Loggable {
 
         leftHoodSwitch = new DigitalInput(4);
         rightHoodSwitch = new DigitalInput(5);
+
+        // shooterMotorFeedforward = new SimpleMotorFeedforward(0.89886, 0.00029265, 0.000062406);
     }
 
-    
-    //SJV: I hope ur fine with me renaming this method
     public void shooterPeriodic() {
+        System.out.println(shooterDrive.getSelectedSensorVelocity(0) + " " + shooterSpeed + " " + shooterAtSpeed());
         if (!hoodAtOrigin) {
             rezeroHood();
         } else if (hoodAtOrigin) {
+            hoodAngle = calculateShooterAngle();
             rotateHood(hoodAngle);
-        } else {
-            System.out.println("The hood just tried to kill itself with a hood angle of: " + hoodAngle);
         }
-        
+
+        // DemandType.ArbitraryFeedForward, shooterMotorFeedforward.calculate(shooterSpeed) / 12
         if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
         // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
-            shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, 0.1);
-            turnToShooter();
+            shooterDrive.set(ControlMode.Velocity, shooterSpeed);
         } else {
             shooterDrive.set(0);
         }
     }
     
     public boolean shooterAtSpeed() {
-        if (Math.abs(shooterDrive.getSelectedSensorVelocity(0) - shooterSpeed) <= shooterSpeed * 0.05) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
+        double velocityError = Math.abs(shooterDrive.getSelectedSensorVelocity(0) - shooterSpeed);
+        // TODO: IF TOO MUCH VARIATION IN SHOTS, NARROW THESE VALUES SO IT STILL SHOOTS
+        if (shooterSpeed * 0.01 < velocityError && velocityError <= shooterSpeed * 0.07) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
             return true;
+            
         } else {
             return false;
         }
+
     }
 
     // Find shooter angle based on distance from hub
+    // TODO: Show distance in shuffleboard
     @Log
     public double calculateShooterAngle() { 
         if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting){
             double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
             double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
-        // placeholder equation
-        // double shooterAngle: y = m(distanceToHub) + b
+            
+            // angle = -14.75x^3 + 497.7x^2 -3726x + 11270, x = distance
             angle = 11270 - 3726 * distance + 497.7 * (Math.pow(distance, 2)) - 14.75 * (Math.pow(distance, 3));
 
-            if (angle < 32000) {
+            if (0 < angle && angle < 32000) {
                 return angle;
             } else {
-                return 0;
+                return hoodAngle;
             }
 
         } else {
-            return 0;
+            return hoodAngle;
         }
     }
 
@@ -121,9 +133,8 @@ public class Shooter implements Loggable {
         if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting && !bloopShot){
         double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
         double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
-        // placeholder equation
-        // double shooterSpeed: y = m(shooterAngle) + b
-        // shooterSpeed * ticks (for converting to ticks)
+
+        // shooterSpeed = -2.846x^3 + 116.5x^2 -1196x + 18110, x = distance
         double shooterSpeed = 18110 - 1196 * (distance) + 116.5 * (Math.pow(distance, 2)) - 2.846 * (Math.pow(distance, 3));
         return shooterSpeed;
         } else {
@@ -132,7 +143,7 @@ public class Shooter implements Loggable {
     }
 
     public void rotateHood(double angle) {
-            hoodMotor.set(ControlMode.Position, angle);
+        hoodMotor.set(ControlMode.Position, angle);
     }
 
     private void rezeroHood() { // check default on hood switches
@@ -165,20 +176,6 @@ public class Shooter implements Loggable {
         }
     }
 
-
-    public void turnToShooter() {
-        if (!Robot.INTAKE.limelightIsOpen) {
-            Robot.INTAKE.limelightSolenoid.set(Value.kForward);
-        }
-        //Make shoot er pipeline
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
-        // Robot.INTAKE.limelightIsOpen = true;
-        // Figure out which way later
-
-        hoodAngle = calculateShooterAngle();
-        shooterSpeed = calculateShooterSpeed();
-    }
-
     public void checkAndSetShooterCANStatus() {
         if(shooterDrive.hasResetOccurred()){
           int mycounter = 0;
@@ -205,18 +202,30 @@ public class Shooter implements Loggable {
         hoodAngle = targetAngle;
     }
 
+    // TODO: RESTRICT MAX VALUE WHEN ADDING OFFSET
+    // @Config.NumberSlider(name = "Set Shooter Angle Offset", defaultValue = 0, min = 0, max = 32000, blockIncrement = 1000, height = 2, width = 2)
+    // public void setHoodAngleOffset(double targetAngleOffset) {
+    //     hoodAngleOffset = targetAngleOffset;
+    // }
+
     //SJV: ONCE WE FIGURE OUT OUR SHOOTER ANGLE AND SPEED MAKE BOOLEAN FOR EACH OF THE SHOOTER SPEEDS AND PUT IT ON THE COMPETITION LOGGER
     @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 2, width = 2)
     public void setShooterSpeed(double targetVelocity) {
         shooterSpeed = targetVelocity;
 
     }
+    
+    // TODO: RESTRICT MAX VALUE WHEN ADDING OFFSET
+    // @Config.NumberSlider(name = "Set Shooter Speed Offset", defaultValue = 0, min = 0, max = 18000, blockIncrement = 1000, height = 2, width = 2)
+    // public void setShooterSpeedOffset(double targetOffest) {
+    //     shooterSpeedOffset = targetOffest;
+    // }
 
     @Config.ToggleButton(name = "kill battery?", defaultValue = false, rowIndex = 1, columnIndex = 0)
     public void killTheBattery(boolean _input) {
         homocideTheBattery = _input;
     }
-
+ 
     @Log
     public boolean getLeftHoodLimit() {
         return leftHoodSwitch.get();

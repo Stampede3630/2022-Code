@@ -28,6 +28,8 @@ public class Climber implements Loggable{
     boolean atOrigin;
     boolean upCompleted;
     boolean tiltArms = false;
+    boolean fullyExtended = false;
+    boolean climberSafety = true;
     
     final double TICKSPERREVOLUTION=2048;
     final double TICKSATTOP=(283675-1475);
@@ -59,7 +61,6 @@ public class Climber implements Loggable{
         atOrigin = false;
         upCompleted = false;
 
-
         // We want the default state to keep climber upright
         climberSolenoid.set(Value.kForward);
     }
@@ -72,14 +73,19 @@ public class Climber implements Loggable{
         } else if (Robot.COMPETITIONLOGGER.beginClimb) {
             climberRunner("");
         }
-        
     }
 
     private void manualClimberMotor(){
-        if (Robot.xbox.getPOV()==0){
-            climberTalon.set(ControlMode.PercentOutput, 1); //SJV:MAYBE PUT SOME SAFETY HERE TOO?!?!
+        if (Robot.xbox.getPOV() == 0 && !fullyExtended && climberSafety){
+            climberTalon.set(ControlMode.PercentOutput, 1); 
+
+            if (climberTalon.getSelectedSensorPosition(0) >= 28 && climberSafety) {
+                fullyExtended = true;
+            } else if (!climberSafety) {
+                fullyExtended = false;
+            }
         }
-        else if (Robot.xbox.getPOV()==180 & !(climberHomeLeft.get() || climberHomeRight.get())){
+        else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
             climberTalon.set(ControlMode.PercentOutput, -1);
         } else {
             climberTalon.set(ControlMode.PercentOutput, 0);
@@ -87,9 +93,9 @@ public class Climber implements Loggable{
     }
     
     private void manualClimberSolenoid(){
-        if (Robot.xbox.getPOV()==90 ){ 
+        if (Robot.xbox.getPOV() == 90 ){ 
            openSolenoid();
-        } else if (Robot.xbox.getPOV()==270 ){ 
+        } else if (Robot.xbox.getPOV() == 270 ){ 
            closeSolenoid();
            
         }
@@ -147,8 +153,6 @@ public class Climber implements Loggable{
         if (CurrentState == "") {
             CurrentState = ClimberState.values()[0].toString();
         }
-
-
         // If we made one round with the state, we have successfully initialized
         if (!StateHasInitialized) {StateHasInitialized = true;}
         ClimberState.valueOf(CurrentState).getAction().run();
@@ -160,7 +164,6 @@ public class Climber implements Loggable{
     }
 
     public void reZero() { 
-
         if (climberHomeLeft.get() || climberHomeRight.get() 
         || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) >-.5 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
             atOrigin = true;
@@ -204,7 +207,7 @@ public class Climber implements Loggable{
         // **** Add fault tolerance for arms ****
         if (climberHomeLeft.get() || climberHomeRight.get() || climberTalon.getSelectedSensorPosition(0) <=3.5 ) {
             climberTalon.set(ControlMode.PercentOutput, 0);
-            StateHasFinished  = true;
+            StateHasFinished = true;
         }
     }
 
@@ -212,7 +215,7 @@ public class Climber implements Loggable{
         climberTalon.set(ControlMode.Position, 14);
 
         if (climberTalon.getSelectedSensorPosition(0)>=14) {
-            StateHasFinished =true;
+            StateHasFinished = true;
         }
     }
 
@@ -274,8 +277,10 @@ public class Climber implements Loggable{
     public boolean getClimberHomeRight() {
       return climberHomeRight.get();
     }
-    @Log
-    public double getClimberTalonPosition() {
-      return climberTalon.getSelectedSensorPosition();
-}
+
+    // @Log
+    // public double getClimberTalonPosition() {
+    //   return climberTalon.getSelectedSensorPosition();
+    // }
+
 }

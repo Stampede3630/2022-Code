@@ -4,7 +4,9 @@ import javax.print.attribute.standard.Compression;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -17,8 +19,6 @@ public class CompetitionLogger implements Loggable {
     public static CompetitionLogger getInstance() {
         return SINGLE_INSTANCE;
     }
-    @Log
-    double distanceToHub = Limelight.Hub.getxDistance();
 
     @Log
     double shooterAngle = Robot.SHOOTER.calculateShooterAngle();
@@ -30,14 +30,17 @@ public class CompetitionLogger implements Loggable {
     private SwerveDriveDB mySwerveDrivebuttons = new SwerveDriveDB();
     
     public class SwerveDriveDB implements Loggable {
-        
-        
         @Override
         public int[] configureLayoutSize() {
-            int[] size = {2,3};
+            int[] size = {2,4};
             return size;
         }
-        @Config
+        @Override
+        public int[] configureLayoutPosition() {
+            int[] position = {0,0};
+            return position;
+        }
+        @Config 
         public void HoldRobotAngle(boolean _input){
             Robot.SWERVEDRIVE.holdRobotAngleEnabled = _input;
         }
@@ -74,13 +77,12 @@ public class CompetitionLogger implements Loggable {
             SwerveMap.FrontLeftSwerveModule.hasSwerveZeroingOccurred &&
             SwerveMap.FrontRightSwerveModule.hasSwerveZeroingOccurred;
         }
-        
     }
     
-    @Log
-    public float getPitch(){
-        return SwerveMap.GYRO.getPitch();
-    }
+    // @Log
+    // public float getPitch(){
+    //     return SwerveMap.GYRO.getPitch();
+    // }
     
     @Log
     public float navXData() {
@@ -92,7 +94,7 @@ public class CompetitionLogger implements Loggable {
         return SwerveMap.GYRO.getDisplacementY();
     }
     
-    @Log
+    @Log.NumberBar(min = 0, max = 140, rowIndex = 2, columnIndex = 2)
     public double getPressure() {
         return compressor.getPressure();
     }
@@ -102,9 +104,24 @@ public class CompetitionLogger implements Loggable {
         return Robot.SWERVEDRIVE.field;
     }
     
-    @Log
+    @Log(rowIndex = 3, columnIndex = 2)
     public double getMatchTimer() {
         return Timer.getMatchTime();
+    }
+
+    @Log
+    public double leftJoystickValues() {
+        return Robot.xbox.getLeftX();
+    }
+
+    @Log
+    public double rightJoystickValues() {
+        return Robot.xbox.getRightX();
+    }
+
+    @Log.NumberBar (min = 0, max = 14, rowIndex = 1, columnIndex = 2)
+    public double batteryVoltage() {
+        return RobotController.getBatteryVoltage();
     }
     
 }
