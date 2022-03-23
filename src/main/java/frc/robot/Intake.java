@@ -10,8 +10,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -36,10 +38,12 @@ public class Intake implements Loggable {
   public ColorSensorV3 colorSensor;
   private boolean cargoInTransit = false;
   public boolean intakeNow = false;
+  @Log(tabName = "CompetitionLogger")
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
   public double intakeSpeed = -15000;
+  public boolean ballReject = true;
   
   public final I2C.Port i2cPort = I2C.Port.kMXP;
 
@@ -83,7 +87,7 @@ public class Intake implements Loggable {
   }
 //SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
   private void intake() {
-    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
+    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow || indexManager() == "Ball Reject") {  // Right trigger held --> intake goes down and spins intake motor
       if (!intakeIsOut) {
         intakeSolenoid.set(Value.kForward);
         intakeIsOut = true;
@@ -142,6 +146,9 @@ public class Intake implements Loggable {
           indexBottom.set(ControlMode.PercentOutput, -0.4);
           break;
 
+        case "Ball Reject": //Rejects ball if it's the wrong color
+        indexBottom.set(ControlMode.PercentOutput, 0.8);
+
         default:  // Everything stops
           indexBottom.set(ControlMode.PercentOutput, 0);
           indexTop.set(ControlMode.PercentOutput, 0);
@@ -152,6 +159,10 @@ public class Intake implements Loggable {
   private String indexManager() {
     if (Robot.xbox.getBButton()) {
       return "Reverse Intake";
+    } else if(DriverStation.getAlliance() == Alliance.Blue && (colorSensor.getBlue() < colorSensor.getRed()) && colorSensor.getRed() > 1000 && ballReject) {
+      return "Ball Reject";
+    } else if(DriverStation.getAlliance() == Alliance.Red && (colorSensor.getRed() < colorSensor.getBlue()) && colorSensor.getBlue() > 1000 && ballReject) {
+      return "Ball Reject";
     } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { // Both switches pressed
       return "2 Balls";
     } else if (!bottomLimitSwitch.get() || (cargoInTransit && bottomLimitSwitch.get() && topLimitSwitch.get())) { // Bottom switch pressed/cargo in transit
@@ -240,23 +251,23 @@ public class Intake implements Loggable {
   //I think that matters... not SURE THOWRONG WRONG WATCH OBLOG WANTS DOUBLES i THINK
 
   
-  // @Log
-  // public double getRedColor() {
-  //   return (double) colorSensor.getRed();
+  @Log
+  public double getRedColor() {
+    return (double) colorSensor.getRed();
     
-  // }
+  }
 
-  // @Log
-  // public double getBlueColor() {
-  //   return (double) colorSensor.getBlue();
+  @Log
+  public double getBlueColor() {
+    return (double) colorSensor.getBlue();
     
-  // }
+  }
 
-  // @Log
-  // public double getGreenColor() {
-  //   return (double) colorSensor.getGreen();
+  @Log
+  public double getGreenColor() {
+    return (double) colorSensor.getGreen();
     
-  // }
+  }
   
   @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
   public boolean getBottomLimitSwitch() {
@@ -266,6 +277,11 @@ public class Intake implements Loggable {
   @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
   public boolean getTopLimitSwitch() {
     return topLimitSwitch.get();
+  }
+
+  @Config(defaultValueBoolean = true)
+  public void setBallReject(boolean _input) {
+    ballReject = _input;
   }
 
   // @Config.NumberSlider(name = "Set Intake Speed", defaultValue = -15000, min = -20000, max = -2000, blockIncrement = 1000, rowIndex = 1, columnIndex = 0, height = 1, width = 3)

@@ -76,14 +76,15 @@ public class Climber implements Loggable{
     }
 
     private void manualClimberMotor(){
+        
+        if (climberTalon.getSelectedSensorPosition(0) >= 28 && climberSafety) {
+            fullyExtended = true;
+        } else {
+            fullyExtended = false;
+        }
+
         if (Robot.xbox.getPOV() == 0 && !fullyExtended && climberSafety){
             climberTalon.set(ControlMode.PercentOutput, 1); 
-
-            if (climberTalon.getSelectedSensorPosition(0) >= 28 && climberSafety) {
-                fullyExtended = true;
-            } else if (!climberSafety) {
-                fullyExtended = false;
-            }
         }
         else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
             climberTalon.set(ControlMode.PercentOutput, -1);

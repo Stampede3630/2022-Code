@@ -46,7 +46,7 @@ public class AutoWaypoints implements Loggable {
         }
         chosenWaypoints = chosenPath.thisWPset;
         SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
-        Robot.SHOOTER.homocideTheBattery = true;
+        Robot.SHOOTER.homocideTheBattery = false;
         currentWaypointNumber = 0;
     }
     
@@ -102,6 +102,7 @@ public class AutoWaypoints implements Loggable {
         //SJV: NEED TO TURN INTAKE OFF WHEN STATE IS FINISHED, NEED TO PROLLY LOWER THE DISTANCE FROM HALF A METER TO LESS (TEST PLEASE)
         if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 1.5) {
             Robot.INTAKE.intakeNow = true;
+            Robot.INTAKE.shootNow = false;
         } else if (Robot.INTAKE.intakeNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 1.5) {
             StateHasFinished = true;
             Robot.INTAKE.intakeNow = false;
@@ -115,20 +116,18 @@ public class AutoWaypoints implements Loggable {
             // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, -0.25);
 
         } else if (Robot.INTAKE.shootNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 0.5) {
-            Robot.INTAKE.shootNow = false;
+            
             // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, 0);
                 StateHasFinished = true;
         }
     }
 
     private void shootAndIntake() {
-        if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 1.5) {
+        if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.5) {
             Robot.INTAKE.intakeNow = true;
             Robot.INTAKE.shootNow = true;
         } else if (Robot.INTAKE.intakeNow && getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) > 1.5) {
-            StateHasFinished = true;
-            Robot.INTAKE.intakeNow = false;
-            Robot.INTAKE.shootNow = false;
+
             StateHasFinished = true;
         }
     }
