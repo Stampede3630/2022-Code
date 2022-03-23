@@ -98,7 +98,7 @@ public class Shooter implements Loggable {
         // TODO: IF TOO MUCH VARIATION IN SHOTS, NARROW THESE VALUES SO IT STILL SHOOTS
         if (shooterSpeed * 0.01 < velocityError && velocityError <= shooterSpeed * 0.07) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
             return true;
-            
+
         } else {
             return false;
         }
@@ -114,7 +114,7 @@ public class Shooter implements Loggable {
             double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
             
             // angle = -14.75x^3 + 497.7x^2 -3726x + 11270, x = distance
-            angle = 11270 - 3726 * distance + 497.7 * (Math.pow(distance, 2)) - 14.75 * (Math.pow(distance, 3));
+            angle = -37840 + 10740 * distance - 686.3 * (Math.pow(distance, 2)) + 15.22 * (Math.pow(distance, 3));
 
             if (0 < angle && angle < 32000) {
                 return angle;
@@ -135,7 +135,7 @@ public class Shooter implements Loggable {
         double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 28) / 12;
 
         // shooterSpeed = -2.846x^3 + 116.5x^2 -1196x + 18110, x = distance
-        double shooterSpeed = 18110 - 1196 * (distance) + 116.5 * (Math.pow(distance, 2)) - 2.846 * (Math.pow(distance, 3));
+        double shooterSpeed = (358.7*distance) + 10960;
         return shooterSpeed;
         } else {
             return shooterSpeed;
