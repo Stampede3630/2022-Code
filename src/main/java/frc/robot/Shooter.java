@@ -87,6 +87,9 @@ public class Shooter implements Loggable {
             rotateHood(hoodAngle);
         }
 
+        //bloop shot
+        
+
         // DemandType.ArbitraryFeedForward, shooterMotorFeedforward.calculate(shooterSpeed) / 12
         if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
         // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
@@ -112,12 +115,12 @@ public class Shooter implements Loggable {
     // TODO: Show distance in shuffleboard
     @Log
     public double calculateShooterAngle() { 
-        if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting){
+        if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting  && !bloopShot && !Robot.xbox.getLeftBumper()){
             double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
             double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
             // System.out.println(distance); 
             // angle = -14.75x^3 + 497.7x^2 -3726x + 11270, x = distance
-            angle = -37840 + 10740 * distance - 686.3 * (Math.pow(distance, 2)) + 15.22 * (Math.pow(distance, 3));
+            angle = -37840 + 10740 * distance - 686.3 * (Math.pow(distance, 2)) + 15.22 * (Math.pow(distance, 3)) + hoodAngleOffset;
 
             if (0 < angle && angle < 32000) {
                 return angle;
@@ -125,7 +128,9 @@ public class Shooter implements Loggable {
                 return hoodAngle;
             }
 
-        } else {
+        } else if (bloopShot || Robot.xbox.getLeftBumper()){
+            return 20000.00;
+        }else {
             return hoodAngle;
         }
     }
@@ -133,13 +138,16 @@ public class Shooter implements Loggable {
     // Find shooter speed based on shooter angle
     @Log
     public double calculateShooterSpeed() {
-        if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting && !bloopShot){
+        if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting && !bloopShot && !Robot.xbox.getLeftBumper()){
         double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
         double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
         // shooterSpeed = -2.846x^3 + 116.5x^2 -1196x + 18110, x = distance
         double shooterSpeed = (358.7*distance) + 10960;
-        return shooterSpeed;
-        } else {
+
+        return shooterSpeed + shooterSpeedOffset;
+        } else if (bloopShot || Robot.xbox.getLeftBumper()){
+            return 5000.00;
+        }else {
             return shooterSpeed;
         }
     }
@@ -199,41 +207,40 @@ public class Shooter implements Loggable {
         }
     }
 
-    @Config.NumberSlider(name = "Set Shooter Angle", defaultValue = 0, min = 0, max = 32000, blockIncrement = 1000, rowIndex = 4, columnIndex = 2, height = 2, width = 2)
+    @Config.NumberSlider(name = "Set Shooter Angle", defaultValue = 0, min = 0, max = 32000, blockIncrement = 1000, rowIndex = 3, columnIndex = 2, height = 1, width = 2)
     public void setHoodAngle(double targetAngle) {
         hoodAngle = targetAngle;
     }
 
-    // TODO: RESTRICT MAX VALUE WHEN ADDING OFFSET
-    // @Config.NumberSlider(name = "Set Shooter Angle Offset", defaultValue = 0, min = 0, max = 32000, blockIncrement = 1000, height = 2, width = 2)
-    // public void setHoodAngleOffset(double targetAngleOffset) {
-    //     hoodAngleOffset = targetAngleOffset;
-    // }
+    @Config.NumberSlider(name = "Set Shooter Angle Offset", defaultValue = 0, min = -5000, max = 5000, blockIncrement = 500, rowIndex = 2, columnIndex = 2, height = 1, width = 2)
+    public void setHoodAngleOffset(double targetAngleOffset) {
+        hoodAngleOffset = targetAngleOffset;
+    }
 
     //SJV: ONCE WE FIGURE OUT OUR SHOOTER ANGLE AND SPEED MAKE BOOLEAN FOR EACH OF THE SHOOTER SPEEDS AND PUT IT ON THE COMPETITION LOGGER
-    @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 0, height = 2, width = 2)
+    @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 2, height = 1, width = 2)
     public void setShooterSpeed(double targetVelocity) {
         shooterSpeed = targetVelocity;
 
     }
     
-    // TODO: RESTRICT MAX VALUE WHEN ADDING OFFSET
-    // @Config.NumberSlider(name = "Set Shooter Speed Offset", defaultValue = 0, min = 0, max = 18000, blockIncrement = 1000, height = 2, width = 2)
-    // public void setShooterSpeedOffset(double targetOffest) {
-    //     shooterSpeedOffset = targetOffest;
-    // }
 
-    @Config.ToggleButton(name = "kill battery?", defaultValue = false, rowIndex = 1, columnIndex = 0)
+    @Config.NumberSlider(name = "Set Shooter Speed Offset", defaultValue = 0, min = -5000, max = 5000, rowIndex = 1, columnIndex = 2, blockIncrement = 500, height = 1, width = 2)
+    public void setShooterSpeedOffset(double targetOffest) {
+        shooterSpeedOffset = targetOffest;
+    }
+
+    @Config.ToggleButton(name = "kill battery?", defaultValue = false, rowIndex = 0, columnIndex = 0, height = 1, width = 2)
     public void killTheBattery(boolean _input) {
         homocideTheBattery = _input;
     }
  
-    @Log
+    @Log(rowIndex = 1, columnIndex = 0)
     public boolean getLeftHoodLimit() {
         return leftHoodSwitch.get();
     }
 
-    @Log
+    @Log(rowIndex = 1, columnIndex = 1)
     public boolean getRightHoodLimit() {
         return rightHoodSwitch.get();
     }

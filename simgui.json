@@ -21,6 +21,7 @@
       "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
       "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro",
       "/Shuffleboard/CompetitionLogger/autoChooser": "String Chooser",
+      "/Shuffleboard/CompetitionLogger/field2022": "Field2d",
       "/Shuffleboard/CompetitionLogger/m_autoChooser": "String Chooser",
       "/Shuffleboard/SwerveDrive/Robot Angle": "Gyro"
     }
