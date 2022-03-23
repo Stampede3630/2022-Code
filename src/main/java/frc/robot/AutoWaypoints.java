@@ -16,18 +16,16 @@ public class AutoWaypoints implements Loggable {
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
-    @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 5)
+    @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 4)
     public int currentWaypointNumber = 0;
     private double currentX;
     private double currentY;
     public AutoPose chosenPath;
     public AutoPose[] myAutoContainer;
     
-    @Log
     public boolean StateHasFinished = false;
-    @Log
     public Boolean StateHasInitialized = false;
-    @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 4)
+    @Log(tabName = "CompetitionLogger", rowIndex = 1, columnIndex = 4)
     public double distance = 0;
     @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
     public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();

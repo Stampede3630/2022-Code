@@ -283,7 +283,7 @@ public class Intake implements Loggable {
   //   return topLimitSwitch.get();
   // }
 
-  @Config(tabName = "CompetitionLogger", defaultValueBoolean = true, rowIndex = 2, columnIndex = 3, height = 1, width = 2)
+  @Config(tabName = "CompetitionLogger", defaultValueBoolean = true, rowIndex = 3, columnIndex = 3, height = 1, width = 2)
   public void setBallReject(boolean _input) {
     ballReject = _input;
   }
