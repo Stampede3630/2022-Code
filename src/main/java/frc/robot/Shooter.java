@@ -132,7 +132,7 @@ public class Shooter implements Loggable {
             }
 
         } else if (bloopShot || Robot.xbox.getLeftBumper()){
-            return 20000.00;
+            return 15975.00;
         }else {
             return hoodAngle;
         }
@@ -153,7 +153,7 @@ public class Shooter implements Loggable {
         }
         
         } else if (bloopShot || Robot.xbox.getLeftBumper()){
-            return 5000.00;
+            return 7274.00;
         }else {
             return shooterSpeed;
         }
