@@ -10,10 +10,12 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -37,6 +39,7 @@ public class Shooter implements Loggable {
     public boolean homocideTheBattery;
     public boolean limelightShooting = true;
     public boolean bloopShot = false;
+    public boolean fancyshot = false;
 
     // public static SimpleMotorFeedforward shooterMotorFeedforward;
 
@@ -143,8 +146,12 @@ public class Shooter implements Loggable {
         double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
         // shooterSpeed = -2.846x^3 + 116.5x^2 -1196x + 18110, x = distance
         double shooterSpeed = (358.7*distance) + 10960;
-
-        return shooterSpeed + shooterSpeedOffset;
+        if(fancyshot){
+            return shooterSpeed + shooterSpeedOffset + getVnewTicksoffset();
+        } else{
+            return shooterSpeed + shooterSpeedOffset;
+        }
+        
         } else if (bloopShot || Robot.xbox.getLeftBumper()){
             return 5000.00;
         }else {
@@ -186,6 +193,77 @@ public class Shooter implements Loggable {
         }
     }
 
+    public double shootTicksToVMS(){
+        return -.0000000544*Math.pow(shooterSpeed+shooterSpeedOffset, 2) + .002423*(shooterSpeed+shooterSpeedOffset) - 10.06;
+    }
+
+    public Rotation2d hoodAngleTicksToActual() {
+        return new Rotation2d((-.001875 * (hoodAngle + hoodAngleOffset) + 77.5)*Math.PI/180);
+    }
+
+    public double vbo(){
+        return hoodAngleTicksToActual().getCos() * shootTicksToVMS();
+    }
+
+    private Rotation2d getAlpha(){
+        return SwerveMap.GYRO.getRotation2d().plus(new Rotation2d(Robot.SWERVEDRIVE.limelightTX()));
+    }
+
+    private Rotation2d getBeta(){
+ 
+        if(90 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=180){
+            return getAlpha().minus(new Rotation2d(Math.PI/2));
+        } else if(-180 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=-90){
+            return getAlpha().unaryMinus().minus(new Rotation2d(Math.PI/2));
+        } else if(-90 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=0){
+            return getAlpha().plus(new Rotation2d(Math.PI/2)); 
+        } else if(0 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=90){
+            return getAlpha().unaryMinus().plus(new Rotation2d(Math.PI/2)); 
+        } else {
+            return new Rotation2d(0);
+        }
+    }
+
+    public Rotation2d getPhi(){
+        if(fancyshot){
+            if(90 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=180){
+                return getBeta().unaryMinus().plus(getGamma());
+            } else if(-180 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=-90){
+                return getBeta().minus(getGamma());
+            } else if(-90 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=0){
+                return getBeta().minus(getGamma());
+            } else if(0 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=90){
+                return getBeta().unaryMinus().plus(getGamma());
+            } else {
+                return new Rotation2d(0);
+            }
+        } else {
+            return new Rotation2d(0);
+        }
+    }
+
+    private Rotation2d getGamma(){
+        return new Rotation2d(Math.atan(getVnx()/getVny()));
+    }
+
+    public double getVnx(){
+        return vbo()*getBeta().getCos() + Math.signum(getAlpha().minus(new Rotation2d(Math.PI/2)).getCos())*Robot.SWERVEDRIVE.velocities.get(1);
+    }
+
+    public double getVny(){
+        return vbo()*getBeta().getSin() + Math.signum(getAlpha().minus(new Rotation2d(Math.PI/2)).getSin())*Robot.SWERVEDRIVE.velocities.get(0);
+    }
+
+    public double getVnew(){
+        return Math.sqrt(Math.pow(getVnx(),2) + Math.pow(getVny(),2));
+    }
+
+    public double getVnewTicksoffset(){
+        return (getVnew()+1.552)/0.0148 - shooterSpeedOffset - shooterSpeed;
+    }
+
+    
+
     public void checkAndSetShooterCANStatus() {
         if(shooterDrive.hasResetOccurred()){
           int mycounter = 0;
@@ -212,7 +290,7 @@ public class Shooter implements Loggable {
         hoodAngle = targetAngle;
     }
 
-    @Config.NumberSlider(name = "Set Shooter Angle Offset", defaultValue = 0, min = -5000, max = 5000, blockIncrement = 500, rowIndex = 2, columnIndex = 2, height = 1, width = 2)
+    @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Shooter Angle Offset", defaultValue = 0, min = -5000, max = 5000, blockIncrement = 100, rowIndex = 5, columnIndex = 0, height = 1, width = 2)
     public void setHoodAngleOffset(double targetAngleOffset) {
         hoodAngleOffset = targetAngleOffset;
     }
@@ -224,8 +302,7 @@ public class Shooter implements Loggable {
 
     }
     
-
-    @Config.NumberSlider(name = "Set Shooter Speed Offset", defaultValue = 0, min = -5000, max = 5000, rowIndex = 1, columnIndex = 2, blockIncrement = 500, height = 1, width = 2)
+    @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Shooter Speed Offset", defaultValue = 0, min = -5000, max = 5000, rowIndex = 5, columnIndex = 2, blockIncrement = 100, height = 1, width = 2)
     public void setShooterSpeedOffset(double targetOffest) {
         shooterSpeedOffset = targetOffest;
     }

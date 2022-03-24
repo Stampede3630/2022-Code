@@ -45,7 +45,7 @@ public class Intake implements Loggable {
   public boolean intakeIsOut = false;
   public double intakeSpeed = -15000;
   public boolean ballReject = true;
-  public String indexState;
+  public String indexState="";
   
   public final I2C.Port i2cPort = I2C.Port.kMXP;
 

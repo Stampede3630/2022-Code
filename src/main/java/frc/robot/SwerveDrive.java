@@ -26,7 +26,7 @@ public class SwerveDrive implements Loggable {
   public double previousXDistance = 0;
   public double previousYDistance = 0;
   public double previousTimestamp = 0;
-  public List<Double> velocities = new ArrayList<>();
+  public ArrayList<Double> velocities = new ArrayList<Double>();
   private static SwerveDrive SINGLE_INSTANCE = new SwerveDrive();
   private double SDxSpeed=0;
   private double SDySpeed=0;
@@ -54,6 +54,8 @@ public class SwerveDrive implements Loggable {
   }
 
   public void init(){
+    velocities.add(0.0);
+    velocities.add(0.0);
     m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.getRobotAngle());
     holdRobotAngleController.disableContinuousInput();
     holdRobotAngleController.setTolerance(Math.toRadians(2));
@@ -70,6 +72,7 @@ public class SwerveDrive implements Loggable {
       getSDRotation(), 
       getSDFieldRelative());
       field.setRobotPose(m_odometry.getPoseMeters());
+    setVelocities();
   }
   /**
   * Method to drive the robot using the following params
@@ -83,12 +86,14 @@ public class SwerveDrive implements Loggable {
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
     if (Robot.xbox.getRightStickButton()){
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
-      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX())/360)*(2*Math.PI));
+      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX()+ Robot.SHOOTER.getPhi().getDegrees())/360)*(2*Math.PI));
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
-      System.out.println(limelightTX());
+    //  System.out.println(limelightTX());
     // } else if (_rot == 0 && holdRobotAngleEnabled){
     //   _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
     //   NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+    } else if (Robot.xbox.getLeftStickButton()){
+      _fieldRelative = false;
     } else {
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
@@ -252,7 +257,7 @@ public class SwerveDrive implements Loggable {
     m_odometry.resetPosition(_Pose2d, _Rotation2d);
   }
 
-  public void getVelocities() {
+  public void setVelocities() {
     double _xVelocity = (getXPos() - previousXDistance) / (Timer.getFPGATimestamp() - previousTimestamp);
     double _yVelocity = (getYPos() - previousYDistance) / (Timer.getFPGATimestamp() - previousTimestamp);
 

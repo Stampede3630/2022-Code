@@ -11,6 +11,11 @@
     }
   },
   "Window": {
+    "###/Shuffleboard/CompetitionLogger/m_autoChooser": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "307,60"
+    },
     "###FMS": {
       "Collapsed": "0",
       "Pos": "5,540",
@@ -18,13 +23,13 @@
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "250,465",
+      "Pos": "115,159",
       "Size": "976,82"
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "1302,228",
-      "Size": "750,185"
+      "Pos": "1302,-11",
+      "Size": "750,972"
     },
     "###Other Devices": {
       "Collapsed": "0",

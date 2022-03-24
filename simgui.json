@@ -24,6 +24,13 @@
       "/Shuffleboard/CompetitionLogger/field2022": "Field2d",
       "/Shuffleboard/CompetitionLogger/m_autoChooser": "String Chooser",
       "/Shuffleboard/SwerveDrive/Robot Angle": "Gyro"
+    },
+    "windows": {
+      "/Shuffleboard/CompetitionLogger/m_autoChooser": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
@@ -38,9 +45,11 @@
         "SwerveDrive": {
           "Current Robot Angle": {
             "open": true
-          },
-          "open": true
+          }
         },
+        "open": true
+      },
+      "Shooter": {
         "open": true
       },
       "open": true
