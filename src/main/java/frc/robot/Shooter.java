@@ -95,7 +95,9 @@ public class Shooter implements Loggable {
         
 
         // DemandType.ArbitraryFeedForward, shooterMotorFeedforward.calculate(shooterSpeed) / 12
-        if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0 || Robot.xbox.getLeftBumper() || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
+        if (Robot.xbox.getLeftBumper()){
+            shooterDrive.set(ControlMode.PercentOutput, 0.3);
+        } else if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0 || Robot.xbox.getLeftBumper() || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
         // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed);
         } else {
@@ -124,8 +126,8 @@ public class Shooter implements Loggable {
             double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
             // System.out.println(distance); 
             // angle = -14.75x^3 + 497.7x^2 -3726x + 11270, x = distance
-            angle = -37840 + 10740 * distance - 686.3 * (Math.pow(distance, 2)) + 15.22 * (Math.pow(distance, 3)) + hoodAngleOffset;
-
+            // angle = -37840 + 10740 * distance - 686.3 * (Math.pow(distance, 2)) + 15.22 * (Math.pow(distance, 3)) + hoodAngleOffset;
+            angle = -142000 + 40530 * distance - 3507 * (Math.pow(distance, 2)) + 105.6 * (Math.pow(distance, 3)) + hoodAngleOffset;
             if (0 < angle && angle < 32000) {
                 return angle;
             } else {
@@ -149,8 +151,11 @@ public class Shooter implements Loggable {
         double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
         //System.out.println(distance);
         // shooterSpeed = -2.846x^3 + 116.5x^2 -1196x + 18110, x = distance
-        double shooterSpeed = (358.7*distance) + 11760;
-        if(fancyShot){
+        //double shooterSpeed = (358.7*distance) + 11760;
+        
+        shooterSpeed = 26.5 * (Math.pow(distance, 3)) - 899.4 * (Math.pow(distance, 2)) + 10690 * distance - 28200;
+
+       if(fancyShot){
             double thisNewTickOffset = getVnewTicksoffset();
             System.out.println("shooter speed = " + shooterSpeed + " offset = " + shooterSpeedOffset + " tick offset = "+ thisNewTickOffset);
             return shooterSpeed + shooterSpeedOffset + thisNewTickOffset;
@@ -159,7 +164,7 @@ public class Shooter implements Loggable {
         }
         
         } else if (bloopShot || Robot.xbox.getLeftBumper()){
-            return 10000.00;
+            return 7000;
         }else {
             return shooterSpeed;
         }

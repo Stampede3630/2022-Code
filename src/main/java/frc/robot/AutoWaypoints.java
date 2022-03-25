@@ -133,7 +133,7 @@ public class AutoWaypoints implements Loggable {
     private void shootAndIntake() {     //still inconsistent?
                 Robot.INTAKE.intakeNow = true;
         if (getDistance(currentX, currentY, chosenWaypoints[currentWaypointNumber].posX, chosenWaypoints[currentWaypointNumber].posY) < 0.2) {
-                 Robot.INTAKE.intakeNow = true;
+                 Robot.INTAKE.shootNow = true;
             // if(Robot.INTAKE.indexState.equals("2 Balls") || Robot.INTAKE.indexState.equals("1 Ball")){
             //     Robot.INTAKE.intakeNow = false;
             //     Robot.INTAKE.shootNow = true;  
