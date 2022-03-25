@@ -39,7 +39,7 @@ public class Shooter implements Loggable {
     public boolean homocideTheBattery;
     public boolean limelightShooting = true;
     public boolean bloopShot = false;
-    public boolean fancyshot = false;
+    public boolean fancyShot = false;
 
     // public static SimpleMotorFeedforward shooterMotorFeedforward;
 
@@ -88,6 +88,7 @@ public class Shooter implements Loggable {
             hoodAngle = calculateShooterAngle();
             shooterSpeed = calculateShooterSpeed();
             rotateHood(hoodAngle);
+            getAlpha();
         }
 
         //bloop shot
@@ -134,6 +135,8 @@ public class Shooter implements Loggable {
         } else if (bloopShot || Robot.xbox.getLeftBumper()){
             return 15975.00;
         }else {
+            //double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0)))) + 12.4) / 12;
+           // System.out.println(distance);
             return hoodAngle;
         }
     }
@@ -144,16 +147,19 @@ public class Shooter implements Loggable {
         if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && limelightShooting && !bloopShot && !Robot.xbox.getLeftBumper()){
         double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
         double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
+        //System.out.println(distance);
         // shooterSpeed = -2.846x^3 + 116.5x^2 -1196x + 18110, x = distance
-        double shooterSpeed = (358.7*distance) + 10960;
-        if(fancyshot){
-            return shooterSpeed + shooterSpeedOffset + getVnewTicksoffset();
+        double shooterSpeed = (358.7*distance) + 11760;
+        if(fancyShot){
+            double thisNewTickOffset = getVnewTicksoffset();
+            System.out.println("shooter speed = " + shooterSpeed + " offset = " + shooterSpeedOffset + " tick offset = "+ thisNewTickOffset);
+            return shooterSpeed + shooterSpeedOffset + thisNewTickOffset;
         } else{
             return shooterSpeed + shooterSpeedOffset;
         }
         
         } else if (bloopShot || Robot.xbox.getLeftBumper()){
-            return 7274.00;
+            return 10000.00;
         }else {
             return shooterSpeed;
         }
@@ -206,6 +212,7 @@ public class Shooter implements Loggable {
     }
 
     private Rotation2d getAlpha(){
+        System.out.println(SwerveMap.GYRO.getRotation2d().plus(new Rotation2d(Robot.SWERVEDRIVE.limelightTX())).getDegrees());
         return SwerveMap.GYRO.getRotation2d().plus(new Rotation2d(Robot.SWERVEDRIVE.limelightTX()));
     }
 
@@ -225,7 +232,7 @@ public class Shooter implements Loggable {
     }
 
     public Rotation2d getPhi(){
-        if(fancyshot){
+        if(fancyShot){
             if(90 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=180){
                 return getBeta().unaryMinus().plus(getGamma());
             } else if(-180 <= getAlpha().getDegrees() && getAlpha().getDegrees() <=-90){
@@ -247,7 +254,11 @@ public class Shooter implements Loggable {
     }
 
     public double getVnx(){
+        System.out.println("yVelocity: " + Robot.SWERVEDRIVE.velocities.get(1));
+        System.out.println("yVelocitx: " + Robot.SWERVEDRIVE.velocities.get(0));
         return vbo()*getBeta().getCos() + Math.signum(getAlpha().minus(new Rotation2d(Math.PI/2)).getCos())*Robot.SWERVEDRIVE.velocities.get(1);
+ 
+
     }
 
     public double getVny(){
@@ -259,6 +270,7 @@ public class Shooter implements Loggable {
     }
 
     public double getVnewTicksoffset(){
+
         return (getVnew()+1.552)/0.0148 - shooterSpeedOffset - shooterSpeed;
     }
 

@@ -23,6 +23,7 @@ import io.github.oblarg.oblog.annotations.Log;
 
 
 public class SwerveDrive implements Loggable {
+  public boolean autoLimeLightAim = false;
   public double previousXDistance = 0;
   public double previousYDistance = 0;
   public double previousTimestamp = 0;
@@ -84,7 +85,7 @@ public class SwerveDrive implements Loggable {
   */
   @SuppressWarnings("ParameterName")
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
-    if (Robot.xbox.getRightStickButton()){
+    if (Robot.xbox.getRightStickButton() || autoLimeLightAim){
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
       _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX()+ Robot.SHOOTER.getPhi().getDegrees())/360)*(2*Math.PI));
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();

@@ -153,6 +153,7 @@ public class Robot extends TimedRobot {
     INTAKE.intakeNow = false;
     INTAKE.shootNow = false;
     SHOOTER.homocideTheBattery = false;
+    SWERVEDRIVE.autoLimeLightAim = false;
     
   }
 

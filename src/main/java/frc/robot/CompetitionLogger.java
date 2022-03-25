@@ -60,15 +60,16 @@ public class CompetitionLogger implements Loggable {
             }
         }
         
-        @Config
-        public void resetDisplacement(boolean _input){
-            SwerveMap.GYRO.resetDisplacement();
+        @Config (defaultValueBoolean = false)
+        public void setFancyShot(boolean _input){
+            Robot.SHOOTER.fancyShot = _input;
         }
 
         @Config (defaultValueBoolean = true)
         public void limelightAim(boolean _input){
                 Robot.SHOOTER.limelightShooting = _input;
         }
+        
         
         @Log
         public boolean allZeroedModules(){

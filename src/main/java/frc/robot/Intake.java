@@ -43,7 +43,7 @@ public class Intake implements Loggable {
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
-  public double intakeSpeed = -15000;
+  public double intakeSpeed = -18000;
   public boolean ballReject = true;
   public String indexState="";
   
@@ -96,7 +96,7 @@ public class Intake implements Loggable {
         intakeIsOut = true;
       }
       
-      intakeDrive.set(ControlMode.Velocity, intakeSpeed); //-15000
+      intakeDrive.set(ControlMode.Velocity, intakeSpeed); //-18000
 
       turnToIntake();
 
