@@ -5,7 +5,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.AutoWaypoints.Waypoint;
+import frc.robot.AutoSegmentedWaypoints.Waypoint;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -256,7 +256,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             
             
             StateHasInitialized = true;}
-            SwerveTrajectory.PathPlannerRunner(Robot.AUTOWAYPOINTS.chosenPath.thisPathPLan,  Robot.SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+            SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment,  Robot.SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
         thisWaypointSet[currentWaypointNumber].action.run();
         if (StateHasFinished){
             currentWaypointNumber++;
