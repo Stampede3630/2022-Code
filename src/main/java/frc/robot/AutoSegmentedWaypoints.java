@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.AutoSegmentedWaypoints.Waypoint;
 import io.github.oblarg.oblog.Loggable;
@@ -53,16 +55,12 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     public void init() {
         SwerveMap.GYRO.reset();
-        seg1 = PathPlanner.loadPath("VbhSegOne", 3.5, 3.0);
-        seg2 = PathPlanner.loadPath("VbhSegTwo", 3.5, 3.0);
-        seg3 = PathPlanner.loadPath("VbhSegThree", 3.5, 3.0);
-        seg4 = PathPlanner.loadPath("VbhSegFour", 3.5, 3.0);
-        twoBall = PathPlanner.loadPath("TwoBallHigh", 3.5, 3.0);
-        v2seg1 = PathPlanner.loadPath("Vbh2SegOne", 3.5, 3.0);
-        v2seg2 = PathPlanner.loadPath("Vbh2SegTwo", 3.5, 3.0);
-        v2seg3 = PathPlanner.loadPath("Vbh2SegThree", 3.5, 3.0);
-        v2seg4 = PathPlanner.loadPath("Vbh2SegFour", 3.5, 3.0);
-        ivIntake = PathPlanner.loadPath("IVBallFrickyIntakey", 3.5, 3.0);
+
+
+        PathPlannerState initalPathPose =((PathPlannerState)chosenWaypoints[0].pathPlannerSegment.getInitialState());
+
+
+        Robot.SWERVEDRIVE.resetOdometry(initalPathPose.poseMeters, initalPathPose.poseMeters.getRotation()); 
         
         if (m_autoChooser.getSelected()==null){
             chosenPath = myAutoContainer[0];
@@ -83,6 +81,17 @@ public class AutoSegmentedWaypoints implements Loggable {
     }
 
     public void loadAutoPaths(){
+
+        seg1 = PathPlanner.loadPath("VbhSegOne", 3.5, 3.0);
+        seg2 = PathPlanner.loadPath("VbhSegTwo", 3.5, 3.0);
+        seg3 = PathPlanner.loadPath("VbhSegThree", 3.5, 3.0);
+        seg4 = PathPlanner.loadPath("VbhSegFour", 3.5, 3.0);
+        twoBall = PathPlanner.loadPath("TwoBallHigh", 3.5, 3.0);
+        v2seg1 = PathPlanner.loadPath("Vbh2SegOne", 3.5, 3.0);
+        v2seg2 = PathPlanner.loadPath("Vbh2SegTwo", 3.5, 3.0);
+        v2seg3 = PathPlanner.loadPath("Vbh2SegThree", 3.5, 3.0);
+        v2seg4 = PathPlanner.loadPath("Vbh2SegFour", 3.5, 3.0);
+        ivIntake = PathPlanner.loadPath("IVBallFrickyIntakey", 3.5, 3.0);
 
         HighFiveBallSegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.63, 0.7, seg1),
