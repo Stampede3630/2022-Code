@@ -44,7 +44,7 @@ public class Intake implements Loggable {
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
   public double intakeSpeed = -18000;
-  public boolean ballReject = true;
+  public boolean ballReject = false;
   public String indexState="";
   
   public final I2C.Port i2cPort = I2C.Port.kMXP;
@@ -84,13 +84,16 @@ public class Intake implements Loggable {
     
   }
   public void intakePeriodic(){
+    //
     intake();
     shootIndexManager();
     indexState = indexManager();
+    // System.out.println(indexState);
+    
   }
 //SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
   private void intake() {
-    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow || indexManager() == "Ball Reject") {  // Right trigger held --> intake goes down and spins intake motor
+    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow || indexState == "Ball Reject") {  // Right trigger held --> intake goes down and spins intake motor
       if (!intakeIsOut) {
         intakeSolenoid.set(Value.kForward);
         intakeIsOut = true;
@@ -137,6 +140,7 @@ public class Intake implements Loggable {
 
         case "Cargo in Transit":  // Bring ball from intake to top of tower
           indexTop.set(ControlMode.PercentOutput, -0.4);
+
           indexBottom.set(ControlMode.PercentOutput, -0.4);
           break;
 
@@ -283,7 +287,7 @@ public class Intake implements Loggable {
   //   return topLimitSwitch.get();
   // }
 
-  @Config(tabName = "CompetitionLogger", defaultValueBoolean = true, rowIndex = 3, columnIndex = 3, height = 1, width = 2)
+  @Config(tabName = "CompetitionLogger", defaultValueBoolean = false, rowIndex = 3, columnIndex = 3, height = 1, width = 2)
   public void setBallReject(boolean _input) {
     ballReject = _input;
   }

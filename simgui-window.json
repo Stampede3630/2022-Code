@@ -13,7 +13,7 @@
   "Window": {
     "###/Shuffleboard/CompetitionLogger/m_autoChooser": {
       "Collapsed": "0",
-      "Pos": "60,60",
+      "Pos": "199,60",
       "Size": "307,60"
     },
     "###FMS": {
@@ -28,7 +28,7 @@
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "1302,-11",
+      "Pos": "1136,21",
       "Size": "750,972"
     },
     "###Other Devices": {

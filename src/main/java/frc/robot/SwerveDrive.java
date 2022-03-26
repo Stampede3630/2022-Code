@@ -87,7 +87,7 @@ public class SwerveDrive implements Loggable {
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
     if (Robot.xbox.getRightStickButton() || autoLimeLightAim){
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
-      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX()+ Robot.SHOOTER.getPhi().getDegrees())/360)*(2*Math.PI));
+      _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX())/360)*(2*Math.PI));
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
     //  System.out.println(limelightTX());
     // } else if (_rot == 0 && holdRobotAngleEnabled){
