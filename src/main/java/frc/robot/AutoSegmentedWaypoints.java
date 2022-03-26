@@ -42,6 +42,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public PathPlannerTrajectory v2seg3;
     public PathPlannerTrajectory v2seg4;
     public PathPlannerTrajectory ivIntake;
+    @Log
     public double autoDelay;
     
     public boolean StateHasFinished = false;
@@ -169,7 +170,6 @@ public class AutoSegmentedWaypoints implements Loggable {
         //SJV: NEED TO TURN INTAKE OFF WHEN STATE IS FINISHED, NEED TO PROLLY LOWER THE DISTANCE FROM HALF A METER TO LESS (TEST PLEASE)
         Robot.INTAKE.intakeNow = true;
         if (SwerveTrajectory.trajectoryStatus.equals("done")) {
-            Robot.INTAKE.shootNow = false;
             Robot.INTAKE.intakeNow = false;
         } 
             if (chosenWaypoints.length != currentWaypointNumber+1){
@@ -182,26 +182,28 @@ public class AutoSegmentedWaypoints implements Loggable {
     private void shoot() {
             // Robot.SWERVEDRIVE.autoLimeLightAim = true;
             if  (SwerveTrajectory.trajectoryStatus.equals("done")){
-            Robot.INTAKE.shootNow = true;
-            Robot.INTAKE.intakeNow = false;
-            
+                Robot.INTAKE.shootNow = true;
+                Robot.SWERVEDRIVE.autoLimeLightAim = true;
+            } else {
+                autoDelay = Timer.getFPGATimestamp();
+            }
             // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, -0.25);
 
-        } else if  (SwerveTrajectory.trajectoryStatus.equals("done") && !Robot.INTAKE.indexState.equals("1 Ball") && !Robot.INTAKE.indexState.equals("2 Balls") && !Robot.INTAKE.indexState.equals("Cargo in Transit") && !Robot.INTAKE.indexState.equals("Intake Ball")) {
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (autoDelay - Timer.getFPGATimestamp()>0.5)) {
+            Robot.SWERVEDRIVE.autoLimeLightAim = false;
+            Robot.INTAKE.shootNow = false;
             if (chosenWaypoints.length != currentWaypointNumber+1){
-            // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, 0);
-                // Robot.SWERVEDRIVE.autoLimeLightAim = false;
+
                 StateHasFinished = true;
             }
-                Robot.INTAKE.shootNow = false;
         }
     }
 
     private void shootAndIntake() {
-                Robot.INTAKE.intakeNow = true;
+                
         if (SwerveTrajectory.trajectoryStatus.equals("done")) {
                  Robot.INTAKE.shootNow = true;
-                 Robot.SHOOTER.limelightShooting = true;
+                 Robot.SWERVEDRIVE.autoLimeLightAim = true;
             // if(Robot.INTAKE.indexState.equals("2 Balls") || Robot.INTAKE.indexState.equals("1 Ball")){
             //     Robot.INTAKE.intakeNow = false;
             //     Robot.INTAKE.shootNow = true;  
@@ -215,12 +217,13 @@ public class AutoSegmentedWaypoints implements Loggable {
                 // System.out.println(Robot.INTAKE.indexState);
 
         } else {
+            Robot.INTAKE.intakeNow = true;
             autoDelay = Timer.getFPGATimestamp();
         }
 
         if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (autoDelay - Timer.getFPGATimestamp()>0.5)) {
             System.out.println("hi!");
-            Robot.SHOOTER.limelightShooting = false;
+            Robot.SWERVEDRIVE.autoLimeLightAim = false;
             Robot.INTAKE.shootNow = false;
             if (chosenWaypoints.length != currentWaypointNumber+1){
 
