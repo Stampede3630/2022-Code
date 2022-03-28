@@ -34,9 +34,10 @@ public class Robot extends TimedRobot {
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
-  public static AutoWaypoints AUTOWAYPOINTS;
+  // public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
+  public static AutoSegmentedWaypoints AUTOSEGMENTEDWAYPOINTS;
   public static XboxController xbox = new XboxController(0);
 
   /**
@@ -58,11 +59,13 @@ public class Robot extends TimedRobot {
     INTAKE.checkAndSetIntakeCANStatus();
 
     //*** Auto Container method starts here***
-    AUTOWAYPOINTS = AutoWaypoints.getInstance();
+    // AUTOWAYPOINTS = AutoWaypoints.getInstance();
+    AUTOSEGMENTEDWAYPOINTS = AutoSegmentedWaypoints.getInstance();
     // 
     //loads the selected pathplanner path
     SwerveMap.driveRobotInit();
-    AUTOWAYPOINTS.loadAutoPaths();
+    // AUTOWAYPOINTS.loadAutoPaths();
+    AUTOSEGMENTEDWAYPOINTS.loadAutoPaths();
 
 
 
@@ -125,7 +128,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     SWERVEDRIVE.setToBrake();
-    AUTOWAYPOINTS.init();
+    // AUTOWAYPOINTS.init();
+    AUTOSEGMENTEDWAYPOINTS.init();
      
 
     // For Trajectory instructions go to SwerverTrajectory.java
@@ -137,8 +141,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     
-    AUTOWAYPOINTS.autoPeriodic();
-    SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.chosenPath.thisPathPLan,  SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+    // AUTOWAYPOINTS.autoPeriodic();
+    // SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.chosenPath.thisPathPLan,  SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+
+    AUTOSEGMENTEDWAYPOINTS.autoPeriodic();
     
     INTAKE.intakePeriodic();
     SHOOTER.shooterPeriodic();
@@ -152,6 +158,8 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.setToBrake();
     INTAKE.intakeNow = false;
     INTAKE.shootNow = false;
+    SHOOTER.homocideTheBattery = false;
+    SWERVEDRIVE.autoLimeLightAim = false;
     
   }
 

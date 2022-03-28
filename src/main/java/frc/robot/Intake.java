@@ -10,8 +10,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -35,11 +37,15 @@ public class Intake implements Loggable {
   public DigitalInput topLimitSwitch;
   public ColorSensorV3 colorSensor;
   private boolean cargoInTransit = false;
+  @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 3)
   public boolean intakeNow = false;
+  @Log(tabName = "CompetitionLogger", rowIndex = 1, columnIndex = 3)
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
-  public double intakeSpeed = -15000;
+  public double intakeSpeed = -18000;
+  public boolean ballReject = false;
+  public String indexState="";
   
   public final I2C.Port i2cPort = I2C.Port.kMXP;
 
@@ -78,18 +84,22 @@ public class Intake implements Loggable {
     
   }
   public void intakePeriodic(){
+    //
     intake();
     shootIndexManager();
+    indexState = indexManager();
+    // System.out.println(indexState);
+    
   }
 //SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
   private void intake() {
-    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
+    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow || indexState == "Ball Reject") {  // Right trigger held --> intake goes down and spins intake motor
       if (!intakeIsOut) {
         intakeSolenoid.set(Value.kForward);
         intakeIsOut = true;
       }
       
-      intakeDrive.set(ControlMode.Velocity, intakeSpeed); //-15000
+      intakeDrive.set(ControlMode.Velocity, intakeSpeed); //-18000
 
       turnToIntake();
 
@@ -104,7 +114,7 @@ public class Intake implements Loggable {
   }
 
   private void shootIndexManager() {
-    if (Robot.SHOOTER.shooterAtSpeed() && (Robot.xbox.getLeftTriggerAxis() > 0 || shootNow || Robot.xbox.getLeftBumper())) {  // Once shooter gets up to speed AND left trigger held, balls fed to shooter
+    if (Robot.xbox.getLeftBumper() || (Robot.SHOOTER.shooterAtSpeed() && (Robot.xbox.getLeftTriggerAxis() > 0 || shootNow))) {  // Once shooter gets up to speed AND left trigger held, balls fed to shooter
       if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) {
         indexTop.set(ControlMode.PercentOutput, -0.2); // If there's only one ball being shot
       } else {
@@ -117,7 +127,7 @@ public class Intake implements Loggable {
   }
   //SJV: DOES INDEXER NEED TO BE RUN FASTER?
   private void indexerDrive() {
-      switch (indexManager()) {
+      switch (indexState) {
         case "1 Ball": // Hold the ball at the top of tower
           indexBottom.set(ControlMode.PercentOutput, -0.34);
           indexTop.set(ControlMode.PercentOutput, 0);
@@ -130,6 +140,7 @@ public class Intake implements Loggable {
 
         case "Cargo in Transit":  // Bring ball from intake to top of tower
           indexTop.set(ControlMode.PercentOutput, -0.4);
+
           indexBottom.set(ControlMode.PercentOutput, -0.4);
           break;
 
@@ -142,6 +153,10 @@ public class Intake implements Loggable {
           indexBottom.set(ControlMode.PercentOutput, -0.4);
           break;
 
+        case "Ball Reject": //Rejects ball if it's the wrong color
+        indexBottom.set(ControlMode.PercentOutput, 0.8);
+          break;
+
         default:  // Everything stops
           indexBottom.set(ControlMode.PercentOutput, 0);
           indexTop.set(ControlMode.PercentOutput, 0);
@@ -152,6 +167,10 @@ public class Intake implements Loggable {
   private String indexManager() {
     if (Robot.xbox.getBButton()) {
       return "Reverse Intake";
+    } else if(DriverStation.getAlliance() == Alliance.Blue && (colorSensor.getBlue() < colorSensor.getRed()) && colorSensor.getRed() > 1000 && ballReject) {
+      return "Ball Reject";
+    } else if(DriverStation.getAlliance() == Alliance.Red && (colorSensor.getRed() < colorSensor.getBlue()) && colorSensor.getBlue() > 1000 && ballReject) {
+      return "Ball Reject";
     } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { // Both switches pressed
       return "2 Balls";
     } else if (!bottomLimitSwitch.get() || (cargoInTransit && bottomLimitSwitch.get() && topLimitSwitch.get())) { // Bottom switch pressed/cargo in transit
@@ -258,14 +277,19 @@ public class Intake implements Loggable {
     
   // }
   
-  @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
-  public boolean getBottomLimitSwitch() {
-    return bottomLimitSwitch.get();
-  }
+  // @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
+  // public boolean getBottomLimitSwitch() {
+  //   return bottomLimitSwitch.get();
+  // }
   
-  @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
-  public boolean getTopLimitSwitch() {
-    return topLimitSwitch.get();
+  // @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
+  // public boolean getTopLimitSwitch() {
+  //   return topLimitSwitch.get();
+  // }
+
+  @Config(tabName = "CompetitionLogger", defaultValueBoolean = false, rowIndex = 3, columnIndex = 3, height = 1, width = 2)
+  public void setBallReject(boolean _input) {
+    ballReject = _input;
   }
 
   // @Config.NumberSlider(name = "Set Intake Speed", defaultValue = -15000, min = -20000, max = -2000, blockIncrement = 1000, rowIndex = 1, columnIndex = 0, height = 1, width = 3)
