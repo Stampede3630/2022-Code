@@ -258,16 +258,10 @@ public class SwerveDrive implements Loggable {
     m_odometry.resetPosition(_Pose2d, _Rotation2d);
   }
 
-  public void setVelocities() {
-    double _xVelocity = (getXPos() - previousXDistance) / (Timer.getFPGATimestamp() - previousTimestamp);
-    double _yVelocity = (getYPos() - previousYDistance) / (Timer.getFPGATimestamp() - previousTimestamp);
-
-    previousXDistance = getXPos();
-    previousYDistance = getYPos();
-    previousTimestamp = Timer.getFPGATimestamp();
-
-    velocities.set(0, _xVelocity);
-    velocities.set(1, _yVelocity);
+  public void getVelocities() {
+    ChassisSpeeds mySpeeds = m_kinematics.toChassisSpeeds(SwerveMap.FrontLeftSwerveModule.getState(), SwerveMap.FrontRightSwerveModule.getState(), SwerveMap.BackLeftSwerveModule.getState(),SwerveMap.BackRightSwerveModule.getState()) ;
+    velocities.set(0, mySpeeds.vxMetersPerSecond);
+    velocities.set(1, mySpeeds.vyMetersPerSecond);
   }
 
 
