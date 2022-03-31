@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -30,6 +31,9 @@ public class Climber implements Loggable{
     boolean tiltArms = false;
     boolean fullyExtended = false;
     boolean climberSafety = true;
+
+    public double safePitch = 0; // TODO: GET AN ACTUAL MEASUREMENT IN DEGREES FOR THIS
+    public float currentPitch;
     
     final double TICKSPERREVOLUTION=2048;
     final double TICKSATTOP=(283675-1475);
@@ -39,11 +43,9 @@ public class Climber implements Loggable{
     final int HALFEXTEND = 12;
     final int CLICKARMS = 5; // <-- Place holder value, position to move climber arms down (in inches)
 
-
     public DigitalInput climberHomeLeft;
     public DigitalInput climberHomeRight;
     
-
     private static Climber SINGLE_INSTANCE = new Climber();
     public static Climber getInstance() {
         return SINGLE_INSTANCE;
@@ -60,19 +62,21 @@ public class Climber implements Loggable{
         climberTalon.config_kP(0, 1000, 20);
         atOrigin = false;
         upCompleted = false;
+        
 
         // We want the default state to keep climber upright
         climberSolenoid.set(Value.kForward);
     }
 
     public void periodic() {
-        manualClimberSolenoid();
-        manualClimberMotor();
-        if (!atOrigin) {
-          reZero();
-        } else if (Robot.COMPETITIONLOGGER.beginClimb) {
-            climberRunner("");
-        }
+        // currentPitch = SwerveMap.GYRO.getRoll();
+        // manualClimberSolenoid();
+        // manualClimberMotor();
+        // if (!atOrigin) {
+        //   reZero();
+        // } else if (Robot.COMPETITIONLOGGER.beginClimb) {
+        //     climberRunner("");
+        // }
     }
 
     private void manualClimberMotor(){
@@ -88,7 +92,7 @@ public class Climber implements Loggable{
         }
         else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
             climberTalon.set(ControlMode.PercentOutput, -1);
-        } else {
+        } else if(CurrentState.equals("USERINPUT1") || CurrentState.equals("USERINPUT2") || CurrentState.equals("USERINPUT5") || CurrentState.equals("USERINPUT7") || CurrentState.equals("USERINPUT10") || !Robot.COMPETITIONLOGGER.beginClimb) {
             climberTalon.set(ControlMode.PercentOutput, 0);
         }
     }
@@ -109,23 +113,13 @@ public class Climber implements Loggable{
         USERINPUT1(SINGLE_INSTANCE::getUserInput, "LOWERARM1"), 
         LOWERARM1(SINGLE_INSTANCE::lowerArm28, "USERINPUT2"), // Change back to lower28 when done (hasn't been tested yet)
         USERINPUT2(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND1"), 
-        RAISEANDEXTEND1(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT3"), 
-        USERINPUT3(SINGLE_INSTANCE::getAltUserInput, "OPENSOLENOID2"),
-        OPENSOLENOID2(SINGLE_INSTANCE::openSolenoid, "USERINPUT4"),
-        USERINPUT4(SINGLE_INSTANCE::getAltUserInput, "RAISEANDEXTEND2"), 
-        RAISEANDEXTEND2(SINGLE_INSTANCE::lowerArm28, "USERINPUT5"),
-        USERINPUT5(SINGLE_INSTANCE::getUserInput, "USERINPUT6"),
-        USERINPUT6(SINGLE_INSTANCE::getUserInput, "LOWERARM2"),
-        LOWERARM2(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT7"),
+        RAISEANDEXTEND1(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT5"), 
+        USERINPUT5(SINGLE_INSTANCE::getUserInput, "LOWERARM3"),
+        LOWERARM3(SINGLE_INSTANCE::lowerArm28, "USERINPUT7"),
         USERINPUT7(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND3"), 
-        RAISEANDEXTEND3(SINGLE_INSTANCE::openSolenoid, "USERINPUT8"), 
-        USERINPUT8(SINGLE_INSTANCE::getAltUserInput, "OPENSOLENOID3"),
-        OPENSOLENOID3(SINGLE_INSTANCE::lowerArm28, "USERINPUT9"),
-        USERINPUT9(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND4"), 
-        RAISEANDEXTEND4(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT10"),
-        USERINPUT10(SINGLE_INSTANCE::getUserInput, "USERINPUT11"),
-        USERINPUT11(SINGLE_INSTANCE::openSolenoid, "LOWERARM3"),
-        LOWERARM3(SINGLE_INSTANCE::lowerArm28, "DONE"),
+        RAISEANDEXTEND3(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT10"),
+        USERINPUT10(SINGLE_INSTANCE::getUserInput, "LOWERARM4"),
+        LOWERARM4(SINGLE_INSTANCE::lowerArm28, "DONE"),
         DONE(SINGLE_INSTANCE::DoneAction, "DONE");
 
         private Runnable action;
@@ -181,16 +175,22 @@ public class Climber implements Loggable{
     }
 
     public void raiseAndExtend()  {
-        if (climberTalon.getSelectedSensorPosition(0) < 10.0) {
-            climberTalon.set(ControlMode.Position, 12.0);
+        if (climberTalon.getSelectedSensorPosition(0) < 15.0) {
+            climberSolenoid.set(Value.kForward);
+            climberTalon.set(ControlMode.PercentOutput, 1);
             //(ControlMode.Position, DemandType.ArbitraryFeedForward, -.15);
 
-        } else if (climberTalon.getSelectedSensorPosition(0) >= 10.0) {
-            climberSolenoid.set(Value.kReverse);
-            climberTalon.set(ControlMode.Position, 26.0);
+        } else if (climberTalon.getSelectedSensorPosition(0) >= 15.0 && currentPitch < safePitch) {
             if (climberTalon.getSelectedSensorPosition(0) >= 26.0) {
+                climberTalon.set(ControlMode.PercentOutput, 0);
+        
                 StateHasFinished = true;
+            } else {
+                climberSolenoid.set(Value.kReverse);
+                climberTalon.set(ControlMode.PercentOutput, 1);
             }
+        } else {
+            climberTalon.set(ControlMode.PercentOutput, 0);
         }
     }
 
@@ -203,12 +203,13 @@ public class Climber implements Loggable{
     }
 
     public void lowerArm28() {
-        climberTalon.set(ControlMode.Position, 3, DemandType.ArbitraryFeedForward, -.15);
 
         // **** Add fault tolerance for arms ****
-        if (climberHomeLeft.get() || climberHomeRight.get() || climberTalon.getSelectedSensorPosition(0) <=3.5 ) {
+        if (climberHomeLeft.get() || climberHomeRight.get() || climberTalon.getSelectedSensorPosition(0) <= -1) {
             climberTalon.set(ControlMode.PercentOutput, 0);
             StateHasFinished = true;
+        } else {
+            climberTalon.set(ControlMode.PercentOutput, -1);
         }
     }
 

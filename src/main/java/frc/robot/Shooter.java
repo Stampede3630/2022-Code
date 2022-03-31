@@ -40,13 +40,13 @@ public class Shooter implements Loggable {
     public boolean homocideTheBattery;
     public boolean limelightShooting = true;
     public boolean bloopShot = false;
-    public boolean fancyShot = false;
+    public boolean fancyShot = true;
     InterpolatingTreeMap<Double, Double> shootSpeedTable;
     InterpolatingTreeMap<Double, Double> shootAngleTable;
     
     public double fakeDistance;
     
-    // public static SimpleMotorFeedforward shooterMotorFeedforward;
+    public static SimpleMotorFeedforward shooterMotorFeedforward;
     
     public static Shooter getInstance() {
         return SINGLE_INSTANCE;
@@ -57,38 +57,67 @@ public class Shooter implements Loggable {
         shooterDrive.setInverted(TalonFXInvertType.Clockwise);
         shooterDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 1000);
         shooterDrive.setNeutralMode(NeutralMode.Coast);
-        shooterDrive.configVoltageCompSaturation(12.0,100);
+        shooterDrive.configVoltageCompSaturation(12.0, 100);
         //TODO: fix this at 10 v
         shooterDrive.enableVoltageCompensation(true);
         
         limelightShooting = true;
         
         // Don't mess with this value, suck a big one Evan
-        shooterDrive.config_kF(0, (1023 * .8) / 20000, 100);
-        shooterDrive.config_kD(0, 15, 100);
-        shooterDrive.config_kP(0, 0.45, 100);
+        // shooterDrive.config_kF(0, (1023 * .8) / 20000, 100);
+        // shooterDrive.config_kD(0, 15, 100);
+        // shooterDrive.config_kP(0, 0.45, 100);
 
-        shootSpeedTable = new InterpolatingTreeMap<>();
-            shootSpeedTable.put(7.0, 14665.0);
-            shootSpeedTable.put(8.37, 13808.0);
-            shootSpeedTable.put(9.37, 14791.0);
-            shootSpeedTable.put(10.37, 15467.0);
-            shootSpeedTable.put(11.7, 16081.0);
-            shootSpeedTable.put(12.37, 16511.0);
-            shootSpeedTable.put(13.07, 17064.0);
-            shootSpeedTable.put(15.0, 16912.0);
-            shootSpeedTable.put(20.0, 18000.0);
+        shooterDrive.config_kF(0, 0, 100);
+        shooterDrive.config_kD(0, 0, 100);
+        shooterDrive.config_kP(0, 0.015, 100);
 
-        shootAngleTable = new InterpolatingTreeMap<>();
-            shootAngleTable.put(7.0, 4302.0);
-            shootAngleTable.put(8.37, 13542.0);
-            shootAngleTable.put(9.37, 16542.0);
-            shootAngleTable.put(10.37, 19071.0);
-            shootAngleTable.put(11.37, 20819.0);
-            shootAngleTable.put(12.37, 22348.0);
-            shootAngleTable.put(13.07, 24532.0);
-            shootAngleTable.put(15.0, 17424.0);
-            shootAngleTable.put(20.0, 17868.0);
+        // shootSpeedTable = new InterpolatingTreeMap<>();
+        //     shootSpeedTable.put(7.0, 14665.0);
+        //     shootSpeedTable.put(8.37, 13808.0);
+        //     shootSpeedTable.put(9.37, 14791.0);
+        //     shootSpeedTable.put(10.37, 15467.0);
+        //     shootSpeedTable.put(11.7, 16081.0);
+        //     shootSpeedTable.put(12.37, 16511.0);
+        //     shootSpeedTable.put(13.07, 17064.0);
+        //     shootSpeedTable.put(15.0, 16912.0);
+        //     shootSpeedTable.put(20.0, 18000.0);
+
+        // shootAngleTable = new InterpolatingTreeMap<>();
+        //     shootAngleTable.put(7.0, 4302.0);
+        //     shootAngleTable.put(8.37, 13542.0);
+        //     shootAngleTable.put(9.37, 16542.0);
+        //     shootAngleTable.put(10.37, 19071.0);
+        //     shootAngleTable.put(11.37, 20819.0);
+        //     shootAngleTable.put(12.37, 22348.0);
+        //     shootAngleTable.put(13.07, 24532.0);
+        //     shootAngleTable.put(15.0, 17424.0);
+        //     shootAngleTable.put(20.0, 17868.0);
+
+    // New values (3/29/22)
+    shootSpeedTable = new InterpolatingTreeMap<>();
+        shootSpeedTable.put(6.8, 14344.0);
+        shootSpeedTable.put(8.0, 14344.0);
+        shootSpeedTable.put(9.03, 14897.0);
+        shootSpeedTable.put(10.07, 15327.0);
+        shootSpeedTable.put(11.04, 16064.0);
+        shootSpeedTable.put(12.37, 16511.0); // Most recent measurement here: remeasure
+        shootSpeedTable.put(13.03, 16802.0);
+        shootSpeedTable.put(13.98, 17519.0);
+        shootSpeedTable.put(15.04, 18378.0);
+        shootSpeedTable.put(20.0, 18000.0);
+
+    shootAngleTable = new InterpolatingTreeMap<>();
+        shootAngleTable.put(6.8, 10484.0);
+        shootAngleTable.put(8.0, 17037.0);
+        shootAngleTable.put(9.03, 17474.0);
+        shootAngleTable.put(10.07, 19658.0);
+        shootAngleTable.put(11.04, 21952.0);
+        shootAngleTable.put(12.37, 22348.0);// Most recent measurement here: remeasure
+        shootAngleTable.put(13.03, 25501.0);
+        shootSpeedTable.put(13.98, 24812.0);
+        shootAngleTable.put(15.04, 17424.0);
+        shootAngleTable.put(20.0, 17868.0);
 
         hoodMotor = new WPI_TalonFX(49);
         hoodMotor.config_kP(0, 0.07625, 100);
@@ -105,7 +134,7 @@ public class Shooter implements Loggable {
         leftHoodSwitch = new DigitalInput(4);
         rightHoodSwitch = new DigitalInput(5);
         
-        // shooterMotorFeedforward = new SimpleMotorFeedforward(0.89886, 0.00029265, 0.000062406);
+        shooterMotorFeedforward = new SimpleMotorFeedforward(0.74223, 0.11079, 0.0081274);
     }
     @Config
     public void setFakeDistance(double _input){
@@ -126,12 +155,11 @@ public class Shooter implements Loggable {
         //bloop shot
         
         
-        // DemandType.ArbitraryFeedForward, shooterMotorFeedforward.calculate(shooterSpeed) / 12
         if (Robot.xbox.getLeftBumper()){
             shooterDrive.set(ControlMode.PercentOutput, 0.5);
         } else if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0 || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
             // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
-                shooterDrive.set(ControlMode.Velocity, shooterSpeed);
+                shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(shooterSpeed / 2048 * 10) / 12 - 0.03));
             } else {
                 shooterDrive.set(0);
             }
@@ -140,7 +168,7 @@ public class Shooter implements Loggable {
         public boolean shooterAtSpeed() {
             double velocityError = Math.abs(shooterDrive.getSelectedSensorVelocity(0) - shooterSpeed);
             // TODO: IF TOO MUCH VARIATION IN SHOTS, NARROW THESE VALUES SO IT STILL SHOOTS
-            if (shooterSpeed * 0.01 < velocityError && velocityError <= shooterSpeed * 0.07) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
+            if (velocityError <= shooterSpeed * 0.04) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
                 return true;
                 
             } else {
@@ -191,25 +219,24 @@ public class Shooter implements Loggable {
             double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
             double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;   
             //distance = fakeDistance;
-            //System.out.println(distance);
             // shooterSpeed = -2.846x^3 + 116.5x^2 -1196x + 18110, x = distance
             double _methodSpeed = (358.7*distance) + 11760 + shooterSpeedOffset;
-          
+            
             //shooterSpeed = -43.49 * (Math.pow(distance, 3)) + 1382.0 * (Math.pow(distance, 2)) -13801.0 * distance + 58310.0;
             
-                if(fancyShot){
-                    
-                    return shootSpeedTable.get(distance) + shooterSpeedOffset;
-                    
-                } else{
-                    return _methodSpeed;
-                }
+            if(fancyShot){
                 
-            } else if (bloopShot || Robot.xbox.getLeftBumper()){
-                return 7000;
-            } else {
+                return shootSpeedTable.get(distance) + shooterSpeedOffset;
                 
-                return shooterSpeed;
+            } else{
+                return _methodSpeed;
+            }
+            
+        } else if (bloopShot || Robot.xbox.getLeftBumper()){
+            return 7000;
+        } else {
+            System.out.println((((103.0 - 36.614) / Math.tan(Math.toRadians(35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0)))) + 12.4) / 12);
+            return shooterSpeed;
             }
         }
         @Log
@@ -218,42 +245,42 @@ public class Shooter implements Loggable {
         }
         
 
-    public void rotateHood(double angle) {
-        hoodMotor.set(ControlMode.Position, angle);
-    }
-
-    private void rezeroHood() { // check default on hood switches
-        // if (!leftHoodSwitch.get()
-        // ) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
-        //     hoodAtOrigin = true;
-        //     hoodMotor.set(ControlMode.PercentOutput, 0);
+        public void rotateHood(double angle) {
+            hoodMotor.set(ControlMode.Position, angle);
+        }
+        
+        private void rezeroHood() { // check default on hood switches
+            // if (!leftHoodSwitch.get()
+            // ) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
+                //     hoodAtOrigin = true;
+                //     hoodMotor.set(ControlMode.PercentOutput, 0);
         //     hoodMotor.setSelectedSensorPosition(0, 0, 20);
         // } else if (!hoodAtOrigin && !rotComplete) {
-        //     hoodMotor.set(ControlMode.Position, 5000);
+            //     hoodMotor.set(ControlMode.Position, 5000);
         //     if (hoodMotor.getSelectedSensorPosition(0) >= 4500) {
-        //         rotComplete = true;
-        //     }
-        // } else if (!hoodAtOrigin && rotComplete) {
-        //     hoodMotor.set(ControlMode.PercentOutput, -0.1);
+            //         rotComplete = true;
+            //     }
+            // } else if (!hoodAtOrigin && rotComplete) {
+                //     hoodMotor.set(ControlMode.PercentOutput, -0.1);
         // }
-
+        
         if (!leftHoodSwitch.get() || !rightHoodSwitch.get()){     //this code works, but i've left the previous code in jic -e 
-            hoodAtOrigin = true;        //**this is also gross bc nested if statements 
-            hoodMotor.set(ControlMode.PercentOutput, 0);
-            hoodMotor.setSelectedSensorPosition(0, 0, 20);
-        } else if ((leftHoodSwitch.get() || rightHoodSwitch.get()) && !hoodAtOrigin && !rotComplete){
-            hoodMotor.set(ControlMode.Position, 3000);
-                if (hoodMotor.getSelectedSensorPosition(0) >= 2300){
-                    rotComplete = true; 
+        hoodAtOrigin = true;        //**this is also gross bc nested if statements 
+        hoodMotor.set(ControlMode.PercentOutput, 0);
+        hoodMotor.setSelectedSensorPosition(0, 0, 20);
+    } else if ((leftHoodSwitch.get() || rightHoodSwitch.get()) && !hoodAtOrigin && !rotComplete){
+        hoodMotor.set(ControlMode.Position, 3000);
+        if (hoodMotor.getSelectedSensorPosition(0) >= 2300){
+            rotComplete = true; 
                         if (rotComplete){
                             hoodMotor.set(ControlMode.PercentOutput, -0.1);
                         }
+                    }
                 }
-        }
-    }
-
-
-    public void checkAndSetShooterCANStatus() {
+            }
+            
+            
+            public void checkAndSetShooterCANStatus() {
         if(shooterDrive.hasResetOccurred()){
           int mycounter = 0;
           if(shooterDrive.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255,1000) !=ErrorCode.OK) {mycounter++;}
@@ -273,22 +300,22 @@ public class Shooter implements Loggable {
           System.out.println("RESET DETECTED FOR TALONFX " + shooterDrive.getDeviceID() + " Errors: " + mycounter );
         }
     }
-
+    
     @Config.NumberSlider(name = "Set Shooter Angle", defaultValue = 0, min = 0, max = 32000, blockIncrement = 1000, rowIndex = 3, columnIndex = 2, height = 1, width = 2)
     public void setHoodAngle(double targetAngle) {
         hoodAngle = targetAngle;
     }
-
+    
     @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Shooter Angle Offset", defaultValue = 0, min = -5000, max = 5000, blockIncrement = 100, rowIndex = 5, columnIndex = 0, height = 1, width = 2)
     public void setHoodAngleOffset(double targetAngleOffset) {
         hoodAngleOffset = targetAngleOffset;
     }
-
+    
     //SJV: ONCE WE FIGURE OUT OUR SHOOTER ANGLE AND SPEED MAKE BOOLEAN FOR EACH OF THE SHOOTER SPEEDS AND PUT IT ON THE COMPETITION LOGGER
     @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 2, height = 1, width = 2)
     public void setShooterSpeed(double targetVelocity) {
         shooterSpeed = targetVelocity;
-
+        
     }
     
     @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Shooter Speed Offset", defaultValue = 0, min = -5000, max = 5000, rowIndex = 5, columnIndex = 2, blockIncrement = 100, height = 1, width = 2)
@@ -300,7 +327,7 @@ public class Shooter implements Loggable {
     public void killTheBattery(boolean _input) {
         homocideTheBattery = _input;
     }
- 
+    
     // @Log(rowIndex = 1, columnIndex = 0)
     // public boolean getLeftHoodLimit() {
     //     return leftHoodSwitch.get();

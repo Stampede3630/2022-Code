@@ -60,7 +60,7 @@ public class CompetitionLogger implements Loggable {
             }
         }
         
-        @Config (defaultValueBoolean = false)
+        @Config (defaultValueBoolean = true)
         public void setFancyShot(boolean _input){
             Robot.SHOOTER.fancyShot = _input;
         }

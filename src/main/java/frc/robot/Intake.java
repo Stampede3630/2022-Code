@@ -31,10 +31,12 @@ public class Intake implements Loggable {
   public WPI_TalonFX indexTop;
   public DoubleSolenoid intakeSolenoid;
   public DoubleSolenoid limelightSolenoid;
+
   // SWITCHES: GREEN = NOT PRESSED, RED = PRESSED
   // SWITCHES RETURN TRUE WHEN NOT PRESSED, FALSE WHEN PRESSED
   public DigitalInput bottomLimitSwitch;
   public DigitalInput topLimitSwitch;
+
   public ColorSensorV3 colorSensor;
   private boolean cargoInTransit = false;
   @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 3)
@@ -80,11 +82,8 @@ public class Intake implements Loggable {
         intakeDrive.config_kP(0,
                 0.055, 20);
 
-
-    
   }
   public void intakePeriodic(){
-    //
     intake();
     shootIndexManager();
     indexState = indexManager();
@@ -93,15 +92,20 @@ public class Intake implements Loggable {
   }
 //SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
   private void intake() {
-    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow || indexState == "Ball Reject") {  // Right trigger held --> intake goes down and spins intake motor
+    if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       if (!intakeIsOut) {
         intakeSolenoid.set(Value.kForward);
         intakeIsOut = true;
       }
-      
-      intakeDrive.set(ControlMode.Velocity, intakeSpeed); //-18000
 
-      turnToIntake();
+      // If we are in "Reject Ball" state, reverse intake
+      if (indexState.equals("Ball Reject")) {
+        intakeDrive.set(ControlMode.Velocity, -intakeSpeed);
+        turnToIntake();
+      } else {
+        intakeDrive.set(ControlMode.Velocity, intakeSpeed); //-18000
+        turnToIntake();
+      }
 
     } else {
       if (intakeIsOut) {
@@ -145,7 +149,7 @@ public class Intake implements Loggable {
           break;
 
         case "Reverse Intake":  // Both intakes go backwards
-          indexTop.set(ControlMode.PercentOutput, 0.8);
+          indexTop.set(ControlMode.PercentOutput, 0.7);
           indexBottom.set(ControlMode.PercentOutput, 0.8);
           break;
 
@@ -153,8 +157,8 @@ public class Intake implements Loggable {
           indexBottom.set(ControlMode.PercentOutput, -0.4);
           break;
 
-        case "Ball Reject": //Rejects ball if it's the wrong color
-        indexBottom.set(ControlMode.PercentOutput, 0.8);
+        case "Ball Reject": // Rejects ball if it's the wrong color
+          indexBottom.set(ControlMode.PercentOutput, 0.8);
           break;
 
         default:  // Everything stops
@@ -167,20 +171,29 @@ public class Intake implements Loggable {
   private String indexManager() {
     if (Robot.xbox.getBButton()) {
       return "Reverse Intake";
-    } else if(DriverStation.getAlliance() == Alliance.Blue && (colorSensor.getBlue() < colorSensor.getRed()) && colorSensor.getRed() > 1000 && ballReject) {
+
+    } else if(DriverStation.getAlliance() == Alliance.Blue && 
+    (colorSensor.getBlue() < colorSensor.getRed()) && colorSensor.getRed() > 1000 && ballReject) {
       return "Ball Reject";
-    } else if(DriverStation.getAlliance() == Alliance.Red && (colorSensor.getRed() < colorSensor.getBlue()) && colorSensor.getBlue() > 1000 && ballReject) {
+
+    } else if(DriverStation.getAlliance() == Alliance.Red && 
+    (colorSensor.getRed() < colorSensor.getBlue()) && colorSensor.getBlue() > 1000 && ballReject) {
       return "Ball Reject";
+
     } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { // Both switches pressed
       return "2 Balls";
+
     } else if (!bottomLimitSwitch.get() || (cargoInTransit && bottomLimitSwitch.get() && topLimitSwitch.get())) { // Bottom switch pressed/cargo in transit
       cargoInTransit = true;
       return "Cargo in Transit";
+
     } else if (!topLimitSwitch.get()) { //top switch pressed
       cargoInTransit = false;
       return "1 Ball";
+
     } else if (bottomLimitSwitch.get() && (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow )) { // Right trigger held AND nothing pressing the bottom switch
       return "Intake Ball";
+
     } else {
       return "default";
     }
@@ -259,23 +272,23 @@ public class Intake implements Loggable {
   //I think that matters... not SURE THOWRONG WRONG WATCH OBLOG WANTS DOUBLES i THINK
 
   
-  // @Log
-  // public double getRedColor() {
-  //   return (double) colorSensor.getRed();
+  @Log
+  public double getRedColor() {
+    return (double) colorSensor.getRed();
     
-  // }
+  }
 
-  // @Log
-  // public double getBlueColor() {
-  //   return (double) colorSensor.getBlue();
+  @Log
+  public double getBlueColor() {
+    return (double) colorSensor.getBlue();
     
-  // }
+  }
 
-  // @Log
-  // public double getGreenColor() {
-  //   return (double) colorSensor.getGreen();
+  @Log
+  public double getGreenColor() {
+    return (double) colorSensor.getGreen();
     
-  // }
+  }
   
   // @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
   // public boolean getBottomLimitSwitch() {

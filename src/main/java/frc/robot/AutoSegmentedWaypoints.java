@@ -88,10 +88,10 @@ public class AutoSegmentedWaypoints implements Loggable {
     public void loadAutoPaths(){
 
         twoBall = PathPlanner.loadPath("TwoBallHigh", 1.5, 1.0);
-        seg1 = PathPlanner.loadPath("VbhSegOne", 1.5, 1.0);
-        seg2 = PathPlanner.loadPath("VbhSegTwo", 2.0, 2.0);
-        seg3 = PathPlanner.loadPath("VbhSegThree", 2.0, 2.0);
-        seg4 = PathPlanner.loadPath("VbhSegFour", 2.0, 2.0);
+        seg1 = PathPlanner.loadPath("VbhSegOne", 1.5, 2.0);
+        seg2 = PathPlanner.loadPath("VbhSegTwo", 2.5, 2.0);
+        seg3 = PathPlanner.loadPath("VbhSegThree", 3.0, 2.0);
+        seg4 = PathPlanner.loadPath("VbhSegFour", 2.5, 2.0);
         v2seg1 = PathPlanner.loadPath("Vbh2SegOne", 3.5, 3.0);
         v2seg2 = PathPlanner.loadPath("Vbh2SegTwo", 3.5, 3.0);
         v2seg3 = PathPlanner.loadPath("Vbh2SegThree", 3.5, 3.0);
@@ -101,8 +101,7 @@ public class AutoSegmentedWaypoints implements Loggable {
         HighFiveBallSegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.65, 0.62, seg1),
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.35, 2.04, seg2),
-            new Waypoint(SINGLE_INSTANCE::intakeBall, 0.74, 1.02, seg3),
-            new Waypoint(SINGLE_INSTANCE::shoot, 6.39, 0.95, seg4)
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 0.74, 1.02, seg3)
         };
         HighTwoBallAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.18, 6.06, twoBall)
@@ -189,7 +188,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             }
             // Robot.INTAKE.indexBottom.set(ControlMode.PercentOutput, -0.25);
 
-        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (autoDelay - Timer.getFPGATimestamp()>0.5)) {
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
             Robot.SWERVEDRIVE.autoLimeLightAim = false;
             Robot.INTAKE.shootNow = false;
             if (chosenWaypoints.length != currentWaypointNumber+1){
@@ -221,7 +220,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             autoDelay = Timer.getFPGATimestamp();
         }
 
-        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (autoDelay - Timer.getFPGATimestamp()>0.5)) {
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
             System.out.println("hi!");
             Robot.SWERVEDRIVE.autoLimeLightAim = false;
             Robot.INTAKE.shootNow = false;
