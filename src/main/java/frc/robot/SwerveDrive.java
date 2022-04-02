@@ -73,7 +73,7 @@ public class SwerveDrive implements Loggable {
       getSDRotation(), 
       getSDFieldRelative());
       field.setRobotPose(m_odometry.getPoseMeters());
-    setVelocities();
+    //getVelocities();
   }
   /**
   * Method to drive the robot using the following params

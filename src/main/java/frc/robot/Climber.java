@@ -69,14 +69,17 @@ public class Climber implements Loggable{
     }
 
     public void periodic() {
-        // currentPitch = SwerveMap.GYRO.getRoll();
-        // manualClimberSolenoid();
-        // manualClimberMotor();
-        // if (!atOrigin) {
-        //   reZero();
-        // } else if (Robot.COMPETITIONLOGGER.beginClimb) {
-        //     climberRunner("");
-        // }
+        currentPitch = SwerveMap.GYRO.getRoll();
+        manualClimberSolenoid();
+        manualClimberMotor();
+        if (!atOrigin) {
+          reZero();
+        } else if (Robot.COMPETITIONLOGGER.beginClimb) {
+            climberRunner("");
+        } else {
+            manualClimberSolenoid();
+            manualClimberMotor();
+        }
     }
 
     private void manualClimberMotor(){
@@ -92,7 +95,7 @@ public class Climber implements Loggable{
         }
         else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
             climberTalon.set(ControlMode.PercentOutput, -1);
-        } else if(CurrentState.equals("USERINPUT1") || CurrentState.equals("USERINPUT2") || CurrentState.equals("USERINPUT5") || CurrentState.equals("USERINPUT7") || CurrentState.equals("USERINPUT10") || !Robot.COMPETITIONLOGGER.beginClimb) {
+        } else {
             climberTalon.set(ControlMode.PercentOutput, 0);
         }
     }
@@ -176,7 +179,7 @@ public class Climber implements Loggable{
 
     public void raiseAndExtend()  {
         if (climberTalon.getSelectedSensorPosition(0) < 15.0) {
-            climberSolenoid.set(Value.kForward);
+            climberSolenoid.set(Value.kReverse);
             climberTalon.set(ControlMode.PercentOutput, 1);
             //(ControlMode.Position, DemandType.ArbitraryFeedForward, -.15);
 
@@ -186,7 +189,7 @@ public class Climber implements Loggable{
         
                 StateHasFinished = true;
             } else {
-                climberSolenoid.set(Value.kReverse);
+                climberSolenoid.set(Value.kForward);
                 climberTalon.set(ControlMode.PercentOutput, 1);
             }
         } else {

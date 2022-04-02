@@ -11,6 +11,8 @@ public class Constants {
     public static final double VERTICAL_FOV = 0;
 
     //SWERVE MODULE CHARACTERISTICS
+    // OG WHEEL_RADIUS_METERS = 0.10033/2
+    // NEW WHEEL_RADIUS_METERS = 0.13000/2
     public static final double WHEEL_RADIUS_METERS = .10033/2;
     public static final double WHEEL_BASE_METERS = 24.125 * 2.54/100; //18 inch wheel base to meters track width is 24in and wheel base is 22.5 in
     public static final double MAX_SPEED_TICKSper100MS = 21900;
