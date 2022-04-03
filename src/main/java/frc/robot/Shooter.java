@@ -96,11 +96,11 @@ public class Shooter implements Loggable {
         shootSpeedTable.put(9.03, 14897.0);
         shootSpeedTable.put(10.07, 15327.0);
         shootSpeedTable.put(11.04, 16064.0);
-        shootSpeedTable.put(12.37, 16511.0); // Most recent measurement here: remeasure
+        shootSpeedTable.put(12.37, 16511.0); 
         shootSpeedTable.put(13.03, 16802.0);
         shootSpeedTable.put(13.98, 17519.0);
         shootSpeedTable.put(15.04, 18378.0);
-        shootSpeedTable.put(20.0, 18000.0);
+        shootSpeedTable.put(20.0, 18000.0);//TODO: test this shot again
 
     shootAngleTable = new InterpolatingTreeMap<>();
         shootAngleTable.put(6.8, 10484.0);
@@ -108,11 +108,11 @@ public class Shooter implements Loggable {
         shootAngleTable.put(9.03, 17474.0);
         shootAngleTable.put(10.07, 19658.0);
         shootAngleTable.put(11.04, 21952.0);
-        shootAngleTable.put(12.37, 22348.0);// Most recent measurement here: remeasure
+        shootAngleTable.put(12.37, 22348.0);
         shootAngleTable.put(13.03, 25501.0);
         shootSpeedTable.put(13.98, 24812.0);
         shootAngleTable.put(15.04, 17424.0);
-        shootAngleTable.put(20.0, 17868.0);
+        shootAngleTable.put(20.0, 17868.0);//TODO: test this shot again
 
         hoodMotor = new WPI_TalonFX(49);
         hoodMotor.config_kP(0, 0.07625, 100);

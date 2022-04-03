@@ -30,7 +30,7 @@ public class Climber implements Loggable{
     boolean fullyExtended = false;
     boolean climberSafety = true;
 
-    public double safePitch = 0; // TODO: GET AN ACTUAL MEASUREMENT IN DEGREES FOR THIS
+    public double safePitch = 0; // TODO: 0 is a good starting point... check for pitch velocity
     public float currentPitch;
     
     final double TICKSPERREVOLUTION=2048;
