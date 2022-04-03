@@ -175,7 +175,7 @@ public class SwerveMap {
             }
 
             mSteeringMotor.setInverted(TalonFXInvertType.Clockwise);
-            mSteeringMotor.configSelectedFeedbackCoefficient(1/Constants.TICKSperTALONFX_DEGREE,0,Constants.kDefaultTimeout);
+            mSteeringMotor.configSelectedFeedbackCoefficient(1/Constants.TICKSperTALONFX_STEERING_DEGREE,0,Constants.kDefaultTimeout);
             mSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor,0,Constants.kDefaultTimeout);
         }
 

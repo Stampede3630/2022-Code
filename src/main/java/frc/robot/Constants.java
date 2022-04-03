@@ -25,7 +25,7 @@ public class Constants {
     //SWERVE Drive Default Values
     public static final double ROBOTHoldAngleKP = 10; //Start at .7 and see where you go from there
     public static final boolean DEFAULT_HOLD_ROBOT_ANGLE = false;
-	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = false;
+	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = true;
 	public static final double DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT = 0; 
 
     //Swerve Drive Motor IDs
@@ -91,15 +91,13 @@ public class Constants {
     
     //Constants for conversion maths (RARELY THESE SHOULD BE CHANGED)
     public static final double SECONDSper100MS = .1;
-    public static final double STEERING_SENSOR_TICKSperROTATION = 4096;
-    public static final double STEERING_SENSOR_DEGREESperTICKS = 360/STEERING_SENSOR_TICKSperROTATION;
     public static final double TICKSperTALONFX_Rotation = 2048;
     public static final double DRIVE_MOTOR_TICKSperREVOLUTION = DRIVE_MOTOR_GEARING*TICKSperTALONFX_Rotation;
     public static final double METERSperWHEEL_REVOLUTION = 2*Math.PI*WHEEL_RADIUS_METERS;
     public static final double METERSperROBOT_REVOLUTION =  2*Math.PI*pythagoreanTheorem(TRACK_WIDE, WHEEL_BASE_METERS);
     public static final double MAX_SPEED_METERSperSECOND = MAX_SPEED_TICKSper100MS/SECONDSper100MS/DRIVE_MOTOR_TICKSperREVOLUTION*METERSperWHEEL_REVOLUTION;
     public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/METERSperROBOT_REVOLUTION*(2*Math.PI);
-    public static final double TICKSperTALONFX_DEGREE = TICKSperTALONFX_Rotation*STEERING_MOTOR_GEARING/360;
+    public static final double TICKSperTALONFX_STEERING_DEGREE = TICKSperTALONFX_Rotation*STEERING_MOTOR_GEARING/360;
 
     public static class Gains {
         public final double kP;
@@ -132,7 +130,7 @@ public class Constants {
     }
 
     private static double pythagoreanTheorem(double side1, double side2) {
-        double radius = Math.sqrt(Math.pow(side1, 2) + Math.pow(side2, 2));
+        double radius = Math.sqrt(Math.pow(side1, 2.0) + Math.pow(side2, 2.0));
         return radius;
     }
 
