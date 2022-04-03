@@ -5,11 +5,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 public class Constants {
     public static final double XBOXDEADBAND = .1;
     
-    // LIMELIGHT CONSTANTS
-    // TODO: find and set them
-    public static final double HORIZONTAL_FOV = 0;
-    public static final double VERTICAL_FOV = 0;
-
     //SWERVE MODULE CHARACTERISTICS
     // OG WHEEL_RADIUS_METERS = 0.10033/2
     // NEW WHEEL_RADIUS_METERS = 0.13000/2
@@ -86,9 +81,7 @@ public class Constants {
     public static final int kDefaultTimeout = 30;//milliseconds
     public static final int kDefaultClosedLoopError = 1; //degrees 
 
-    // Field piece constants TODO: actually set them
-    public static final double UPPER_GOAL_HEIGHT = 103;
-    
+ 
     //Constants for conversion maths (RARELY THESE SHOULD BE CHANGED)
     public static final double SECONDSper100MS = .1;
     public static final double TICKSperTALONFX_Rotation = 2048;
