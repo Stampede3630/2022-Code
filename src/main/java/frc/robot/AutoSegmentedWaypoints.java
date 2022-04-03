@@ -1,6 +1,4 @@
 package frc.robot;
-import java.nio.file.Path;
-
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
@@ -75,8 +73,6 @@ public class AutoSegmentedWaypoints implements Loggable {
     
     public void autoPeriodic() {
         //System.out.println(currentWaypointNumber);
-        currentX = Robot.SWERVEDRIVE.getXPos();
-        currentY = Robot.SWERVEDRIVE.getYPos();
         waypointRunner(chosenWaypoints);
     }
     
