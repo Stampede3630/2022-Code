@@ -1,14 +1,12 @@
 package frc.robot;
 import java.nio.file.Path;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.AutoSegmentedWaypoints.Waypoint;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -28,8 +26,6 @@ public class AutoSegmentedWaypoints implements Loggable {
     public Waypoint[] chosenWaypoints;
     @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 4)
     public int currentWaypointNumber = 0;
-    private double currentX;
-    private double currentY;
     public AutoPose chosenPath;
     public AutoPose[] myAutoContainer;
     public PathPlannerTrajectory seg1;

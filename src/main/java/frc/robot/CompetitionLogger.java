@@ -1,17 +1,14 @@
 package frc.robot;
 
-import javax.print.attribute.standard.Compression;
-
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
-import io.github.oblarg.oblog.annotations.Log.BooleanBox;
+
 
 public class CompetitionLogger implements Loggable {
     private static CompetitionLogger SINGLE_INSTANCE = new CompetitionLogger();
