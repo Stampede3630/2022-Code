@@ -20,6 +20,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public Waypoint[] HighFiveBallSeg2AutoWPs;
     public Waypoint[] HighFourBallSegAutoWPs;
     public Waypoint[] HighFourBallV2SegAutoWPs;
+    public Waypoint[] HighTwoBallV2AutoWPs;
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
@@ -39,6 +40,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public PathPlannerTrajectory ivIntake;
     public PathPlannerTrajectory ivV2Seg1;
     public PathPlannerTrajectory ivV2Seg2;
+    public PathPlannerTrajectory twoBallv2;
     @Log
     public double autoDelay;
     
@@ -94,6 +96,7 @@ public class AutoSegmentedWaypoints implements Loggable {
         ivIntake = PathPlanner.loadPath("IVBallFrickyIntakey", 3.5, 3.0);
         ivV2Seg1 = PathPlanner.loadPath("IVbh2SegOne", 2.0, 1.0);
         ivV2Seg2 = PathPlanner.loadPath("IVbh2SegTwo", 3.0, 2.0);
+        twoBallv2 = PathPlanner.loadPath("TwoBallV2High", 1.5, 1.0);
 
         HighFiveBallSegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.65, 0.62, seg1),
@@ -118,6 +121,9 @@ public class AutoSegmentedWaypoints implements Loggable {
         HighFourBallV2SegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.34, 2.04, ivV2Seg1),
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 1.37, 1.22, ivV2Seg2)
+        };
+        HighTwoBallV2AutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.36, 2.03, twoBallv2)
         };
 
 
@@ -158,7 +164,9 @@ public class AutoSegmentedWaypoints implements Loggable {
         myAutoContainer = new AutoPose[] {
             new AutoPose("HighTwoBallAutoWPs", 6.09, 5.19, 43.78, HighTwoBallAutoWPs),
             new AutoPose("HighFiveBallSegAutoWPs", 7.57, 1.84, -91.17, HighFiveBallSegAutoWPs),
-            new AutoPose("HighFourBallSegAutoWPs", 7.57, 1.84, -91.17, HighFourBallSegAutoWPs)
+            new AutoPose("HighFourBallSegAutoWPs", 7.57, 1.84, -91.17, HighFourBallSegAutoWPs),
+            new AutoPose("HighFourBallV2SegAutoWPs", 6.57, 2.59, 149.04, HighFourBallV2SegAutoWPs),
+            new AutoPose("HighTwoBallV2AutoWPs", 6.57, 2.57, 149.53, HighTwoBallV2AutoWPs)
         };
         for (AutoPose myAutoPose : myAutoContainer ){
             m_autoChooser.addOption(myAutoPose.name, myAutoPose);
