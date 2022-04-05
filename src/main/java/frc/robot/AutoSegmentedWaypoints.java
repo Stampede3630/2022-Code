@@ -19,6 +19,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public Waypoint[] HighFiveBallSegAutoWPs;
     public Waypoint[] HighFiveBallSeg2AutoWPs;
     public Waypoint[] HighFourBallSegAutoWPs;
+    public Waypoint[] HighFourBallV2SegAutoWPs;
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
@@ -36,6 +37,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     public PathPlannerTrajectory v2seg3;
     public PathPlannerTrajectory v2seg4;
     public PathPlannerTrajectory ivIntake;
+    public PathPlannerTrajectory ivV2Seg1;
+    public PathPlannerTrajectory ivV2Seg2;
     @Log
     public double autoDelay;
     
@@ -89,6 +92,8 @@ public class AutoSegmentedWaypoints implements Loggable {
         v2seg3 = PathPlanner.loadPath("Vbh2SegThree", 3.5, 3.0);
         v2seg4 = PathPlanner.loadPath("Vbh2SegFour", 3.5, 3.0);
         ivIntake = PathPlanner.loadPath("IVBallFrickyIntakey", 3.5, 3.0);
+        ivV2Seg1 = PathPlanner.loadPath("IVbh2SegOne", 2.0, 1.0);
+        ivV2Seg2 = PathPlanner.loadPath("IVbh2SegTwo", 3.0, 2.0);
 
         HighFiveBallSegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.65, 0.62, seg1),
@@ -109,6 +114,10 @@ public class AutoSegmentedWaypoints implements Loggable {
             new Waypoint(SINGLE_INSTANCE::intakeBall, 1.46, 1.23, ivIntake),
             new Waypoint(SINGLE_INSTANCE::shoot, 6.39, 0.95, seg4)
 
+        };
+        HighFourBallV2SegAutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.34, 2.04, ivV2Seg1),
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 1.37, 1.22, ivV2Seg2)
         };
 
 
