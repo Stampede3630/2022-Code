@@ -212,7 +212,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             autoDelay = Timer.getFPGATimestamp();
         }
 
-        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Robot.INTAKE.colorSensor.getBlue()<500 && Robot.INTAKE.colorSensor.getRed()<1000) && (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
             System.out.println("hi!");
             Robot.SWERVEDRIVE.autoLimeLightAim = false;
             Robot.INTAKE.shootNow = false;

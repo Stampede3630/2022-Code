@@ -97,10 +97,11 @@ public class Shooter implements Loggable {
         shootSpeedTable.put(10.07, 15327.0);
         shootSpeedTable.put(11.04, 16064.0);
         shootSpeedTable.put(12.37, 16511.0); 
-        shootSpeedTable.put(13.03, 16802.0);
-        shootSpeedTable.put(13.98, 17519.0);
-        shootSpeedTable.put(15.04, 18378.0);
-        shootSpeedTable.put(20.0, 18000.0);//TODO: test this shot again
+        shootSpeedTable.put(13.13, 17631.0);
+        shootSpeedTable.put(14.08, 17849.0);
+        shootSpeedTable.put(15.16, 18590.0);
+        shootSpeedTable.put(16.07, 19000.0);
+        shootSpeedTable.put(17.03, 20000.0);//TODO: test this shot again
 
     shootAngleTable = new InterpolatingTreeMap<>();
         shootAngleTable.put(6.8, 10484.0);
@@ -109,10 +110,11 @@ public class Shooter implements Loggable {
         shootAngleTable.put(10.07, 19658.0);
         shootAngleTable.put(11.04, 21952.0);
         shootAngleTable.put(12.37, 22348.0);
-        shootAngleTable.put(13.03, 25501.0);
-        shootSpeedTable.put(13.98, 24812.0);
-        shootAngleTable.put(15.04, 17424.0);
-        shootAngleTable.put(20.0, 17868.0);//TODO: test this shot again
+        shootAngleTable.put(13.13, 25481.0);
+        shootSpeedTable.put(14.08, 27481.0);
+        shootAngleTable.put(15.16, 29481.0);
+        shootSpeedTable.put(16.07, 30000.0);
+        shootAngleTable.put(17.23, 32000.0);//TODO: test this shot again
 
         hoodMotor = new WPI_TalonFX(49);
         hoodMotor.config_kP(0, 0.07625, 100);
@@ -154,7 +156,7 @@ public class Shooter implements Loggable {
             shooterDrive.set(ControlMode.PercentOutput, 0.5);
         } else if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0 || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
             // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
-                shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(shooterSpeed / 2048 * 10) / 12 - 0.03));
+                shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(shooterSpeed / 2048.0 * 10.0) / 12.0 - 0.03));
             } else {
                 shooterDrive.set(0);
             }
@@ -180,7 +182,7 @@ public class Shooter implements Loggable {
                 double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
                 double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
                 //distance = fakeDistance;//sjv
-                // System.out.println(distance); 
+                System.out.println(distance); 
                 if(fancyShot){
                     
                     angle =  shootAngleTable.get(distance);

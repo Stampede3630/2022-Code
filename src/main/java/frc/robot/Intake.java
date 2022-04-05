@@ -119,7 +119,7 @@ public class Intake implements Loggable {
 
   private void shootIndexManager() {
     if (Robot.xbox.getLeftBumper() || (Robot.SHOOTER.shooterAtSpeed() && (Robot.xbox.getLeftTriggerAxis() > 0 || shootNow))) {  // Once shooter gets up to speed AND left trigger held, balls fed to shooter
-      if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) {
+      if (!bottomLimitSwitch.get() && !topLimitSwitch.get() && (colorSensor.getRed()>1000 && colorSensor.getBlue()>500)) {
         indexTop.set(ControlMode.PercentOutput, -0.2); // If there's only one ball being shot
       } else {
         indexTop.set(ControlMode.PercentOutput, -0.2); // If two balls are being shot
@@ -290,10 +290,10 @@ public class Intake implements Loggable {
     
   }
   
-  // @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
-  // public boolean getBottomLimitSwitch() {
-  //   return bottomLimitSwitch.get();
-  // }
+  @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
+  public boolean getBottomLimitSwitch() {
+    return bottomLimitSwitch.get();
+  }
   
   // @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
   // public boolean getTopLimitSwitch() {

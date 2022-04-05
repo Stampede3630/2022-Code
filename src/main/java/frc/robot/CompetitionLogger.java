@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -52,9 +53,9 @@ public class CompetitionLogger implements Loggable {
 
         @Config
         private void beginClimbing(boolean _input){
-            if(_input){
-                beginClimb = true;
-            }
+            
+                beginClimb = _input;
+            
         }
         
         @Config (defaultValueBoolean = true)
@@ -77,10 +78,15 @@ public class CompetitionLogger implements Loggable {
         }
     }
     
-    // @Log
-    // public float getPitch(){
-    //     return SwerveMap.GYRO.getPitch();
-    // }
+    @Log
+    public float getPitch(){
+        return SwerveMap.GYRO.getPitch();
+    }
+
+    @Log 
+    public float getPitchV() {
+        return SwerveMap.GYRO.getVelocityY();
+    }
     
     // @Log
     // public float navXData() {
@@ -106,6 +112,11 @@ public class CompetitionLogger implements Loggable {
     public double getMatchTimer() {
         return Timer.getMatchTime();
     }
+
+    // @Log.BooleanBox
+    // public boolean getBottomLimit() {
+    //     return Robot.INTAKE.bottomLimitSwitch.get();
+    // }
 
     // @Log
     // public double leftJoystickValues() {

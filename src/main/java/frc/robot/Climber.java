@@ -28,11 +28,11 @@ public class Climber implements Loggable{
     boolean upCompleted;
     boolean tiltArms = false;
     boolean fullyExtended = false;
-    boolean climberSafety = true;
+    // boolean climberSafety = true;
 
-    public double safePitch = 0; // TODO: 0 is a good starting point... check for pitch velocity
+    public double safePitch = 2; // TODO: 0 is a good starting point... check for pitch velocity
     public float currentPitch;
-    
+    public float currentPitchSpeed;
     final double TICKSPERREVOLUTION=2048;
     final double TICKSATTOP=(283675-1475);
     final double INCHESATTOP=27;
@@ -68,8 +68,7 @@ public class Climber implements Loggable{
 
     public void periodic() {
         currentPitch = SwerveMap.GYRO.getRoll();
-        manualClimberSolenoid();
-        manualClimberMotor();
+        currentPitchSpeed = SwerveMap.GYRO.getVelocityY();
         if (!atOrigin) {
           reZero();
         } else if (Robot.COMPETITIONLOGGER.beginClimb) {
@@ -77,18 +76,19 @@ public class Climber implements Loggable{
         } else {
             manualClimberSolenoid();
             manualClimberMotor();
+            
         }
     }
 
     private void manualClimberMotor(){
         
-        if (climberTalon.getSelectedSensorPosition(0) >= 28 && climberSafety) {
+        if (climberTalon.getSelectedSensorPosition(0) >= 28) {
             fullyExtended = true;
         } else {
             fullyExtended = false;
         }
 
-        if (Robot.xbox.getPOV() == 0 && !fullyExtended && climberSafety){
+        if (Robot.xbox.getPOV() == 0 && !fullyExtended){
             climberTalon.set(ControlMode.PercentOutput, 1); 
         }
         else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
@@ -182,7 +182,7 @@ public class Climber implements Loggable{
             //(ControlMode.Position, DemandType.ArbitraryFeedForward, -.15);
 
         } else if (climberTalon.getSelectedSensorPosition(0) >= 15.0 && currentPitch < safePitch) {
-            if (climberTalon.getSelectedSensorPosition(0) >= 26.0) {
+            if (climberTalon.getSelectedSensorPosition(0) >= 28.0) {
                 climberTalon.set(ControlMode.PercentOutput, 0);
         
                 StateHasFinished = true;
