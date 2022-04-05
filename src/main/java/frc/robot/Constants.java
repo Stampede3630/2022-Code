@@ -5,6 +5,29 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 public class Constants {
     public static final double XBOXDEADBAND = .1;
     
+    // Index and Intake IDs
+    public static final int IndexBottomMotorID = 6;
+    public static final int IndexTopMotorID = 9;
+    public static final int IntakeMotorID = 7;
+    public static final int IntakeSolenoidForwardID = 4;
+    public static final int IntakeSolenoidReverseID = 5;
+    public static final int BottomIntakeSwitchID = 0;
+    public static final int TopIntakeSwitchID = 1;
+
+    // Shooter IDs
+    public static final int ShooterMotorID = 10;
+    public static final int HoodMotorID = 49; // <--- Evan's fault for this weird number
+    public static final int LeftHoodSwitchID = 4;
+    public static final int RightHoodSwitchID = 5;
+
+    // Climber IDs
+    public static final int ClimberMotorId = 8;
+    public static final int ClimberSolenoidForwardID = 2;
+    public static final int ClimberSolenoidReverseID = 3;
+    public static final int LeftClimberSwitchID = 2;
+    public static final int RightClimberSwitchID = 3;
+
+
     //SWERVE MODULE CHARACTERISTICS
     // OG WHEEL_RADIUS_METERS = 0.10033/2
     // NEW WHEEL_RADIUS_METERS = 0.13000/2
@@ -15,7 +38,6 @@ public class Constants {
     public static final double DRIVE_MOTOR_GEARING = 57.0/7.0; // 1/(14/50*25/19*15/45)
     public static final double SPEED_GOVERNOR = 1; //.11 is a good safe start. Unlock it to "1" when you're confident with the robot
     public static final double TRACK_WIDE = 24.685 * 2.54/100;
-    
     
     //SWERVE Drive Default Values
     public static final double ROBOTHoldAngleKP = 10; //Start at .7 and see where you go from there
@@ -74,7 +96,7 @@ public class Constants {
     public static final double kS = 0.4148;
     public static final double kV = 2.55;
     public static final double kA = 3.4537;
-    public static final double kP = 4.4561;//previous value (for testing): 6.09 -e
+    public static final double kP = 11.469;//previous value (for testing): 4.4561 -e
 
     //CTRE CAN-based constants (shouldn't need to change these)
     public static final int kDefaultPIDSlotID = 0;

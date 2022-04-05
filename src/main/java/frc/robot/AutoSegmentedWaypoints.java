@@ -21,6 +21,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public Waypoint[] HighFourBallSegAutoWPs;
     public Waypoint[] HighFourBallV2SegAutoWPs;
     public Waypoint[] HighTwoBallV2AutoWPs;
+    public Waypoint[] HighTwoBallV3AutoWPs;
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
@@ -120,10 +121,13 @@ public class AutoSegmentedWaypoints implements Loggable {
         };
         HighFourBallV2SegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.34, 2.04, ivV2Seg1),
-            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 1.37, 1.22, ivV2Seg2)
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.28, 1.55, ivV2Seg2)
         };
         HighTwoBallV2AutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.36, 2.03, twoBallv2)
+        };
+        HighTwoBallV3AutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.65, 0.62, seg1)
         };
 
 
@@ -165,8 +169,9 @@ public class AutoSegmentedWaypoints implements Loggable {
             new AutoPose("HighTwoBallAutoWPs", 6.09, 5.19, 43.78, HighTwoBallAutoWPs),
             new AutoPose("HighFiveBallSegAutoWPs", 7.57, 1.84, -91.17, HighFiveBallSegAutoWPs),
             new AutoPose("HighFourBallSegAutoWPs", 7.57, 1.84, -91.17, HighFourBallSegAutoWPs),
-            new AutoPose("HighFourBallV2SegAutoWPs", 6.57, 2.59, 149.04, HighFourBallV2SegAutoWPs),
-            new AutoPose("HighTwoBallV2AutoWPs", 6.57, 2.57, 149.53, HighTwoBallV2AutoWPs)
+            new AutoPose("HighFourBallV2SegAutoWPs", 6.57, 2.59, -43.85, HighFourBallV2SegAutoWPs),
+            new AutoPose("HighTwoBallV2AutoWPs", 6.57, 2.57, -43.85, HighTwoBallV2AutoWPs),
+            new AutoPose("HighTwoBallV3AutoWPs", 7.57, 1.84, -91.17, HighTwoBallV3AutoWPs)
         };
         for (AutoPose myAutoPose : myAutoContainer ){
             m_autoChooser.addOption(myAutoPose.name, myAutoPose);
@@ -232,10 +237,12 @@ public class AutoSegmentedWaypoints implements Loggable {
         if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Robot.INTAKE.colorSensor.getBlue()<500 && Robot.INTAKE.colorSensor.getRed()<1000) && (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
             System.out.println("hi!");
             Robot.SWERVEDRIVE.autoLimeLightAim = false;
-            Robot.INTAKE.shootNow = false;
             if (chosenWaypoints.length != currentWaypointNumber+1){
 
+                Robot.INTAKE.intakeNow = false;
+                Robot.INTAKE.shootNow = false;
                 StateHasFinished = true;
+
             }
         }
     }

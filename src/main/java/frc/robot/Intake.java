@@ -55,25 +55,23 @@ public class Intake implements Loggable {
     return SINGLE_INSTANCE;
   }
 
-  public void init(){
+  public void init() {
 
-    //SJV: PUT ALL SOLENOID AND MOTOR VALUES IN CONSTANTS, FORMATE BELOW SHOULD LOOK LIKE "=new WPI_TalonFX(Constants.intakeMotor);"
-    indexBottom = new WPI_TalonFX(6);
-    indexTop = new WPI_TalonFX(9);
+    
+    indexBottom = new WPI_TalonFX(Constants.IndexBottomMotorID);
+    indexTop = new WPI_TalonFX(Constants.IndexTopMotorID);
 
     indexBottom.setNeutralMode(NeutralMode.Brake);
     indexTop.setNeutralMode(NeutralMode.Brake);
 
-    intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 5);
+    intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, Constants.IntakeSolenoidForwardID, Constants.IntakeSolenoidReverseID);
 
-    limelightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
-
-    bottomLimitSwitch = new DigitalInput(0);
-    topLimitSwitch = new DigitalInput(1);
+    bottomLimitSwitch = new DigitalInput(Constants.BottomIntakeSwitchID);
+    topLimitSwitch = new DigitalInput(Constants.TopIntakeSwitchID);
 
     colorSensor = new ColorSensorV3(i2cPort);
 
-    intakeDrive = new WPI_TalonFX(7);
+    intakeDrive = new WPI_TalonFX(Constants.IntakeMotorID);
         intakeDrive.setInverted(TalonFXInvertType.Clockwise);
         intakeDrive.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
         intakeDrive.config_kF(0,
@@ -83,14 +81,12 @@ public class Intake implements Loggable {
                 0.055, 20);
 
   }
-  public void intakePeriodic(){
+  public void intakePeriodic() {
     intake();
     shootIndexManager();
     indexState = indexManager();
-    // System.out.println(indexState);
-    
   }
-//SJV: WE MAY NEED TO RUN INTAKE ON A PID SO IT GETS TO SPEED A LOT FASTER 
+
   private void intake() {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
       if (!intakeIsOut) {
@@ -118,50 +114,59 @@ public class Intake implements Loggable {
   }
 
   private void shootIndexManager() {
-    if (Robot.xbox.getLeftBumper() || (Robot.SHOOTER.shooterAtSpeed() && (Robot.xbox.getLeftTriggerAxis() > 0 || shootNow))) {  // Once shooter gets up to speed AND left trigger held, balls fed to shooter
+    // Once shooter gets up to speed AND left trigger held OR shooting during Auto, balls fed to shooter
+    if (Robot.xbox.getLeftBumper() || (Robot.SHOOTER.shooterAtSpeed() && (Robot.xbox.getLeftTriggerAxis() > 0 || shootNow))) {  
+      // If there's only one ball being shot
       if (!bottomLimitSwitch.get() && !topLimitSwitch.get() && (colorSensor.getRed()>1000 && colorSensor.getBlue()>500)) {
-        indexTop.set(ControlMode.PercentOutput, -0.2); // If there's only one ball being shot
+        indexTop.set(ControlMode.PercentOutput, -0.2); 
       } else {
-        indexTop.set(ControlMode.PercentOutput, -0.2); // If two balls are being shot
+        // If two balls are being shot
+        indexTop.set(ControlMode.PercentOutput, -0.2); 
         indexBottom.set(ControlMode.PercentOutput, -0.2);
       }
     } else {
       indexerDrive(); // Defaults to state machine below
     }
   }
-  //SJV: DOES INDEXER NEED TO BE RUN FASTER?
   private void indexerDrive() {
       switch (indexState) {
-        case "1 Ball": // Hold the ball at the top of tower
+        // Hold the ball at the top of tower
+        case "1 Ball": 
           indexBottom.set(ControlMode.PercentOutput, -0.34);
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
 
-        case "2 Balls": // Indexer full
+        // Indexer full
+        case "2 Balls": 
           indexBottom.set(ControlMode.PercentOutput, 0); 
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
 
-        case "Cargo in Transit":  // Bring ball from intake to top of tower
+        // Bring ball from intake to top of tower
+        case "Cargo in Transit":  
           indexTop.set(ControlMode.PercentOutput, -0.4);
 
           indexBottom.set(ControlMode.PercentOutput, -0.4);
           break;
 
-        case "Reverse Intake":  // Both intakes go backwards
+        // Both intakes go backwards
+        case "Reverse Intake":  
           indexTop.set(ControlMode.PercentOutput, 0.7);
           indexBottom.set(ControlMode.PercentOutput, 0.8);
           break;
 
-        case "Intake Ball": // Spins bottom intake while ball in being intaked
+        // Spins bottom intake while ball in being intaked
+        case "Intake Ball": 
           indexBottom.set(ControlMode.PercentOutput, -0.4);
           break;
 
-        case "Ball Reject": // Rejects ball if it's the wrong color
+        // Rejects ball if it's the wrong color
+        case "Ball Reject": 
           indexBottom.set(ControlMode.PercentOutput, 0.8);
           break;
 
-        default:  // Everything stops
+        // Everything stops
+        default:  
           indexBottom.set(ControlMode.PercentOutput, 0);
           indexTop.set(ControlMode.PercentOutput, 0);
           break;
@@ -169,29 +174,36 @@ public class Intake implements Loggable {
     } 
 
   private String indexManager() {
+    // Reverse Intake
     if (Robot.xbox.getBButton()) {
       return "Reverse Intake";
 
+    // Reject Red Balls when in Blue Alliance
     } else if(DriverStation.getAlliance() == Alliance.Blue && 
     (colorSensor.getBlue() < colorSensor.getRed()) && colorSensor.getRed() > 1000 && ballReject) {
       return "Ball Reject";
 
+    // Reject Blue Balls when in Red Alliance
     } else if(DriverStation.getAlliance() == Alliance.Red && 
     (colorSensor.getRed() < colorSensor.getBlue()) && colorSensor.getBlue() > 1000 && ballReject) {
       return "Ball Reject";
 
-    } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { // Both switches pressed
+    // Both switches pressed
+    } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { 
       return "2 Balls";
-
-    } else if (!bottomLimitSwitch.get() || (cargoInTransit && bottomLimitSwitch.get() && topLimitSwitch.get())) { // Bottom switch pressed/cargo in transit
+      
+    // Bottom switch pressed/cargo in transit
+    } else if (!bottomLimitSwitch.get() || (cargoInTransit && bottomLimitSwitch.get() && topLimitSwitch.get())) { 
       cargoInTransit = true;
       return "Cargo in Transit";
 
-    } else if (!topLimitSwitch.get()) { //top switch pressed
+    // Top switch pressed
+    } else if (!topLimitSwitch.get()) { 
       cargoInTransit = false;
       return "1 Ball";
-
-    } else if (bottomLimitSwitch.get() && (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow )) { // Right trigger held AND nothing pressing the bottom switch
+      
+    // Right trigger held AND nothing pressing the bottom switch OR not intaking for Auto path
+    } else if (bottomLimitSwitch.get() && (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow )) { 
       return "Intake Ball";
 
     } else {
@@ -207,7 +219,6 @@ public class Intake implements Loggable {
     //SJV: time to make those pipe lines
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
     limelightIsOpen = false;
-    // ^^^
   }
   
   public void checkAndSetIntakeCANStatus() {
@@ -269,9 +280,6 @@ public class Intake implements Loggable {
     }
   }
 
-  //I think that matters... not SURE THOWRONG WRONG WATCH OBLOG WANTS DOUBLES i THINK
-
-  
   @Log
   public double getRedColor() {
     return (double) colorSensor.getRed();

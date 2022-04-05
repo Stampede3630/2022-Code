@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
 public class Climber implements Loggable{
@@ -28,6 +29,7 @@ public class Climber implements Loggable{
     boolean upCompleted;
     boolean tiltArms = false;
     boolean fullyExtended = false;
+    boolean autoExtend = true;
     // boolean climberSafety = true;
 
     public double safePitch = 2; // TODO: 0 is a good starting point... check for pitch velocity
@@ -50,13 +52,13 @@ public class Climber implements Loggable{
     }
     
     public void init(){
-        climberTalon = new WPI_TalonFX(8);
-        climberHomeLeft = new DigitalInput(2);
-        climberHomeRight = new DigitalInput(3);
+        climberTalon = new WPI_TalonFX(Constants.ClimberMotorId);
+        climberHomeLeft = new DigitalInput(Constants.LeftClimberSwitchID);
+        climberHomeRight = new DigitalInput(Constants.RightClimberSwitchID);
         climberTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
         climberTalon.setSelectedSensorPosition(0,0,200);
         climberTalon.configSelectedFeedbackCoefficient(1/TICKSPERINCH, 0, 20);
-        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 3);
+        climberSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, Constants.ClimberSolenoidForwardID, Constants.ClimberSolenoidReverseID);
         climberTalon.config_kP(0, 1000, 20);
         atOrigin = false;
         upCompleted = false;
@@ -80,6 +82,22 @@ public class Climber implements Loggable{
         }
     }
 
+    public void reZero() { 
+        if (climberHomeLeft.get() || climberHomeRight.get() 
+        || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) >-.5 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
+            atOrigin = true;
+            climberTalon.set(ControlMode.PercentOutput, 0);
+            climberTalon.setSelectedSensorPosition(0, 0, 20);
+        } else if (!atOrigin && !upCompleted) {
+            climberTalon.set(ControlMode.Position, 5);
+            if (climberTalon.getSelectedSensorPosition(0) >= 4) {
+                upCompleted = true;
+            }
+        } else if (!atOrigin && upCompleted) {
+            climberTalon.set(ControlMode.PercentOutput, -0.3);
+        }
+    }
+
     private void manualClimberMotor(){
         
         if (climberTalon.getSelectedSensorPosition(0) >= 28) {
@@ -88,14 +106,19 @@ public class Climber implements Loggable{
             fullyExtended = false;
         }
 
-        if (Robot.xbox.getPOV() == 0 && !fullyExtended){
-            climberTalon.set(ControlMode.PercentOutput, 1); 
-        }
-        else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
-            climberTalon.set(ControlMode.PercentOutput, -1);
+        if (autoExtend) {
+            autoClimberExtend();
         } else {
-            climberTalon.set(ControlMode.PercentOutput, 0);
+            if (Robot.xbox.getPOV() == 0 && !fullyExtended){
+                climberTalon.set(ControlMode.PercentOutput, 1); 
+            }
+            else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
+                climberTalon.set(ControlMode.PercentOutput, -1);
+            } else {
+                climberTalon.set(ControlMode.PercentOutput, 0);
+            }
         }
+
     }
     
     private void manualClimberSolenoid(){
@@ -104,6 +127,16 @@ public class Climber implements Loggable{
         } else if (Robot.xbox.getPOV() == 270 ){ 
            closeSolenoid();
            
+        }
+    }
+
+    private void autoClimberExtend() {
+        if (currentPitch < safePitch && Robot.xbox.getPOV() == 0 && !(climberHomeLeft.get()) || climberHomeLeft.get()) {
+            climberTalon.set(ControlMode.PercentOutput, 1);
+        } else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeLeft.get())) {
+            climberTalon.set(ControlMode.PercentOutput, -1);
+        } else {
+            climberTalon.set(ControlMode.PercentOutput, 0);
         }
     }
 
@@ -159,21 +192,6 @@ public class Climber implements Loggable{
         }
     }
 
-    public void reZero() { 
-        if (climberHomeLeft.get() || climberHomeRight.get() 
-        || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) >-.5 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
-            atOrigin = true;
-            climberTalon.set(ControlMode.PercentOutput, 0);
-            climberTalon.setSelectedSensorPosition(0, 0, 20);
-        } else if (!atOrigin && !upCompleted) {
-            climberTalon.set(ControlMode.Position, 5);
-            if (climberTalon.getSelectedSensorPosition(0) >= 4) {
-                upCompleted = true;
-            }
-        } else if (!atOrigin && upCompleted) {
-            climberTalon.set(ControlMode.PercentOutput, -0.3);
-        }
-    }
 
     public void raiseAndExtend()  {
         if (climberTalon.getSelectedSensorPosition(0) < 15.0) {
@@ -182,7 +200,7 @@ public class Climber implements Loggable{
             //(ControlMode.Position, DemandType.ArbitraryFeedForward, -.15);
 
         } else if (climberTalon.getSelectedSensorPosition(0) >= 15.0 && currentPitch < safePitch) {
-            if (climberTalon.getSelectedSensorPosition(0) >= 28.0) {
+            if (climberTalon.getSelectedSensorPosition(0) >= 29.0) {
                 climberTalon.set(ControlMode.PercentOutput, 0);
         
                 StateHasFinished = true;
@@ -273,12 +291,17 @@ public class Climber implements Loggable{
 
     @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
     public boolean getClimberHomeLeft() {
-      return climberHomeLeft.get();
+        return climberHomeLeft.get();
     }
     
     @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
     public boolean getClimberHomeRight() {
-      return climberHomeRight.get();
+        return climberHomeRight.get();
+    }
+
+    @Config(defaultValueBoolean = true)
+    public void getAutoExtend(boolean _input) {
+        autoExtend = _input;
     }
 
     // @Log
