@@ -45,7 +45,7 @@ public class Intake implements Loggable {
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
-  public double intakeSpeed = -18000;
+  public double intakeSpeed = -20000;
   public boolean ballReject = false;
   public String indexState="";
   
@@ -56,6 +56,7 @@ public class Intake implements Loggable {
   }
 
   public void init() {
+
 
     
     indexBottom = new WPI_TalonFX(Constants.IndexBottomMotorID);
@@ -169,6 +170,7 @@ public class Intake implements Loggable {
         default:  
           indexBottom.set(ControlMode.PercentOutput, 0);
           indexTop.set(ControlMode.PercentOutput, 0);
+          // System.out.println("howdy");
           break;
       }
     } 
@@ -192,7 +194,7 @@ public class Intake implements Loggable {
     } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { 
       return "2 Balls";
       
-    // Bottom switch pressed/cargo in transit
+    // Bottom switch pressed/cargo in transit !!remove color sensor logic if it goes to shit -e
     } else if (!bottomLimitSwitch.get() || (cargoInTransit && bottomLimitSwitch.get() && topLimitSwitch.get())) { 
       cargoInTransit = true;
       return "Cargo in Transit";
@@ -303,17 +305,18 @@ public class Intake implements Loggable {
     return bottomLimitSwitch.get();
   }
   
-  // @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
-  // public boolean getTopLimitSwitch() {
-  //   return topLimitSwitch.get();
-  // }
+  @Log.BooleanBox(rowIndex = 3, columnIndex = 4)
+  public boolean getTopLimitSwitch() {
+    return topLimitSwitch.get();
+  }
 
   @Config(tabName = "CompetitionLogger", defaultValueBoolean = false, rowIndex = 3, columnIndex = 3, height = 1, width = 2)
   public void setBallReject(boolean _input) {
     ballReject = _input;
   }
 
-  // @Config.NumberSlider(name = "Set Intake Speed", defaultValue = -15000, min = -20000, max = -2000, blockIncrement = 1000, rowIndex = 1, columnIndex = 0, height = 1, width = 3)
+
+  // @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Intake Speed", defaultValue = -20000, min = -20000, max = -2000, blockIncrement = 1000, rowIndex = 1, columnIndex = 5, height = 1, width = 3)
   // public void setIntakeSpeed(double targetIntakeVelocity) {
   //     intakeSpeed = targetIntakeVelocity;
 

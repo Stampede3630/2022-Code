@@ -40,6 +40,8 @@ public class Shooter implements Loggable {
     InterpolatingTreeMap<Double, Double> shootAngleTable;
     
     public double fakeDistance;
+
+    public double distance;
     
     public static SimpleMotorFeedforward shooterMotorFeedforward;
     
@@ -108,8 +110,8 @@ public class Shooter implements Loggable {
 
     // New values (3/29/22): Distances percieved by limelight were shorter than reality
     shootSpeedTable = new InterpolatingTreeMap<>();
-        shootSpeedTable.put(6.8, 14344.0);
-        shootSpeedTable.put(8.0, 14344.0);
+        shootSpeedTable.put(6.8, 14644.0); //14344.0
+        shootSpeedTable.put(8.0, 14644.0);  //14344.0
         shootSpeedTable.put(9.03, 14897.0);
         shootSpeedTable.put(10.07, 15327.0);
         shootSpeedTable.put(11.04, 16064.0);
@@ -140,6 +142,7 @@ public class Shooter implements Loggable {
     }
     
     public void shooterPeriodic() {
+        distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0)))) + 12.4) / 12;
         // System.out.println(shooterDrive.getSelectedSensorVelocity(0) + " " + shooterSpeed + " " + shooterAtSpeed());
         if (!hoodAtOrigin) {
             rezeroHood();
@@ -148,12 +151,13 @@ public class Shooter implements Loggable {
             shooterSpeed = calculateShooterSpeed();
             
             rotateHood(hoodAngle + hoodAngleOffset);
+
         }
         
         //bloop shot
         
         if (Robot.xbox.getLeftBumper()) {
-            shooterDrive.set(ControlMode.PercentOutput, 0.5);
+            shooterDrive.set(ControlMode.Velocity, 7000, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(7000 / 2048.0 * 10.0) / 12.0 - 0.03));
         } else if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0 || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
             // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(shooterSpeed / 2048.0 * 10.0) / 12.0 - 0.03));
@@ -181,22 +185,22 @@ public class Shooter implements Loggable {
         if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) 
         && limelightShooting  && !bloopShot && !Robot.xbox.getLeftBumper()) {
 
-            double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-            double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
+            double calculatedHoodAngle;
+            // distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;
             //distance = fakeDistance;//sjv
-            System.out.println(distance); 
+            // System.out.println(distance); 
             if(fancyShot){   
-                angle =  shootAngleTable.get(distance);
+                calculatedHoodAngle =  shootAngleTable.get(distance);
                     
             } else {
-                angle = -37840 + 10740 * distance - 686.3 * (Math.pow(distance, 2)) + 15.22 * (Math.pow(distance, 3));
+                calculatedHoodAngle = -37840 + 10740 * distance - 686.3 * (Math.pow(distance, 2)) + 15.22 * (Math.pow(distance, 3));
 
             }
             // angle = -14.75x^3 + 497.7x^2 -3726x + 11270, x = distance
                 
             // angle = 25460.0 - 6868.0 * distance + 908.4 * (Math.pow(distance, 2)) - 29.87 * (Math.pow(distance, 3)) + hoodAngleOffset;
-            if (0 < angle && angle < 32000) {
-                return angle;
+            if (0 < calculatedHoodAngle && calculatedHoodAngle < 32000) {
+                return calculatedHoodAngle;
             } else { 
                 return hoodAngle;
             }
@@ -212,10 +216,8 @@ public class Shooter implements Loggable {
     @Log
     public double calculateShooterSpeed() {
         if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) && 
-        limelightShooting && !bloopShot && !Robot.xbox.getLeftBumper()) {
-
-            double angle = 35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-            double distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(angle))) + 12.4) / 12;   
+        limelightShooting && !bloopShot && !Robot.xbox.getLeftBumper()) {  
+            
             //distance = fakeDistance;
             // shooterSpeed = -2.846x^3 + 116.5x^2 -1196x + 18110, x = distance
             double _methodSpeed = (358.7*distance) + 11760 + shooterSpeedOffset;
@@ -230,10 +232,8 @@ public class Shooter implements Loggable {
                 return _methodSpeed;
             }
             
-        } else if (bloopShot || Robot.xbox.getLeftBumper()){
-            return 7000;
         } else {
-            System.out.println((((103.0 - 36.614) / Math.tan(Math.toRadians(35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0)))) + 12.4) / 12);
+            // System.out.println((((103.0 - 36.614) / Math.tan(Math.toRadians(35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0)))) + 12.4) / 12);
             return shooterSpeed;
             }
     }

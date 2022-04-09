@@ -105,10 +105,6 @@ public class Climber implements Loggable{
         } else {
             fullyExtended = false;
         }
-
-        if (autoExtend) {
-            autoClimberExtend();
-        } else {
             if (Robot.xbox.getPOV() == 0 && !fullyExtended){
                 climberTalon.set(ControlMode.PercentOutput, 1); 
             }
@@ -117,8 +113,6 @@ public class Climber implements Loggable{
             } else {
                 climberTalon.set(ControlMode.PercentOutput, 0);
             }
-        }
-
     }
     
     private void manualClimberSolenoid(){
@@ -131,7 +125,7 @@ public class Climber implements Loggable{
     }
 
     private void autoClimberExtend() {
-        if (currentPitch < safePitch && Robot.xbox.getPOV() == 0 && !(climberHomeLeft.get()) || climberHomeLeft.get()) {
+        if (currentPitch < safePitch && Robot.xbox.getPOV() == 0 && !fullyExtended) {
             climberTalon.set(ControlMode.PercentOutput, 1);
         } else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeLeft.get())) {
             climberTalon.set(ControlMode.PercentOutput, -1);

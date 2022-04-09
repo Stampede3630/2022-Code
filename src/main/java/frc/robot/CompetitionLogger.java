@@ -38,10 +38,10 @@ public class CompetitionLogger implements Loggable {
             int[] position = {0,0};
             return position;
         }
-        @Config 
-        public void HoldRobotAngle(boolean _input){
-            Robot.SWERVEDRIVE.holdRobotAngleEnabled = _input;
-        }
+        // @Config 
+        // public void HoldRobotAngle(boolean _input){
+        //     Robot.SWERVEDRIVE.holdRobotAngleEnabled = _input;
+        // }
         @Config(defaultValueBoolean = true)
         public void FieldRelativeDrive(boolean _input){
             Robot.SWERVEDRIVE.SDFieldRelative = _input;
@@ -66,6 +66,11 @@ public class CompetitionLogger implements Loggable {
         @Config (defaultValueBoolean = true)
         public void limelightAim(boolean _input){
                 Robot.SHOOTER.limelightShooting = _input;
+        }
+
+        @Log
+        public double LLDistance() {
+            return Robot.SHOOTER.distance;
         }
         
         

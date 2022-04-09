@@ -22,6 +22,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public Waypoint[] HighFourBallV2SegAutoWPs;
     public Waypoint[] HighTwoBallV2AutoWPs;
     public Waypoint[] HighTwoBallV3AutoWPs;
+    public Waypoint[] HighFiveBallNoUSegAutoWPs;
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
@@ -42,6 +43,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     public PathPlannerTrajectory ivV2Seg1;
     public PathPlannerTrajectory ivV2Seg2;
     public PathPlannerTrajectory twoBallv2;
+    public PathPlannerTrajectory vBallNoU;
+    public PathPlannerTrajectory vBallNoUShoot;
     @Log
     public double autoDelay;
     
@@ -58,9 +61,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     public void init() {
         SwerveMap.GYRO.reset();
-
-
-        
+    
         if (m_autoChooser.getSelected()==null){
             chosenPath = myAutoContainer[0];
         } else {
@@ -73,7 +74,6 @@ public class AutoSegmentedWaypoints implements Loggable {
         
         PathPlannerState initalPathPose =((PathPlannerState)chosenWaypoints[0].pathPlannerSegment.getInitialState());
     
-    
         Robot.SWERVEDRIVE.resetOdometry(initalPathPose.poseMeters, initalPathPose.poseMeters.getRotation()); 
     }
     
@@ -81,11 +81,10 @@ public class AutoSegmentedWaypoints implements Loggable {
         //System.out.println(currentWaypointNumber);
         waypointRunner(chosenWaypoints);
     }
-    
 
     public void loadAutoPaths(){
 
-        twoBall = PathPlanner.loadPath("TwoBallHigh", 1.5, 1.0);
+        twoBall = PathPlanner.loadPath("TwoBallHigh", 2.0, 1.5);
         seg1 = PathPlanner.loadPath("VbhSegOne", 1.5, 2.0);
         seg2 = PathPlanner.loadPath("VbhSegTwo", 2.5, 2.0);
         seg3 = PathPlanner.loadPath("VbhSegThree", 3.0, 2.0);
@@ -98,11 +97,20 @@ public class AutoSegmentedWaypoints implements Loggable {
         ivV2Seg1 = PathPlanner.loadPath("IVbh2SegOne", 2.0, 1.0);
         ivV2Seg2 = PathPlanner.loadPath("IVbh2SegTwo", 3.0, 2.0);
         twoBallv2 = PathPlanner.loadPath("TwoBallV2High", 1.5, 1.0);
+        vBallNoU = PathPlanner.loadPath("VbhNoU", 2.5, 2.0);
+        vBallNoUShoot = PathPlanner.loadPath("VbhNoUShoot", 2.5, 2.0);
 
         HighFiveBallSegAutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::shootAndIntakeNoTimer, 7.62, 0.75, seg1),
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.23, 1.97, seg2),
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 0.74, 1.02, seg3)
+        };
+        HighFiveBallNoUSegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.65, 0.62, seg1),
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.35, 2.04, seg2),
-            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 0.74, 1.02, seg3)
+            new Waypoint(SINGLE_INSTANCE::intakeBall, 1.31, 1.34, vBallNoU),
+            new Waypoint(SINGLE_INSTANCE::shoot, 4.31, 1.91, vBallNoUShoot)
+
         };
         HighTwoBallAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.18, 6.06, twoBall)
@@ -171,7 +179,8 @@ public class AutoSegmentedWaypoints implements Loggable {
             new AutoPose("HighFourBallSegAutoWPs", 7.57, 1.84, -91.17, HighFourBallSegAutoWPs),
             new AutoPose("HighFourBallV2SegAutoWPs", 6.57, 2.59, -43.85, HighFourBallV2SegAutoWPs),
             new AutoPose("HighTwoBallV2AutoWPs", 6.57, 2.57, -43.85, HighTwoBallV2AutoWPs),
-            new AutoPose("HighTwoBallV3AutoWPs", 7.57, 1.84, -91.17, HighTwoBallV3AutoWPs)
+            new AutoPose("HighTwoBallV3AutoWPs", 7.57, 1.84, -91.17, HighTwoBallV3AutoWPs),
+            new AutoPose("HighFiveBallNoUAutoWPs", 6.09, 5.19, 43.78, HighFiveBallNoUSegAutoWPs)
         };
         for (AutoPose myAutoPose : myAutoContainer ){
             m_autoChooser.addOption(myAutoPose.name, myAutoPose);
@@ -182,12 +191,16 @@ public class AutoSegmentedWaypoints implements Loggable {
     private void intakeBall() {
         //SJV: NEED TO TURN INTAKE OFF WHEN STATE IS FINISHED, NEED TO PROLLY LOWER THE DISTANCE FROM HALF A METER TO LESS (TEST PLEASE)
         Robot.INTAKE.intakeNow = true;
-        if (SwerveTrajectory.trajectoryStatus.equals("done")) {
-            Robot.INTAKE.intakeNow = false;
-        } 
-            if (chosenWaypoints.length != currentWaypointNumber+1){
-            StateHasFinished = true;
-            }
+        Robot.INTAKE.shootNow = false;
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && (Robot.INTAKE.indexState.equals("2 Balls") || (Timer.getFPGATimestamp() - autoDelay > 1.0))) {
+            // Robot.INTAKE.intakeNow = false;
+            if (chosenWaypoints.length != currentWaypointNumber+1) {
+                StateHasFinished = true;
+                }
+        } else if (!SwerveTrajectory.trajectoryStatus.equals("done")) {
+            autoDelay = Timer.getFPGATimestamp();
+        }
+            
                 
         
     }
@@ -195,8 +208,9 @@ public class AutoSegmentedWaypoints implements Loggable {
     private void shoot() {
             // Robot.SWERVEDRIVE.autoLimeLightAim = true;
             if  (SwerveTrajectory.trajectoryStatus.equals("done")){
-                Robot.INTAKE.shootNow = true;
                 Robot.SWERVEDRIVE.autoLimeLightAim = true;
+                Robot.INTAKE.intakeNow = false;
+                Robot.INTAKE.shootNow = true;
             } else {
                 autoDelay = Timer.getFPGATimestamp();
             }
@@ -235,6 +249,76 @@ public class AutoSegmentedWaypoints implements Loggable {
         }
 
         if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Robot.INTAKE.colorSensor.getBlue()<500 && Robot.INTAKE.colorSensor.getRed()<1000) && (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
+            System.out.println("hi!");
+            Robot.SWERVEDRIVE.autoLimeLightAim = false;
+            if (chosenWaypoints.length != currentWaypointNumber+1){
+
+                Robot.INTAKE.intakeNow = false;
+                Robot.INTAKE.shootNow = false;
+                StateHasFinished = true;
+
+            }
+        }
+    }
+
+    private void shootAndIntakeLL() {
+
+        Robot.SWERVEDRIVE.autoLimeLightAim = true;        
+        if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+                 Robot.INTAKE.shootNow = true;
+            // if(Robot.INTAKE.indexState.equals("2 Balls") || Robot.INTAKE.indexState.equals("1 Ball")){
+            //     Robot.INTAKE.intakeNow = false;
+            //     Robot.INTAKE.shootNow = true;  
+            //     Robot.SWERVEDRIVE.autoLimeLightAim = true;
+            // } else {
+            //     Robot.INTAKE.intakeNow = true;
+            //     Robot.INTAKE.shootNow = false; 
+            //     Robot.SWERVEDRIVE.autoLimeLightAim = false; 
+            // }
+            Robot.INTAKE.intakeNow = false;
+                // System.out.println(Robot.INTAKE.indexState);
+
+        } else {
+            Robot.INTAKE.intakeNow = true;
+            autoDelay = Timer.getFPGATimestamp();
+        }
+
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Robot.INTAKE.colorSensor.getBlue()<500 && Robot.INTAKE.colorSensor.getRed()<1000) && (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
+            System.out.println("hi!");
+            Robot.SWERVEDRIVE.autoLimeLightAim = false;
+            if (chosenWaypoints.length != currentWaypointNumber+1){
+
+                Robot.INTAKE.intakeNow = false;
+                Robot.INTAKE.shootNow = false;
+                StateHasFinished = true;
+
+            }
+        }
+    }
+
+    private void shootAndIntakeNoTimer() {
+                
+        if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+                 Robot.INTAKE.shootNow = true;
+                 Robot.SWERVEDRIVE.autoLimeLightAim = true;
+            // if(Robot.INTAKE.indexState.equals("2 Balls") || Robot.INTAKE.indexState.equals("1 Ball")){
+            //     Robot.INTAKE.intakeNow = false;
+            //     Robot.INTAKE.shootNow = true;  
+            //     Robot.SWERVEDRIVE.autoLimeLightAim = true;
+            // } else {
+            //     Robot.INTAKE.intakeNow = true;
+            //     Robot.INTAKE.shootNow = false; 
+            //     Robot.SWERVEDRIVE.autoLimeLightAim = false; 
+            // }
+            Robot.INTAKE.intakeNow = false;
+                // System.out.println(Robot.INTAKE.indexState);
+
+        } else {
+            Robot.INTAKE.intakeNow = true;
+            autoDelay = Timer.getFPGATimestamp();
+        }
+
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default")) {
             System.out.println("hi!");
             Robot.SWERVEDRIVE.autoLimeLightAim = false;
             if (chosenWaypoints.length != currentWaypointNumber+1){
@@ -291,6 +375,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
         }
     }
+
 
     public void waypointRunner(Waypoint[] thisWaypointSet){
         // If we made one round with the state, we have successfully initialized
