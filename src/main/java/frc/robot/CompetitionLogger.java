@@ -51,6 +51,11 @@ public class CompetitionLogger implements Loggable {
             Robot.SWERVEDRIVE.resetGyroAndOdometry(_input);
         }
 
+        @Config(defaultValueBoolean = false)
+        public void SetShotBlock(boolean _input){
+            Robot.SHOOTER.shotBlock = _input;
+        }
+
         @Config
         private void beginClimbing(boolean _input){
             

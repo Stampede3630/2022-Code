@@ -316,11 +316,11 @@ public class Intake implements Loggable {
   }
 
 
-  // @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Intake Speed", defaultValue = -20000, min = -20000, max = -2000, blockIncrement = 1000, rowIndex = 1, columnIndex = 5, height = 1, width = 3)
-  // public void setIntakeSpeed(double targetIntakeVelocity) {
-  //     intakeSpeed = targetIntakeVelocity;
+  @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Intake Speed", defaultValue = -20000, min = -20000, max = -15000, blockIncrement = 1000, rowIndex = 1, columnIndex = 5, height = 1, width = 3)
+  public void setIntakeSpeed(double targetIntakeVelocity) {
+      intakeSpeed = targetIntakeVelocity;
 
-  // }
+  }
   
   
 }

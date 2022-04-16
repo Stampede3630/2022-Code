@@ -36,6 +36,7 @@ public class Shooter implements Loggable {
     public boolean limelightShooting = true;
     public boolean bloopShot = false;
     public boolean fancyShot = true;
+    public boolean shotBlock = false;
     InterpolatingTreeMap<Double, Double> shootSpeedTable;
     InterpolatingTreeMap<Double, Double> shootAngleTable;
     
@@ -157,7 +158,7 @@ public class Shooter implements Loggable {
         //bloop shot
         
         if (Robot.xbox.getLeftBumper()) {
-            shooterDrive.set(ControlMode.Velocity, 7000, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(7000 / 2048.0 * 10.0) / 12.0 - 0.03));
+            shooterDrive.set(ControlMode.Velocity, 10000, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(10000 / 2048.0 * 10.0) / 12.0 - 0.03));
         } else if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0 || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
             // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(shooterSpeed / 2048.0 * 10.0) / 12.0 - 0.03));
@@ -207,6 +208,8 @@ public class Shooter implements Loggable {
                 
         } else if (bloopShot || Robot.xbox.getLeftBumper()){
             return 15975.00;
+        } else if (!limelightShooting) {
+            return 17469.0;
         } else {
             return hoodAngle;
         }
@@ -230,8 +233,12 @@ public class Shooter implements Loggable {
                 
             } else{
                 return _methodSpeed;
+
             }
-            
+
+        } else if (!limelightShooting){
+            return 14869.0;
+        
         } else {
             // System.out.println((((103.0 - 36.614) / Math.tan(Math.toRadians(35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0)))) + 12.4) / 12);
             return shooterSpeed;
@@ -264,6 +271,17 @@ public class Shooter implements Loggable {
                 }
              }
          }
+    }
+
+    public void blockShot(boolean shotBlock) {
+        if (shotBlock) {
+            hoodMotor.setSelectedSensorPosition(100, 0, 20);
+            NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+            Robot.SWERVEDRIVE.defensiveStop = false;
+        } else {
+            NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0);
+            Robot.SWERVEDRIVE.defensiveStop = true;
+        }
     }
 
     public void checkAndSetShooterCANStatus() {
@@ -309,7 +327,7 @@ public class Shooter implements Loggable {
         shooterSpeedOffset = targetOffest;
     }
 
-    @Config.ToggleButton(name = "kill battery?", defaultValue = false, rowIndex = 0, columnIndex = 0, height = 1, width = 2)
+    @Config.ToggleButton(tabName = "CompetitionLogger", name = "kill battery?", defaultValue = false, rowIndex = 0, columnIndex = 0, height = 1, width = 2)
     public void killTheBattery(boolean _input) {
         homocideTheBattery = _input;
     }
