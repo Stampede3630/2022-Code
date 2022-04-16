@@ -23,10 +23,12 @@ public class AutoSegmentedWaypoints implements Loggable {
     public Waypoint[] HighTwoBallV2AutoWPs;
     public Waypoint[] HighTwoBallV3AutoWPs;
     public Waypoint[] HighFiveBallNoUSegAutoWPs;
+    public Waypoint[] OneBallStupidAutoWPs;
+    public Waypoint[] ChaosOneBallAutoWPs;
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
-    @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 4)
+    // @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 4)
     public int currentWaypointNumber = 0;
     public AutoPose chosenPath;
     public AutoPose[] myAutoContainer;
@@ -45,8 +47,11 @@ public class AutoSegmentedWaypoints implements Loggable {
     public PathPlannerTrajectory twoBallv2;
     public PathPlannerTrajectory vBallNoU;
     public PathPlannerTrajectory vBallNoUShoot;
+    public PathPlannerTrajectory oneBallStupid;
+    public PathPlannerTrajectory chaosWEEEE;
     @Log
     public double autoDelay;
+    // public static final float ; =0.00000;
     
     public boolean StateHasFinished = false;
     public Boolean StateHasInitialized = false;
@@ -99,6 +104,8 @@ public class AutoSegmentedWaypoints implements Loggable {
         twoBallv2 = PathPlanner.loadPath("TwoBallV2High", 1.5, 1.0);
         vBallNoU = PathPlanner.loadPath("VbhNoU", 2.5, 2.0);
         vBallNoUShoot = PathPlanner.loadPath("VbhNoUShoot", 2.5, 2.0);
+        oneBallStupid = PathPlanner.loadPath("OneBallAuto", 1.5, 2.0);
+        chaosWEEEE = PathPlanner.loadPath("ChaosAutoSegOne", 2.0, 1.5);
 
         HighFiveBallSegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntakeNoTimer, 7.62, 0.75, seg1),
@@ -136,6 +143,13 @@ public class AutoSegmentedWaypoints implements Loggable {
         };
         HighTwoBallV3AutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.65, 0.62, seg1)
+        };
+        OneBallStupidAutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::shoot, 4.55, 4.00, oneBallStupid)
+        };
+        ChaosOneBallAutoWPs = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.18, 6.06, twoBall),
+            new Waypoint(SINGLE_INSTANCE::done, 2.74, 6.50, chaosWEEEE)
         };
 
 
@@ -180,7 +194,9 @@ public class AutoSegmentedWaypoints implements Loggable {
             new AutoPose("HighFourBallV2SegAutoWPs", 6.57, 2.59, -43.85, HighFourBallV2SegAutoWPs),
             new AutoPose("HighTwoBallV2AutoWPs", 6.57, 2.57, -43.85, HighTwoBallV2AutoWPs),
             new AutoPose("HighTwoBallV3AutoWPs", 7.57, 1.84, -91.17, HighTwoBallV3AutoWPs),
-            new AutoPose("HighFiveBallNoUAutoWPs", 6.09, 5.19, 43.78, HighFiveBallNoUSegAutoWPs)
+            new AutoPose("HighFiveBallNoUAutoWPs", 6.09, 5.19, 43.78, HighFiveBallNoUSegAutoWPs),
+            new AutoPose("OneBallStupidAutoWPs", 6.00, 4.00, 175.82, OneBallStupidAutoWPs),
+            new AutoPose("ChaosOneBallAutoWPs", 6.09, 5.19, 43.78, ChaosOneBallAutoWPs)
         };
         for (AutoPose myAutoPose : myAutoContainer ){
             m_autoChooser.addOption(myAutoPose.name, myAutoPose);
@@ -334,6 +350,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public void done(){
         //ADDED TO NOT GO OUT OF BOUNDS IN A ARRAY WAYPOINT RUNNER
         //FEEL FREE TO ADD THING TO THE DONE STATE
+        System.out.println("delete me if you see this");
        
 
     }
