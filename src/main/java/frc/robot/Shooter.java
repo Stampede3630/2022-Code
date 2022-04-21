@@ -36,7 +36,7 @@ public class Shooter implements Loggable {
     public boolean limelightShooting = true;
     public boolean bloopShot = false;
     public boolean fancyShot = true;
-    public boolean shotBlock = false;
+    public boolean shotBlock;
     InterpolatingTreeMap<Double, Double> shootSpeedTable;
     InterpolatingTreeMap<Double, Double> shootAngleTable;
     
@@ -158,7 +158,7 @@ public class Shooter implements Loggable {
         //bloop shot
         
         if (Robot.xbox.getLeftBumper()) {
-            shooterDrive.set(ControlMode.Velocity, 10000, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(10000 / 2048.0 * 10.0) / 12.0 - 0.03));
+            shooterDrive.set(ControlMode.Velocity, 12000, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(12000 / 2048.0 * 10.0) / 12.0 - 0.03));
         } else if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0 || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
             // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(shooterSpeed / 2048.0 * 10.0) / 12.0 - 0.03));
