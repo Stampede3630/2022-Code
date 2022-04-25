@@ -4,6 +4,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -25,6 +26,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public Waypoint[] HighFiveBallNoUSegAutoWPs;
     public Waypoint[] OneBallStupidAutoWPs;
     public Waypoint[] ChaosOneBallAutoWPs;
+    public Waypoint[] OneBallRightTarmac;
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
     public Waypoint[] chosenWaypoints;
@@ -49,6 +51,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     public PathPlannerTrajectory vBallNoUShoot;
     public PathPlannerTrajectory oneBallStupid;
     public PathPlannerTrajectory chaosWEEEE;
+    public PathPlannerTrajectory rightTarmacOneBall;
+    
     @Log
     public double autoDelay;
     // public static final float ; =0.00000;
@@ -106,6 +110,7 @@ public class AutoSegmentedWaypoints implements Loggable {
         vBallNoUShoot = PathPlanner.loadPath("VbhNoUShoot", 2.5, 2.0);
         oneBallStupid = PathPlanner.loadPath("OneBallAuto", 1.5, 2.0);
         chaosWEEEE = PathPlanner.loadPath("ChaosAutoSegOne", 2.0, 1.5);
+        rightTarmacOneBall = PathPlanner.loadPath("RightTarmacOneBall", 1.5, 2.0);
 
         HighFiveBallSegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntakeNoTimer, 7.62, 0.75, seg1),
@@ -122,6 +127,9 @@ public class AutoSegmentedWaypoints implements Loggable {
         HighTwoBallAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.18, 6.06, twoBall)
         };  
+        OneBallRightTarmac = new Waypoint[] {
+            new Waypoint(SINGLE_INSTANCE::shoot, 4.80, 4.50, rightTarmacOneBall)
+        };
         HighFiveBallSeg2AutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.69, 0.59, v2seg1),
             new Waypoint(SINGLE_INSTANCE::intakeBall, 1.40, 1.31, v2seg2),
@@ -145,7 +153,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.65, 0.62, seg1)
         };
         OneBallStupidAutoWPs = new Waypoint[] {
-            new Waypoint(SINGLE_INSTANCE::shoot, 4.55, 4.00, oneBallStupid)
+            new Waypoint(SINGLE_INSTANCE::shoot, 4.65, 4.26, oneBallStupid)
         };
         ChaosOneBallAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.18, 6.06, twoBall),
@@ -196,7 +204,8 @@ public class AutoSegmentedWaypoints implements Loggable {
             new AutoPose("HighTwoBallV3AutoWPs", 7.57, 1.84, -91.17, HighTwoBallV3AutoWPs),
             new AutoPose("HighFiveBallNoUAutoWPs", 6.09, 5.19, 43.78, HighFiveBallNoUSegAutoWPs),
             new AutoPose("OneBallStupidAutoWPs", 6.00, 4.00, 175.82, OneBallStupidAutoWPs),
-            new AutoPose("ChaosOneBallAutoWPs", 6.09, 5.19, 43.78, ChaosOneBallAutoWPs)
+            new AutoPose("ChaosOneBallAutoWPs", 6.09, 5.19, 43.78, ChaosOneBallAutoWPs),
+            new AutoPose("OneBallRightTarmac", 6.75, 2.58, -45.94, OneBallRightTarmac)
         };
         for (AutoPose myAutoPose : myAutoContainer ){
             m_autoChooser.addOption(myAutoPose.name, myAutoPose);
@@ -264,7 +273,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             autoDelay = Timer.getFPGATimestamp();
         }
 
-        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Robot.INTAKE.colorSensor.getBlue()<500 && Robot.INTAKE.colorSensor.getRed()<1000) && (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Timer.getFPGATimestamp() - autoDelay > 1.5)) {
             System.out.println("hi!");
             Robot.SWERVEDRIVE.autoLimeLightAim = false;
             if (chosenWaypoints.length != currentWaypointNumber+1){

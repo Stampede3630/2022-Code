@@ -112,11 +112,13 @@ public class Shooter implements Loggable {
     // New values (3/29/22): Distances percieved by limelight were shorter than reality
     shootSpeedTable = new InterpolatingTreeMap<>();
         shootSpeedTable.put(6.8, 14644.0); //14344.0
-        shootSpeedTable.put(8.0, 14644.0);  //14344.0
-        shootSpeedTable.put(9.03, 14897.0);
-        shootSpeedTable.put(10.07, 15327.0);
+        shootSpeedTable.put(8.0, 14544.0);  //14344.0
+        shootSpeedTable.put(9.03, 14997.0);
+        shootSpeedTable.put(10.07, 15127.0);
+        shootSpeedTable.put(10.70, 15595.0);
         shootSpeedTable.put(11.04, 16064.0);
-        shootSpeedTable.put(12.37, 16511.0); 
+        shootSpeedTable.put(12.37, 16411.0); 
+        // shootSpeedTable.put(12.99, 16100.0);
         shootSpeedTable.put(13.13, 17631.0);
         shootSpeedTable.put(14.08, 17849.0);
         shootSpeedTable.put(15.16, 18590.0);
@@ -128,8 +130,10 @@ public class Shooter implements Loggable {
         shootAngleTable.put(8.0, 17037.0);
         shootAngleTable.put(9.03, 17474.0);
         shootAngleTable.put(10.07, 19658.0);
+        shootAngleTable.put(10.70, 21115.0);
         shootAngleTable.put(11.04, 21952.0);
         shootAngleTable.put(12.37, 22348.0);
+        // shootAngleTable.put(12.99, 25100.0);
         shootAngleTable.put(13.13, 25481.0);
         shootSpeedTable.put(14.08, 27481.0);
         shootAngleTable.put(15.16, 29481.0);
@@ -143,6 +147,8 @@ public class Shooter implements Loggable {
     }
     
     public void shooterPeriodic() {
+
+        System.out.println(homocideTheBattery);
         distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0)))) + 12.4) / 12;
         // System.out.println(shooterDrive.getSelectedSensorVelocity(0) + " " + shooterSpeed + " " + shooterAtSpeed());
         if (!hoodAtOrigin) {
@@ -170,7 +176,8 @@ public class Shooter implements Loggable {
     public boolean shooterAtSpeed() {
         double velocityError = Math.abs(shooterDrive.getSelectedSensorVelocity(0) - shooterSpeed);
         // TODO: IF TOO MUCH VARIATION IN SHOTS, NARROW THESE VALUES SO IT STILL SHOOTS
-        if (velocityError <= shooterSpeed * 0.04) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
+        // if (velocityError <= shooterSpeed * 0.03) { // Checks if the shooter is spinning fast enough to shoot *see intake file*
+        if(shooterDrive.getSelectedSensorVelocity(0)<=shooterSpeed*1.02 && shooterDrive.getSelectedSensorVelocity() >= shooterSpeed * 0.96){
             return true;
 
         } else {
@@ -209,7 +216,7 @@ public class Shooter implements Loggable {
         } else if (bloopShot || Robot.xbox.getLeftBumper()){
             return 15975.00;
         } else if (!limelightShooting) {
-            return 17469.0;
+            return hoodAngle;
         } else {
             return hoodAngle;
         }
@@ -237,7 +244,7 @@ public class Shooter implements Loggable {
             }
 
         } else if (!limelightShooting){
-            return 14869.0;
+            return shooterSpeed;
         
         } else {
             // System.out.println((((103.0 - 36.614) / Math.tan(Math.toRadians(35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0)))) + 12.4) / 12);
@@ -314,6 +321,7 @@ public class Shooter implements Loggable {
     public void setHoodAngleOffset(double targetAngleOffset) {
         hoodAngleOffset = targetAngleOffset;
     }
+
     
     //SJV: ONCE WE FIGURE OUT OUR SHOOTER ANGLE AND SPEED MAKE BOOLEAN FOR EACH OF THE SHOOTER SPEEDS AND PUT IT ON THE COMPETITION LOGGER
     @Config.NumberSlider(name = "Set Shooter Speed", defaultValue = 15000, min = 0, max = 18000, blockIncrement = 1000, rowIndex = 0, columnIndex = 2, height = 1, width = 2)
@@ -327,10 +335,7 @@ public class Shooter implements Loggable {
         shooterSpeedOffset = targetOffest;
     }
 
-    @Config.ToggleButton(tabName = "CompetitionLogger", name = "kill battery?", defaultValue = false, rowIndex = 0, columnIndex = 0, height = 1, width = 2)
-    public void killTheBattery(boolean _input) {
-        homocideTheBattery = _input;
-    }
+
     
     // @Log(rowIndex = 1, columnIndex = 0)
     // public boolean getLeftHoodLimit() {
