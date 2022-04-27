@@ -105,10 +105,10 @@ public class Climber implements Loggable{
         } else {
             fullyExtended = false;
         }
-            if (Robot.xbox.getPOV() == 0 && !fullyExtended){
+            if (Robot.ddrPad.getPOV() == 0 && !fullyExtended){
                 climberTalon.set(ControlMode.PercentOutput, 1); 
             }
-            else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
+            else if (Robot.ddrPad.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
                 climberTalon.set(ControlMode.PercentOutput, -1);
             } else {
                 climberTalon.set(ControlMode.PercentOutput, 0);
@@ -116,18 +116,18 @@ public class Climber implements Loggable{
     }
     
     private void manualClimberSolenoid(){
-        if (Robot.xbox.getPOV() == 90 ){ 
+        if (Robot.ddrPad.getPOV() == 90 ){ 
            openSolenoid();
-        } else if (Robot.xbox.getPOV() == 270 ){ 
+        } else if (Robot.ddrPad.getPOV() == 270 ){ 
            closeSolenoid();
            
         }
     }
 
     private void autoClimberExtend() {
-        if (currentPitch < safePitch && Robot.xbox.getPOV() == 0 && !fullyExtended) {
+        if (currentPitch < safePitch && Robot.ddrPad.getPOV() == 0 && !fullyExtended) {
             climberTalon.set(ControlMode.PercentOutput, 1);
-        } else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeLeft.get())) {
+        } else if (Robot.ddrPad.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeLeft.get())) {
             climberTalon.set(ControlMode.PercentOutput, -1);
         } else {
             climberTalon.set(ControlMode.PercentOutput, 0);
@@ -253,7 +253,7 @@ public class Climber implements Loggable{
         }
     }
     public void getAltUserInput() {
-        if(Robot.xbox.getXButton()){
+        if(Robot.xbox.getBButton()){
             StateHasFinished =true;
         }
     }

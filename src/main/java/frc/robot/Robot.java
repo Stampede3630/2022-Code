@@ -6,9 +6,12 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import io.github.oblarg.oblog.Logger;
 
@@ -33,6 +36,7 @@ public class Robot extends TimedRobot {
   public static CompetitionLogger COMPETITIONLOGGER;
   public static AutoSegmentedWaypoints AUTOSEGMENTEDWAYPOINTS;
   public static XboxController xbox = new XboxController(0);
+  public static GenericHID ddrPad = new GenericHID(1);
 
   /**
    * This function is run when the robot is first started up and should be used for any
