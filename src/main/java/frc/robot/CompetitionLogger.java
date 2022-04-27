@@ -112,6 +112,11 @@ public class CompetitionLogger implements Loggable {
     public double getPressure() {
         return compressor.getPressure();
     }
+
+    @Config(name = "kill battery?", defaultValueBoolean = false, rowIndex = 2, columnIndex = 4, height = 1, width = 1)
+    public void killTheBattery(boolean _input) {
+        Robot.SHOOTER.homocideTheBattery = _input;
+    }
     
     // @Log
     // public Field2d field2022(){

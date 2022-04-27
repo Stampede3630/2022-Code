@@ -45,7 +45,7 @@ public class Intake implements Loggable {
   public boolean shootNow = false;
   public boolean limelightIsOpen = true; // rename and figure out if it starts open or closed
   public boolean intakeIsOut = false;
-  public double intakeSpeed = -16000.0;
+  public double intakeSpeed = -16500.0;
   public boolean ballReject = false;
   public String indexState="";
   
@@ -316,7 +316,7 @@ public class Intake implements Loggable {
   }
 
 
-  @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Intake Speed", defaultValue = -16000, min = -20000, max = -15000, blockIncrement = 1000, rowIndex = 1, columnIndex = 5, height = 1, width = 3)
+  @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Intake Speed", defaultValue = -16000, min = -20000, max = -15000, blockIncrement = 500, rowIndex = 1, columnIndex = 5, height = 1, width = 2)
   public void setIntakeSpeed(double targetIntakeVelocity) {
       intakeSpeed = targetIntakeVelocity;
 
