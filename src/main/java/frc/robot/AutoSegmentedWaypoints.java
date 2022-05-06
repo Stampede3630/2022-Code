@@ -25,7 +25,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public Waypoint[] HighTwoBallV3AutoWPs;
     public Waypoint[] HighFiveBallNoUSegAutoWPs;
     public Waypoint[] OneBallStupidAutoWPs;
-    public Waypoint[] ChaosOneBallAutoWPs;
+    public Waypoint[] ChaosTooBallAutoWPs;
     public Waypoint[] OneBallRightTarmac;
     public PathPlannerTrajectory fourBallAutoPath;
     public PathPlannerTrajectory twoBallAutoPath;
@@ -95,7 +95,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
         twoBall = PathPlanner.loadPath("TwoBallHigh", 2.0, 1.5);
         seg1 = PathPlanner.loadPath("VbhSegOne", 1.5, 2.0);
-        seg2 = PathPlanner.loadPath("VbhSegTwo", 2.5, 2.0);
+        seg2 = PathPlanner.loadPath("VbhSegTwo", 3.0, 2.5);
         seg3 = PathPlanner.loadPath("VbhSegThree", 3.0, 2.0);
         seg4 = PathPlanner.loadPath("VbhSegFour", 2.5, 2.0);
         v2seg1 = PathPlanner.loadPath("Vbh2SegOne", 3.5, 3.0);
@@ -109,8 +109,8 @@ public class AutoSegmentedWaypoints implements Loggable {
         vBallNoU = PathPlanner.loadPath("VbhNoU", 2.5, 2.0);
         vBallNoUShoot = PathPlanner.loadPath("VbhNoUShoot", 2.5, 2.0);
         oneBallStupid = PathPlanner.loadPath("OneBallAuto", 1.5, 2.0);
-        chaosWEEEE = PathPlanner.loadPath("ChaosAutoSegOne", 2.0, 1.5);
-        rightTarmacOneBall = PathPlanner.loadPath("RightTarmacOneBall", 1.5, 2.0);
+        chaosWEEEE = PathPlanner.loadPath("ChaosAutoSegOne", 0.7, 0.5);
+        rightTarmacOneBall = PathPlanner.loadPath("RightTarmacOneBall", 4.0, 3.1);
 
         HighFiveBallSegAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntakeNoTimer, 7.62, 0.75, seg1),
@@ -118,9 +118,9 @@ public class AutoSegmentedWaypoints implements Loggable {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 0.74, 1.02, seg3)
         };
         HighFiveBallNoUSegAutoWPs = new Waypoint[] {
-            new Waypoint(SINGLE_INSTANCE::shootAndIntake, 7.65, 0.62, seg1),
+            new Waypoint(SINGLE_INSTANCE::shootAndIntakeNoTimer, 7.65, 0.62, seg1),
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.35, 2.04, seg2),
-            new Waypoint(SINGLE_INSTANCE::intakeBall, 1.31, 1.34, vBallNoU),
+            new Waypoint(SINGLE_INSTANCE::whintaiche, 1.31, 1.34, vBallNoU),
             new Waypoint(SINGLE_INSTANCE::shoot, 4.31, 1.91, vBallNoUShoot)
 
         };
@@ -155,10 +155,11 @@ public class AutoSegmentedWaypoints implements Loggable {
         OneBallStupidAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shoot, 4.65, 4.26, oneBallStupid)
         };
-        ChaosOneBallAutoWPs = new Waypoint[] {
+        ChaosTooBallAutoWPs = new Waypoint[] {
             new Waypoint(SINGLE_INSTANCE::shootAndIntake, 5.18, 6.06, twoBall),
             new Waypoint(SINGLE_INSTANCE::done, 2.74, 6.50, chaosWEEEE)
         };
+
 
 
     //     HighTwoBallAutoNewWPs = new Waypoint[] {
@@ -202,9 +203,9 @@ public class AutoSegmentedWaypoints implements Loggable {
             new AutoPose("HighFourBallV2SegAutoWPs", 6.57, 2.59, -43.85, HighFourBallV2SegAutoWPs),
             new AutoPose("HighTwoBallV2AutoWPs", 6.57, 2.57, -43.85, HighTwoBallV2AutoWPs),
             new AutoPose("HighTwoBallV3AutoWPs", 7.57, 1.84, -91.17, HighTwoBallV3AutoWPs),
-            new AutoPose("HighFiveBallNoUAutoWPs", 6.09, 5.19, 43.78, HighFiveBallNoUSegAutoWPs),
+            new AutoPose("HighFiveBallNoUAutoWPs", 7.57, 1.84, -91.17, HighFiveBallNoUSegAutoWPs),
             new AutoPose("OneBallStupidAutoWPs", 6.00, 4.00, 175.82, OneBallStupidAutoWPs),
-            new AutoPose("ChaosOneBallAutoWPs", 6.09, 5.19, 43.78, ChaosOneBallAutoWPs),
+            new AutoPose("ChaosTooBallAutoWPs", 6.09, 5.19, 43.78, ChaosTooBallAutoWPs),
             new AutoPose("OneBallRightTarmac", 6.75, 2.58, -45.94, OneBallRightTarmac)
         };
         for (AutoPose myAutoPose : myAutoContainer ){
@@ -228,6 +229,19 @@ public class AutoSegmentedWaypoints implements Loggable {
             
                 
         
+    }
+    private void whintaiche() {
+        Robot.INTAKE.intakeNow = true;
+        Robot.INTAKE.shootNow = false;
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && (Robot.INTAKE.indexState.equals("2 Balls") || (Timer.getFPGATimestamp() - autoDelay > 0.75))) {
+            // Robot.INTAKE.intakeNow = false;
+            if (chosenWaypoints.length != currentWaypointNumber+1) {
+                StateHasFinished = true;
+                }
+        } else if (!SwerveTrajectory.trajectoryStatus.equals("done")) {
+            autoDelay = Timer.getFPGATimestamp();
+        }
+
     }
 
     private void shoot() {

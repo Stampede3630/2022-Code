@@ -23,7 +23,8 @@ public class Climber implements Loggable{
     String CurrentState = "";
     WPI_TalonFX climberTalon;
     DoubleSolenoid climberSolenoid;
- 
+    
+    boolean ddrTime;
     boolean StartingStateOverride;
     boolean atOrigin;
     boolean upCompleted;
@@ -83,8 +84,7 @@ public class Climber implements Loggable{
     }
 
     public void reZero() { 
-        if (climberHomeLeft.get() || climberHomeRight.get() 
-        || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) >-.5 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
+        if (climberHomeLeft.get() || climberHomeRight.get() || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) >-.5 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
             atOrigin = true;
             climberTalon.set(ControlMode.PercentOutput, 0);
             climberTalon.setSelectedSensorPosition(0, 0, 20);
@@ -99,7 +99,7 @@ public class Climber implements Loggable{
     }
 
     private void manualClimberMotor(){
-        
+      if (ddrTime){  
         if (climberTalon.getSelectedSensorPosition(0) >= 28) {
             fullyExtended = true;
         } else {
@@ -113,14 +113,39 @@ public class Climber implements Loggable{
             } else {
                 climberTalon.set(ControlMode.PercentOutput, 0);
             }
+    } else {
+            if (climberTalon.getSelectedSensorPosition(0) >= 28) {
+                fullyExtended = true;
+            } else {
+                fullyExtended = false;
+            }
+                if (Robot.xbox.getPOV() == 0 && !fullyExtended){
+                    climberTalon.set(ControlMode.PercentOutput, 1); 
+                }
+                else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
+                    climberTalon.set(ControlMode.PercentOutput, -1);
+                } else {
+                    climberTalon.set(ControlMode.PercentOutput, 0);
+                }
+
+        }
     }
     
     private void manualClimberSolenoid(){
+    if (ddrTime){
         if (Robot.ddrPad.getPOV() == 90 ){ 
            openSolenoid();
         } else if (Robot.ddrPad.getPOV() == 270 ){ 
            closeSolenoid();
            
+        }
+    }    else {
+        if (Robot.xbox.getPOV() == 90 ){ 
+            openSolenoid();
+        } else if (Robot.xbox.getPOV() == 270 ){ 
+            closeSolenoid();
+            
+        }
         }
     }
 

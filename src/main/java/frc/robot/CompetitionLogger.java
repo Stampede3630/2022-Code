@@ -117,6 +117,11 @@ public class CompetitionLogger implements Loggable {
     public void killTheBattery(boolean _input) {
         Robot.SHOOTER.homocideTheBattery = _input;
     }
+
+    @Config(name = "funnie clime time", defaultValueBoolean = true, rowIndex = 4, columnIndex = 5)
+    public void isItDDRTime(boolean _input){
+        Robot.CLIMBER.ddrTime = _input;
+    }
     
     // @Log
     // public Field2d field2022(){
