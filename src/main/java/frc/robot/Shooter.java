@@ -330,7 +330,7 @@ public class Shooter implements Loggable {
         
     }
     
-    @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Shooter Speed Offset", defaultValue = 0, min = -5000, max = 5000, rowIndex = 5, columnIndex = 2, blockIncrement = 100, height = 1, width = 2)
+    @Config.NumberSlider(tabName = "CompetitionLogger", name = "Set Shooter Speed Offset", defaultValue = 0, min = -5000, max = 5000, rowIndex = 2, columnIndex = 5, blockIncrement = 100, height = 1, width = 2)
     public void setShooterSpeedOffset(double targetOffest) {
         shooterSpeedOffset = targetOffest;
     }

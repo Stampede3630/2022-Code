@@ -31,13 +31,13 @@ public class Robot extends TimedRobot {
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
+  public static double myWattThingy;
   // public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
   public static AutoSegmentedWaypoints AUTOSEGMENTEDWAYPOINTS;
   public static XboxController xbox = new XboxController(0);
   public static GenericHID ddrPad = new GenericHID(1);
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -121,7 +121,11 @@ public class Robot extends TimedRobot {
     SHOOTER.checkAndSetShooterCANStatus();
     CLIMBER.checkAndSetClimberCANStatus();
     Logger.updateEntries();
+
+    myWattThingy =  myWattThingy + (COMPETITIONLOGGER.getMyPD() * COMPETITIONLOGGER.batteryVoltage()) / 0.02;
+    
   }
+  
 
   @Override
   public void autonomousInit() {

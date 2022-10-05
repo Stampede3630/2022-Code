@@ -3,9 +3,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -23,6 +24,7 @@ public class CompetitionLogger implements Loggable {
 
     public boolean beginClimb = false;
     public Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
+    public PowerDistribution myPD = new PowerDistribution(36, ModuleType.kRev);
 
     //KEEP THIS INSTANTIATION IT'S FOR LOGGING
     private SwerveDriveDB mySwerveDrivebuttons = new SwerveDriveDB();
@@ -118,10 +120,11 @@ public class CompetitionLogger implements Loggable {
         Robot.SHOOTER.homocideTheBattery = _input;
     }
 
-    @Config(name = "funnie clime time", defaultValueBoolean = false, rowIndex = 4, columnIndex = 5)
+    @Config(name = "funnie clime time", defaultValueBoolean = false, rowIndex = 3, columnIndex = 5, height = 1, width = 1)
     public void isItDDRTime(boolean _input){
         Robot.CLIMBER.ddrTime = _input;
     }
+
     
     // @Log
     // public Field2d field2022(){
@@ -148,9 +151,16 @@ public class CompetitionLogger implements Loggable {
     //     return Robot.xbox.getRightX();
     // }
 
+    @Log (rowIndex = 3, columnIndex = 7)
+    public double getMyPD() {
+        return Robot.myWattThingy;
+    }
+
     @Log.NumberBar (min = 0, max = 14, rowIndex = 1, columnIndex = 2)
     public double batteryVoltage() {
         return RobotController.getBatteryVoltage();
-    }
-    
+    } 
+
+
 }
+       
