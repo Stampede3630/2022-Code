@@ -184,6 +184,20 @@ public class SwerveDrive implements Loggable {
     NeutralMode = "Brake";
   }
 
+  public void enableCurrentLimiting(){
+    SwerveMap.FrontRightSwerveModule.enableCurrentLimiting();
+    SwerveMap.BackRightSwerveModule.enableCurrentLimiting();
+    SwerveMap.FrontLeftSwerveModule.enableCurrentLimiting();
+    SwerveMap.BackLeftSwerveModule.enableCurrentLimiting();
+  }
+
+  public void disableCurrentLimiting(){
+    SwerveMap.FrontRightSwerveModule.disableCurrentLimiting();
+    SwerveMap.BackRightSwerveModule.disableCurrentLimiting();
+    SwerveMap.FrontLeftSwerveModule.disableCurrentLimiting();
+    SwerveMap.BackLeftSwerveModule.disableCurrentLimiting();
+  }
+
   public double limelightTX() {  
     return NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
   } //Testing kP=1.5

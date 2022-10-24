@@ -6,10 +6,12 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-
+import com.ctre.phoenix.motorcontrol.can.TalonFXPIDSetConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -25,6 +27,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class SwerveMap {
     public static AHRS GYRO;
+
+
+
+    
 
     public static TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
     public static SimpleMotorFeedforward driveMotorFeedforward = new SimpleMotorFeedforward(Constants.kS, Constants.kV, Constants.kA);
@@ -118,10 +124,29 @@ public class SwerveMap {
         public final DriveMotor mDriveMotor;
         public boolean hasSwerveZeroingOccurred=false;
         public double swerveZeroingRetryCount = 0;
+        public  StatorCurrentLimitConfiguration steerCurrentLimitConfigurationEnable;
+        public  StatorCurrentLimitConfiguration steerCurrentLimitConfigurationDisable;
+        public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationEnable;
+        public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationDisable;
+
         public SwerveModule (DriveMotor _DriveMotor, SteeringMotor _SteeringMotor, SteeringSensor _SteeringSensor){
             mSteeringMotor = _SteeringMotor;
             mSteeringSensor = _SteeringSensor;
             mDriveMotor = _DriveMotor;
+
+            steerCurrentLimitConfigurationEnable.enable = true;
+            steerCurrentLimitConfigurationEnable.triggerThresholdCurrent = 60;
+            steerCurrentLimitConfigurationEnable.triggerThresholdTime = .1;
+            steerCurrentLimitConfigurationEnable.currentLimit = 30;
+
+            steerCurrentLimitConfigurationDisable.enable = false;
+            driveCurrentLimitConfigurationDisable.enable = false; 
+
+            driveCurrentLimitConfigurationEnable.enable = true;
+            driveCurrentLimitConfigurationEnable.triggerThresholdCurrent = 80;
+            driveCurrentLimitConfigurationEnable.triggerThresholdTime = .1;
+            driveCurrentLimitConfigurationEnable.currentLimit = 60;
+
                        
         }
 
@@ -132,7 +157,8 @@ public class SwerveMap {
 
             mDriveMotor.setInverted(mDriveMotor.kWheelDirectionType);
             mDriveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, Constants.kDefaultTimeout);
-            
+            mDriveMotor.configStatorCurrentLimit(driveCurrentLimitConfigurationEnable, 1000);
+            mDriveMotor.configStatorCurrentLimit(driveCurrentLimitConfigurationDisable, 1000);
             //mDriveMotor.config_kF(Constants.kDefaultPIDSlotID, mDriveMotor.kGAINS.kF, Constants.kDefaultTimeout);
             //mDriveMotor.config_kP(Constants.kDefaultPIDSlotID, mDriveMotor.kGAINS.kP, Constants.kDefaultTimeout);
             //mDriveMotor.config_kI(Constants.kDefaultPIDSlotID, mDriveMotor.kGAINS.kI, Constants.kDefaultTimeout);
@@ -173,7 +199,8 @@ public class SwerveMap {
             } else {
                 System.out.println("WARNING! Steer Motor  " + mSteeringMotor.getDeviceID() + " NOT configured correctly!");
             }
-
+            mSteeringMotor.configStatorCurrentLimit(steerCurrentLimitConfigurationEnable, 1000);
+            mSteeringMotor.configStatorCurrentLimit(steerCurrentLimitConfigurationDisable, 1000);
             mSteeringMotor.setInverted(TalonFXInvertType.Clockwise);
             mSteeringMotor.configSelectedFeedbackCoefficient(1/Constants.TICKSperTALONFX_STEERING_DEGREE,0,Constants.kDefaultTimeout);
             mSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor,0,Constants.kDefaultTimeout);
@@ -217,6 +244,16 @@ public class SwerveMap {
                 if(mSteeringMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,100) !=ErrorCode.OK) {mycounter++;}
                 System.out.println("RESET DETECTED FOR TALONFX " + mSteeringMotor.getDeviceID()+ " Errors: " + mycounter);
             }
+        }
+
+        public void enableCurrentLimiting(){
+            mDriveMotor.configStatorCurrentLimit(driveCurrentLimitConfigurationEnable, 250);
+            mSteeringMotor.configStatorCurrentLimit(steerCurrentLimitConfigurationEnable, 250);
+        }
+
+        public void disableCurrentLimiting(){
+            mDriveMotor.configStatorCurrentLimit(driveCurrentLimitConfigurationDisable, 250);
+            mSteeringMotor.configStatorCurrentLimit(steerCurrentLimitConfigurationDisable, 250);
         }
 
         public void swerveDisabledInit(){

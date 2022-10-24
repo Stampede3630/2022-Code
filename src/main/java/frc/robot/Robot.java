@@ -129,6 +129,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    SWERVEDRIVE.disableCurrentLimiting();
     SWERVEDRIVE.setToBrake();
     // AUTOWAYPOINTS.init();
     AUTOSEGMENTEDWAYPOINTS.init();
@@ -157,6 +158,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    SWERVEDRIVE.enableCurrentLimiting();
     SWERVEDRIVE.setToBrake();
     INTAKE.intakeNow = false;
     INTAKE.shootNow = false;
