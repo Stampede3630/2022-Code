@@ -36,18 +36,18 @@ public class SwerveDrive implements Loggable {
   public ArrayList<Double> velocities = new ArrayList<Double>();
   private static SwerveDrive SINGLE_INSTANCE = new SwerveDrive();
   
-  public boolean SDFieldRelative= Constants.DEFAULT_FIELD_RELATIVE_DRIVE;
-  public boolean holdRobotAngleEnabled = Constants.DEFAULT_HOLD_ROBOT_ANGLE;
-  public PIDController holdRobotAngleController = new PIDController(Constants.ROBOTHoldAngleKP, 0, 0);
+  public boolean SDFieldRelative= SwerveConstants.DEFAULT_FIELD_RELATIVE_DRIVE;
+  public boolean holdRobotAngleEnabled = SwerveConstants.DEFAULT_HOLD_ROBOT_ANGLE;
+  public PIDController holdRobotAngleController = new PIDController(SwerveConstants.ROBOTHoldAngleKP, 0, 0);
   
-  public double holdRobotAngleSetpoint = Constants.DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT;
-  public double joystickDriveGovernor = Constants.SPEED_GOVERNOR;
+  public double holdRobotAngleSetpoint = SwerveConstants.DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT;
+  public double joystickDriveGovernor = SwerveConstants.SPEED_GOVERNOR;
   public String NeutralMode = "Brake";
 
-  public final Translation2d m_frontLeftLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, Constants.TRACK_WIDE/2);
-  public final Translation2d m_frontRightLocation = new Translation2d(Constants.WHEEL_BASE_METERS/2, -Constants.TRACK_WIDE/2);
-  public final Translation2d m_backLeftLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, Constants.TRACK_WIDE/2);
-  public final Translation2d m_backRightLocation = new Translation2d(-Constants.WHEEL_BASE_METERS/2, -Constants.TRACK_WIDE/2);
+  public final Translation2d m_frontLeftLocation = new Translation2d(SwerveConstants.WHEEL_BASE_METERS/2, SwerveConstants.TRACK_WIDE/2);
+  public final Translation2d m_frontRightLocation = new Translation2d(SwerveConstants.WHEEL_BASE_METERS/2, -SwerveConstants.TRACK_WIDE/2);
+  public final Translation2d m_backLeftLocation = new Translation2d(-SwerveConstants.WHEEL_BASE_METERS/2, SwerveConstants.TRACK_WIDE/2);
+  public final Translation2d m_backRightLocation = new Translation2d(-SwerveConstants.WHEEL_BASE_METERS/2, -SwerveConstants.TRACK_WIDE/2);
   public final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
   public SwerveDriveOdometry m_odometry;
@@ -109,7 +109,7 @@ public class SwerveDrive implements Loggable {
         ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, SwerveMap.getRobotAngle())
         : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
 
-      SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
+      SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, SwerveConstants.MAX_SPEED_METERSperSECOND);
 
       if (defensiveStop && _xSpeed == 0 && _ySpeed == 0 && _rot == 0) {
         SwerveMap.FrontRightSwerveModule.setSteeringAngle(135);
@@ -210,11 +210,11 @@ public class SwerveDrive implements Loggable {
   }
 
   private double convertToMetersPerSecond(double _input){
-    return _input*Constants.MAX_SPEED_METERSperSECOND;
+    return _input*SwerveConstants.MAX_SPEED_METERSperSECOND;
   }
 
   private double convertToRadiansPerSecond(double _input){
-    return _input*Constants.MAX_SPEED_RADIANSperSECOND;
+    return _input*SwerveConstants.MAX_SPEED_RADIANSperSECOND;
   }
   private double deadband(double _input){
       if(Math.abs(_input)<= Constants.XBOXDEADBAND){

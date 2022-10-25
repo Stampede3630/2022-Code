@@ -26,10 +26,10 @@ public class SwerveTrajectory implements Loggable {
         return SINGLE_INSTANCE;
     }
     public static HolonomicDriveController HDC = new HolonomicDriveController(
-        new PIDController(Constants.kP,0, 0), 
-        new PIDController(Constants.kP, 0, 0), 
-        new ProfiledPIDController(Constants.kP*Constants.MAX_SPEED_RADIANSperSECOND/Constants.MAX_SPEED_METERSperSECOND, 0, 0, 
-        new Constraints(Constants.MAX_SPEED_RADIANSperSECOND, Constants.MAX_SPEED_RADIANSperSECOND)));
+        new PIDController(SwerveConstants.kP,0, 0), 
+        new PIDController(SwerveConstants.kP, 0, 0), 
+        new ProfiledPIDController(SwerveConstants.kP*SwerveConstants.MAX_SPEED_RADIANSperSECOND/SwerveConstants.MAX_SPEED_METERSperSECOND, 0, 0, 
+        new Constraints(SwerveConstants.MAX_SPEED_RADIANSperSECOND, SwerveConstants.MAX_SPEED_RADIANSperSECOND)));
     
 
     /**This is WPILIBs Trajectory Runner (docs.wpilib.org), it pretends that your robot is NOT a swerve drive.  This will work, but there are better options for 2022
