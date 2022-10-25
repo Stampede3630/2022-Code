@@ -33,7 +33,7 @@ public class Climber implements Loggable{
     boolean autoExtend = true;
     // boolean climberSafety = true;
 
-    public double safePitch = 2; // TODO: 0 is a good starting point... check for pitch velocity
+    public double safePitch = 2; 
     public float currentPitch;
     public float currentPitchSpeed;
     final double TICKSPERREVOLUTION=2048;
@@ -74,17 +74,14 @@ public class Climber implements Loggable{
         currentPitchSpeed = SwerveMap.GYRO.getVelocityY();
         if (!atOrigin) {
           reZero();
-        } else if (Robot.COMPETITIONLOGGER.beginClimb) {
-            climberRunner("");
         } else {
             manualClimberSolenoid();
             manualClimberMotor();
-            
         }
     }
 
     public void reZero() { 
-        if (climberHomeLeft.get() || climberHomeRight.get() || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) >-.5 )) { //SJV:create climbsafety variable to override limit switches incase malfunctions occur
+        if (climberHomeLeft.get() || climberHomeRight.get() || (upCompleted && climberTalon.getSelectedSensorPosition(0) < 1 && climberTalon.getSelectedSensorVelocity(0) >-.5 )) {
             atOrigin = true;
             climberTalon.set(ControlMode.PercentOutput, 0);
             climberTalon.setSelectedSensorPosition(0, 0, 20);
@@ -99,163 +96,44 @@ public class Climber implements Loggable{
     }
 
     private void manualClimberMotor(){
-      if (ddrTime){  
         if (climberTalon.getSelectedSensorPosition(0) >= 28) {
             fullyExtended = true;
         } else {
             fullyExtended = false;
         }
+
+        if (ddrTime){  
             if (Robot.ddrPad.getPOV() == 0 && !fullyExtended){
                 climberTalon.set(ControlMode.PercentOutput, 1); 
-            }
-            else if (Robot.ddrPad.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
+            } else if (Robot.ddrPad.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())) {
                 climberTalon.set(ControlMode.PercentOutput, -1);
             } else {
                 climberTalon.set(ControlMode.PercentOutput, 0);
             }
-    } else {
-            if (climberTalon.getSelectedSensorPosition(0) >= 28) {
-                fullyExtended = true;
+        } else {
+            if (Robot.xbox.getPOV() == 0 && !fullyExtended){
+                climberTalon.set(ControlMode.PercentOutput, 1); 
+            } else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
+                climberTalon.set(ControlMode.PercentOutput, -1);
             } else {
-                fullyExtended = false;
+                climberTalon.set(ControlMode.PercentOutput, 0);
             }
-                if (Robot.xbox.getPOV() == 0 && !fullyExtended){
-                    climberTalon.set(ControlMode.PercentOutput, 1); 
-                }
-                else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
-                    climberTalon.set(ControlMode.PercentOutput, -1);
-                } else {
-                    climberTalon.set(ControlMode.PercentOutput, 0);
-                }
-
         }
     }
     
     private void manualClimberSolenoid(){
-    if (ddrTime){
-        if (Robot.ddrPad.getPOV() == 90 ){ 
-           openSolenoid();
-        } else if (Robot.ddrPad.getPOV() == 270 ){ 
-           closeSolenoid();
-           
-        }
-    }    else {
-        if (Robot.xbox.getPOV() == 90 ){ 
+        if (ddrTime){
+            if (Robot.ddrPad.getPOV() == 90 ){ 
             openSolenoid();
-        } else if (Robot.xbox.getPOV() == 270 ){ 
-            closeSolenoid();
-            
-        }
-        }
-    }
-
-    private void autoClimberExtend() {
-        if (currentPitch < safePitch && Robot.ddrPad.getPOV() == 0 && !fullyExtended) {
-            climberTalon.set(ControlMode.PercentOutput, 1);
-        } else if (Robot.ddrPad.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeLeft.get())) {
-            climberTalon.set(ControlMode.PercentOutput, -1);
-        } else {
-            climberTalon.set(ControlMode.PercentOutput, 0);
-        }
-    }
-
-    public enum ClimberState{
-        START(SINGLE_INSTANCE::getUserInput, "OPENSOLENOID1"),
-        OPENSOLENOID1(SINGLE_INSTANCE::openSolenoid, "RAISEARM1"), // Change back to raise28 when done 
-        RAISEARM1(SINGLE_INSTANCE::raiseArm28, "USERINPUT1"),
-        USERINPUT1(SINGLE_INSTANCE::getUserInput, "LOWERARM1"), 
-        LOWERARM1(SINGLE_INSTANCE::lowerArm28, "USERINPUT2"), // Change back to lower28 when done (hasn't been tested yet)
-        USERINPUT2(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND1"), 
-        RAISEANDEXTEND1(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT5"), 
-        USERINPUT5(SINGLE_INSTANCE::getUserInput, "LOWERARM3"),
-        LOWERARM3(SINGLE_INSTANCE::lowerArm28, "USERINPUT7"),
-        USERINPUT7(SINGLE_INSTANCE::getUserInput, "RAISEANDEXTEND3"), 
-        RAISEANDEXTEND3(SINGLE_INSTANCE::raiseAndExtend, "USERINPUT10"),
-        USERINPUT10(SINGLE_INSTANCE::getUserInput, "LOWERARM4"),
-        LOWERARM4(SINGLE_INSTANCE::lowerArm28, "DONE"),
-        DONE(SINGLE_INSTANCE::DoneAction, "DONE");
-
-        private Runnable action;
-        private String nextState;
-
-        ClimberState(Runnable _action, String _nextState){
-            action = _action;
-            nextState = _nextState;
-        }
-
-        public Runnable getAction() {
-            return action;
-        }
-
-        public String getNextState() {
-            return nextState;
-        }
-    }
-
-    public void climberRunner(String _startingState){
-        if (_startingState != "" && StartingStateOverride){
-            CurrentState = _startingState;
-            StartingStateOverride = false;
-        } 
-       
-        if (CurrentState == "") {
-            CurrentState = ClimberState.values()[0].toString();
-        }
-        // If we made one round with the state, we have successfully initialized
-        if (!StateHasInitialized) {StateHasInitialized = true;}
-        ClimberState.valueOf(CurrentState).getAction().run();
-        if (StateHasFinished){
-            CurrentState = ClimberState.valueOf(CurrentState).getNextState();
-            StateHasFinished = false; 
-            StateHasInitialized = false;
-        }
-    }
-
-
-    public void raiseAndExtend()  {
-        if (climberTalon.getSelectedSensorPosition(0) < 15.0) {
-            climberSolenoid.set(Value.kReverse);
-            climberTalon.set(ControlMode.PercentOutput, 1);
-            //(ControlMode.Position, DemandType.ArbitraryFeedForward, -.15);
-
-        } else if (climberTalon.getSelectedSensorPosition(0) >= 15.0 && currentPitch < safePitch) {
-            if (climberTalon.getSelectedSensorPosition(0) >= 29.0) {
-                climberTalon.set(ControlMode.PercentOutput, 0);
-        
-                StateHasFinished = true;
-            } else {
-                climberSolenoid.set(Value.kForward);
-                climberTalon.set(ControlMode.PercentOutput, 1);
+            } else if (Robot.ddrPad.getPOV() == 270 ){ 
+            closeSolenoid(); 
             }
         } else {
-            climberTalon.set(ControlMode.PercentOutput, 0);
-        }
-    }
-
-    public void raiseArm28() {
-        climberTalon.set(ControlMode.Position, 25.0);
-
-        if (climberTalon.getSelectedSensorPosition(0) >= 25.0) {
-            StateHasFinished  = true;
-        }
-    }
-
-    public void lowerArm28() {
-
-        // **** Add fault tolerance for arms ****
-        if (climberHomeLeft.get() || climberHomeRight.get() || climberTalon.getSelectedSensorPosition(0) <= -1) {
-            climberTalon.set(ControlMode.PercentOutput, 0);
-            StateHasFinished = true;
-        } else {
-            climberTalon.set(ControlMode.PercentOutput, -1);
-        }
-    }
-
-    public void raiseArm14() {
-        climberTalon.set(ControlMode.Position, 14);
-
-        if (climberTalon.getSelectedSensorPosition(0)>=14) {
-            StateHasFinished = true;
+            if (Robot.xbox.getPOV() == 90 ){ 
+                openSolenoid();
+            } else if (Robot.xbox.getPOV() == 270 ){ 
+                closeSolenoid();
+            }
         }
     }
 
@@ -271,20 +149,6 @@ public class Climber implements Loggable{
         StateHasFinished = true;
 
     }
-
-    public void getUserInput() {
-        if(Robot.xbox.getAButton()){
-            StateHasFinished =true;
-        }
-    }
-    public void getAltUserInput() {
-        if(Robot.xbox.getBButton()){
-            StateHasFinished =true;
-        }
-    }
-
-    public void DoneAction() {
-    } 
 
     public void checkAndSetClimberCANStatus() {
         if(climberTalon.hasResetOccurred()){
@@ -317,15 +181,5 @@ public class Climber implements Loggable{
     public boolean getClimberHomeRight() {
         return climberHomeRight.get();
     }
-
-    @Config(defaultValueBoolean = true)
-    public void getAutoExtend(boolean _input) {
-        autoExtend = _input;
-    }
-
-    // @Log
-    // public double getClimberTalonPosition() {
-    //   return climberTalon.getSelectedSensorPosition();
-    // }
 
 }
