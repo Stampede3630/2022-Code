@@ -130,7 +130,7 @@ public class Robot extends TimedRobot {
     Logger.updateEntries();
 
     
-    myWattThingy =  myWattThingy + (COMPETITIONLOGGER.myPD.getTotalCurrent() * COMPETITIONLOGGER.batteryVoltage()) * (Timer.getFPGATimestamp() - previousTimestamp);
+    myWattThingy += (COMPETITIONLOGGER.myPD.getTotalCurrent() * COMPETITIONLOGGER.batteryVoltage()) * (Timer.getFPGATimestamp() - previousTimestamp);
 
     myJuulPod = myWattThingy/1000;
 
@@ -190,13 +190,13 @@ public class Robot extends TimedRobot {
     
 
     SWERVEDRIVE.swervePeriodic();
-      //intake code for teleop
-
-   CLIMBER.periodic();
-
+    
+    CLIMBER.periodic();
+    
     INTAKE.intakePeriodic();
-    // SHOOTER INSTANCE LOOP
+    //intake code for teleop
     SHOOTER.shooterPeriodic();
+    // SHOOTER INSTANCE LOOP
   }
 
   /** This function is called once when the robot is disabled. */

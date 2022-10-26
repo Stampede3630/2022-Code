@@ -124,10 +124,10 @@ public class SwerveMap {
         public final DriveMotor mDriveMotor;
         public boolean hasSwerveZeroingOccurred=false;
         public double swerveZeroingRetryCount = 0;
-        public  StatorCurrentLimitConfiguration steerCurrentLimitConfigurationEnable;
-        public  StatorCurrentLimitConfiguration steerCurrentLimitConfigurationDisable;
-        public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationEnable;
-        public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationDisable;
+        public  StatorCurrentLimitConfiguration steerCurrentLimitConfigurationEnable = new StatorCurrentLimitConfiguration();
+        public  StatorCurrentLimitConfiguration steerCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
+        public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationEnable = new StatorCurrentLimitConfiguration();
+        public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
 
         public SwerveModule (DriveMotor _DriveMotor, SteeringMotor _SteeringMotor, SteeringSensor _SteeringSensor){
             mSteeringMotor = _SteeringMotor;
