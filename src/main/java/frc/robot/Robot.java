@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+import edu.wpi.first.wpilibj.Timer;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Log;
 
  /*For starting a new Stampede swerve project
   * 1. Zero out the following constants: ks, kv
@@ -31,7 +34,9 @@ public class Robot extends TimedRobot {
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
-  public static double myWattThingy;
+  public static double myWattThingy = 0;
+  public static double myJuulPod = 0;
+  public double previousTimestamp;
   // public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
@@ -50,6 +55,8 @@ public class Robot extends TimedRobot {
     LiveWindow.disableAllTelemetry();
     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
     SwerveMap.checkAndSetSwerveCANStatus();
+
+    previousTimestamp = Timer.getFPGATimestamp();
 
     //**Intake method starts here**
     INTAKE = Intake.getInstance();
@@ -122,8 +129,14 @@ public class Robot extends TimedRobot {
     CLIMBER.checkAndSetClimberCANStatus();
     Logger.updateEntries();
 
-    myWattThingy =  myWattThingy + (COMPETITIONLOGGER.getMyPD() * COMPETITIONLOGGER.batteryVoltage()) / 0.02;
     
+    myWattThingy =  myWattThingy + (COMPETITIONLOGGER.myPD.getTotalCurrent() * COMPETITIONLOGGER.batteryVoltage()) * (Timer.getFPGATimestamp() - previousTimestamp);
+
+    myJuulPod = myWattThingy/1000;
+
+    System.out.println(myJuulPod);
+    
+    previousTimestamp = Timer.getFPGATimestamp();
   }
   
 
@@ -205,5 +218,9 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
 
+  @Log (rowIndex = 3, columnIndex = 7, tabName = "CompetitionLogger")
+  public double getMyPD() {
+      return Robot.myWattThingy;
+  }
 
 } 

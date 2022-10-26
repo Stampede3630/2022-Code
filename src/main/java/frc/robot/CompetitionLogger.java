@@ -23,7 +23,7 @@ public class CompetitionLogger implements Loggable {
     double shooterAngle = Robot.SHOOTER.calculateShooterAngle();
 
     public boolean beginClimb = false;
-    public Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
+    public Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
     public PowerDistribution myPD = new PowerDistribution(36, ModuleType.kRev);
 
     //KEEP THIS INSTANTIATION IT'S FOR LOGGING
@@ -151,16 +151,13 @@ public class CompetitionLogger implements Loggable {
     //     return Robot.xbox.getRightX();
     // }
 
-    @Log (rowIndex = 3, columnIndex = 7)
-    public double getMyPD() {
-        return Robot.myWattThingy;
-    }
 
     @Log.NumberBar (min = 0, max = 14, rowIndex = 1, columnIndex = 2)
     public double batteryVoltage() {
         return RobotController.getBatteryVoltage();
     } 
 
+   
 
 }
        
