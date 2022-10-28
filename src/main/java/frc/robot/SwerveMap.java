@@ -151,7 +151,12 @@ public class SwerveMap {
         }
 
         public void swerveRobotInit(){
-
+            
+            steerCurrentLimitConfigurationEnable  = new StatorCurrentLimitConfiguration();
+            steerCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
+            driveCurrentLimitConfigurationEnable  = new StatorCurrentLimitConfiguration();
+            driveCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
+            
             //Setup the drive motor, but first set EVERYTHING to DEFAULT
             //mDriveMotor.configFactoryDefault();
 

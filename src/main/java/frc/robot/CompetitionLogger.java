@@ -22,7 +22,6 @@ public class CompetitionLogger implements Loggable {
     @Log
     double shooterAngle = Robot.SHOOTER.calculateShooterAngle();
 
-    public boolean beginClimb = false;
     public Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
     public PowerDistribution myPD = new PowerDistribution(36, ModuleType.kRev);
 
@@ -56,13 +55,6 @@ public class CompetitionLogger implements Loggable {
         @Config(defaultValueBoolean = false)
         public void SetShotBlock(boolean _input){
             Robot.SHOOTER.shotBlock = _input;
-        }
-
-        @Config
-        private void beginClimbing(boolean _input){
-            
-                beginClimb = _input;
-            
         }
         
         @Config (defaultValueBoolean = true)
