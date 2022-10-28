@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import io.github.oblarg.oblog.Logger;
+import edu.wpi.first.wpilibj.RobotBase;
 
  /*For starting a new Stampede swerve project
   * 1. Zero out the following constants: ks, kv
@@ -46,7 +47,11 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     LiveWindow.setEnabled(false);
     LiveWindow.disableAllTelemetry();
-    SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+    if (RobotBase.isReal()) {
+      SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+    } else {
+
+    }
     SwerveMap.checkAndSetSwerveCANStatus();
 
     //**Intake method starts here**
@@ -203,6 +208,16 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
+  }
+
+  @Override
+  public void simulationInit() {
+    
+  }
+
+  @Override
+  public void simulationPeriodic() {
+
   }
 
 

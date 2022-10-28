@@ -3,8 +3,8 @@
     "GLOBAL": {
       "height": "1377",
       "maximized": "1",
-      "style": "0",
-      "userScale": "2",
+      "style": "1",
+      "userScale": "4",
       "width": "3440",
       "xpos": "0",
       "ypos": "23"
@@ -14,17 +14,17 @@
     "###/Shuffleboard/CompetitionLogger/m_autoChooser": {
       "Collapsed": "0",
       "Pos": "199,60",
-      "Size": "254,54"
+      "Size": "361,66"
     },
     "###FMS": {
       "Collapsed": "0",
       "Pos": "5,540",
-      "Size": "283,146"
+      "Size": "388,182"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "115,159",
-      "Size": "796,73"
+      "Pos": "323,119",
+      "Size": "1156,91"
     },
     "###NetworkTables": {
       "Collapsed": "0",
@@ -33,18 +33,18 @@
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1025,20",
+      "Pos": "1551,77",
       "Size": "250,695"
     },
     "###System Joysticks": {
       "Collapsed": "0",
       "Pos": "276,307",
-      "Size": "192,218"
+      "Size": "273,290"
     },
     "###Timing": {
       "Collapsed": "0",
       "Pos": "5,150",
-      "Size": "135,127"
+      "Size": "188,157"
     },
     "Debug##Default": {
       "Collapsed": "0",
@@ -54,7 +54,7 @@
     "Robot State": {
       "Collapsed": "0",
       "Pos": "5,20",
-      "Size": "92,99"
+      "Size": "126,129"
     }
   }
 }
