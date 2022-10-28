@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.swerve;
 
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 public class SwerveConstants {

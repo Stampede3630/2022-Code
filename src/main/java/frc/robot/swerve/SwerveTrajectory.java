@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.swerve;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Robot;
 import io.github.oblarg.oblog.Loggable;
 
 public class SwerveTrajectory implements Loggable {
@@ -47,7 +48,7 @@ public class SwerveTrajectory implements Loggable {
      * @param _odometry SwerveDrive.java's odometry
      * @param _rotation2d Pass in the current angle of the robot
      */
-    public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
+    public static void PathPlannerRunner(SwerveDrive swerveDrive, PathPlannerTrajectory _pathTraj, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
         elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
         switch (trajectoryStatus) {
             case "setup":    
@@ -62,19 +63,19 @@ public class SwerveTrajectory implements Loggable {
                     ChassisSpeeds _speeds = HDC.calculate(
                         _odometry.getPoseMeters(), 
                         ((PathPlannerState) _pathTraj.sample(elapsedTime)),((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
-                    Robot.SWERVEDRIVE.drive(_speeds.vxMetersPerSecond,
+                        swerveDrive.drive(_speeds.vxMetersPerSecond,
                     _speeds.vyMetersPerSecond, 
                     _speeds.omegaRadiansPerSecond,false);
                     
                 } else {
-                    Robot.SWERVEDRIVE.drive(0,0,0,false);
-                    Robot.SWERVEDRIVE.setHoldRobotAngleSetpoint(((PathPlannerState) _pathTraj.getEndState()).holonomicRotation.getRadians());
+                    swerveDrive.drive(0,0,0,false);
+                    swerveDrive.setHoldRobotAngleSetpoint(((PathPlannerState) _pathTraj.getEndState()).holonomicRotation.getRadians());
                     trajectoryStatus = "done";
 
                 }
                 break;
             default:
-                Robot.SWERVEDRIVE.drive(0,0,0,false);
+                swerveDrive.drive(0,0,0,false);
                 break;
         }
     }

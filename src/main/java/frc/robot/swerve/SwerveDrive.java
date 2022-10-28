@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.swerve;
 
 import java.util.ArrayList;
 
@@ -16,6 +16,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import frc.robot.Constants;
+import frc.robot.Robot;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;

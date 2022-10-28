@@ -8,6 +8,8 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.robot.swerve.SwerveMap;
+import frc.robot.swerve.SwerveTrajectory;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -304,7 +306,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             StateHasInitialized = true;
         }
         
-        SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment,  Robot.SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+        SwerveTrajectory.PathPlannerRunner(Robot.SWERVEDRIVE, thisWaypointSet[currentWaypointNumber].pathPlannerSegment,  Robot.SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
         thisWaypointSet[currentWaypointNumber].action.run();
 
         if (StateHasFinished){

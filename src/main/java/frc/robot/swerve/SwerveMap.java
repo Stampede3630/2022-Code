@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.swerve;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.ParamEnum;
@@ -24,6 +24,8 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.Constants;
+import frc.robot.Robot;
 
 public class SwerveMap {
     public static AHRS GYRO;
