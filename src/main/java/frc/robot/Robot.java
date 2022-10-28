@@ -3,16 +3,27 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+import java.util.Arrays;
+
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import frc.robot.swerve.SwerveConstants;
+import frc.robot.sim.wpiClasses.QuadSwerveSim;
+import frc.robot.sim.wpiClasses.SwerveModuleSim;
+import frc.robot.swerve.SwerveDrive;
+import frc.robot.swerve.SwerveMap;
+import frc.robot.swerve.SwerveTrajectory;
 import io.github.oblarg.oblog.Logger;
 import edu.wpi.first.wpilibj.RobotBase;
+
 
  /*For starting a new Stampede swerve project
   * 1. Zero out the following constants: ks, kv
@@ -37,6 +48,54 @@ public class Robot extends TimedRobot {
   public static AutoSegmentedWaypoints AUTOSEGMENTEDWAYPOINTS;
   public static XboxController xbox = new XboxController(0);
   public static GenericHID ddrPad = new GenericHID(1);
+  public static QuadSwerveSim simSwerve = new QuadSwerveSim(SwerveConstants.TRACK_WIDE, 
+                                                            SwerveConstants.WHEEL_BASE_METERS, 
+                                                            56.6, 1.0/12.0 * 56.6 * Math.pow((SwerveConstants.TRACK_WIDE*1.1),2) * 2,
+                                                            Arrays.asList(new SwerveModuleSim(DCMotor.getFalcon500(1), 
+                                                            DCMotor.getFalcon500(1), 
+                                                            SwerveConstants.WHEEL_RADIUS_METERS,
+                                                            1.0/SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
+                                                            1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+                                                            1.0/SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
+                                                            1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+                                                            1.3,
+                                                            0.7,
+                                                            56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
+                                                            0.01 
+                                                            ), new SwerveModuleSim(DCMotor.getFalcon500(1), 
+                                                            DCMotor.getFalcon500(1), 
+                                                            SwerveConstants.WHEEL_RADIUS_METERS,
+                                                            1.0/SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
+                                                            1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+                                                            1.0/SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
+                                                            1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+                                                            1.3,
+                                                            0.7,
+                                                            56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
+                                                            0.01 
+                                                            ), new SwerveModuleSim(DCMotor.getFalcon500(1), 
+                                                            DCMotor.getFalcon500(1), 
+                                                            SwerveConstants.WHEEL_RADIUS_METERS,
+                                                            1.0/SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
+                                                            1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+                                                            1.0/SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
+                                                            1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+                                                            1.3,
+                                                            0.7,
+                                                            56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
+                                                            0.01 
+                                                            ), new SwerveModuleSim(DCMotor.getFalcon500(1), 
+                                                            DCMotor.getFalcon500(1), 
+                                                            SwerveConstants.WHEEL_RADIUS_METERS,
+                                                            1.0/SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
+                                                            1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+                                                            1.0/SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
+                                                            1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+                                                            1.3,
+                                                            0.7,
+                                                            56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
+                                                            0.01 
+                                                            )));
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -217,6 +276,26 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationPeriodic() {
+
+    if(!DriverStation.isEnabled()){
+      for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
+        simSwerve.get(idx).setInputVoltages(0.0, 0.0);
+      }
+    } else {
+        for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
+            double azmthVolts = simSwerve.get(idx).getAppliedRotationVoltage();
+            double wheelVolts = simSwerve.get(idx).getAppliedDriveVoltage();
+            simSwerve.get(idx).setInputVoltages(wheelVolts, azmthVolts);
+        }
+    }
+
+    Pose2d prevRobotPose = simSwerve.getCurPose();
+
+    // Update model (several small steps)
+    for (int i = 0; i< 20; i++) {
+      simSwerve.update(0.001);
+    }
+    
 
   }
 
