@@ -7,11 +7,9 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import io.github.oblarg.oblog.Logger;
 

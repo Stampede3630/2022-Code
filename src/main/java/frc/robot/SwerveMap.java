@@ -134,6 +134,11 @@ public class SwerveMap {
             mSteeringSensor = _SteeringSensor;
             mDriveMotor = _DriveMotor;
 
+            steerCurrentLimitConfigurationEnable  = new StatorCurrentLimitConfiguration();
+            steerCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
+            driveCurrentLimitConfigurationEnable  = new StatorCurrentLimitConfiguration();
+            driveCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
+
             steerCurrentLimitConfigurationEnable.enable = true;
             steerCurrentLimitConfigurationEnable.triggerThresholdCurrent = 60;
             steerCurrentLimitConfigurationEnable.triggerThresholdTime = .1;
@@ -152,10 +157,7 @@ public class SwerveMap {
 
         public void swerveRobotInit(){
             
-            steerCurrentLimitConfigurationEnable  = new StatorCurrentLimitConfiguration();
-            steerCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
-            driveCurrentLimitConfigurationEnable  = new StatorCurrentLimitConfiguration();
-            driveCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
+
             
             //Setup the drive motor, but first set EVERYTHING to DEFAULT
             //mDriveMotor.configFactoryDefault();
