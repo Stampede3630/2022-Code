@@ -18,7 +18,7 @@ public class QuadSwerveSim {
     static public final int BR = 3; // Back Right Module Index
     static public final int NUM_MODULES = 4;
 
-    public List<SwerveModuleSim> modules;
+    List<SwerveModuleSim> modules;
 
     Vector2d accel_prev = new Vector2d();
     Vector2d vel_prev   = new Vector2d();

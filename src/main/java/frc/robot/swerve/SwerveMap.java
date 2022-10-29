@@ -1,5 +1,7 @@
 package frc.robot.swerve;
 
+import java.util.List;
+
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -29,6 +31,7 @@ import frc.robot.Robot;
 
 public class SwerveMap {
     public static AHRS GYRO;
+    
 
 
 
@@ -52,6 +55,7 @@ public class SwerveMap {
         new DriveMotor(SwerveConstants.BLDriveID,SwerveConstants.BLInvertType, SwerveConstants.BLDriveGains), 
         new SteeringMotor(SwerveConstants.BLSteerID, SwerveConstants.BLSteerGains), 
         new SteeringSensor(SwerveConstants.BLSensorID,SwerveConstants.BLSensorOffset));
+    public static final List<SwerveModule> RealSwerveModuleList = List.of(FrontLeftSwerveModule, FrontRightSwerveModule, BackLeftSwerveModule, BackRightSwerveModule);
 
     public static Rotation2d getRobotAngle(){
         return GYRO.getRotation2d();
