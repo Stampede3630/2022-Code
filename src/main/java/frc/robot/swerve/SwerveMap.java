@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXPIDSetConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -28,9 +29,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.sim.SimEncoder;
+import frc.robot.sim.SimGyroSensorModel;
 
 public class SwerveMap {
     public static AHRS GYRO;
+    public static SimGyroSensorModel simNavx;
     
 
 
@@ -126,8 +130,12 @@ public class SwerveMap {
      */
     public static class SwerveModule {
         public final SteeringMotor mSteeringMotor;
+        public final TalonFXSimCollection mSimSteeringSimCollection;
         public final SteeringSensor mSteeringSensor;
         public final DriveMotor mDriveMotor;
+        public final TalonFXSimCollection mSimDriveSimCollection;
+        public final SimEncoder mSimSteeringEncoder;
+        public final SimEncoder mSimDriveEncoder;
         public boolean hasSwerveZeroingOccurred=false;
         public double swerveZeroingRetryCount = 0;
         public  StatorCurrentLimitConfiguration steerCurrentLimitConfigurationEnable;
@@ -139,6 +147,11 @@ public class SwerveMap {
             mSteeringMotor = _SteeringMotor;
             mSteeringSensor = _SteeringSensor;
             mDriveMotor = _DriveMotor;
+
+            mSimSteeringSimCollection = new TalonFXSimCollection(_SteeringMotor);
+            mSimDriveSimCollection = new TalonFXSimCollection(_DriveMotor);
+            mSimSteeringEncoder = new SimEncoder();
+            mSimDriveEncoder = new SimEncoder();
 
             steerCurrentLimitConfigurationEnable  = new StatorCurrentLimitConfiguration();
             steerCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
@@ -276,6 +289,21 @@ public class SwerveMap {
         public void swerveEnabledInit(){
             mDriveMotor.setNeutralMode(NeutralMode.Brake);
             mSteeringMotor.setNeutralMode(NeutralMode.Brake);
+        }
+        /**
+        * Set the state of the module as specified by the simulator
+        * @param angle_rad
+        * @param wheelPos_m
+        * @param wheelVel_mps
+        */
+        public void setSimState(double angle_rad, double wheelPos_m, double wheelVel_mps) {
+            mSimSteeringSimCollection.setIntegratedSensorRawPosition( (int) (Math.toDegrees(angle_rad)*SwerveConstants.TICKSperTALONFX_STEERING_DEGREE));
+            mSimDriveSimCollection.setIntegratedSensorRawPosition( (int) wheelPos_m);
+            mSimDriveSimCollection.setIntegratedSensorVelocity( (int) wheelVel_mps);
+
+            mSimSteeringEncoder.setPosition(angle_rad);
+            mSimDriveEncoder.setPosition(wheelPos_m);
+            mSimDriveEncoder.setVelocity(wheelVel_mps);
         }
 
         public void zeroSwerveAngle() {

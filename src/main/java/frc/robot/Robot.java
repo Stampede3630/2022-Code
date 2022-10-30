@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.robot.swerve.SwerveConstants;
+import frc.robot.sim.SimGyroSensorModel;
 import frc.robot.sim.wpiClasses.QuadSwerveSim;
 import frc.robot.sim.wpiClasses.SwerveModuleSim;
 import frc.robot.swerve.SwerveDrive;
@@ -64,7 +65,7 @@ public class Robot extends TimedRobot {
     if (RobotBase.isReal()) {
       SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
     } else {
-
+      SwerveMap.simNavx = new SimGyroSensorModel();
     }
     SwerveMap.checkAndSetSwerveCANStatus();
 
@@ -260,8 +261,8 @@ public class Robot extends TimedRobot {
 
       double wheelVel = swerveModuleSimList.get(idx).getWheelEncoderVelocityRevPerSec();
       wheelVel = wheelVel / SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
-      modules.get(idx).setSimState(azmthPos, wheelPos, wheelVel);
-      simNavx.update(simSwerve.getCurPose(), prevRobotPose);
+      SwerveMap.RealSwerveModuleList.get(idx).setSimState(azmthPos, wheelPos, wheelVel);
+      SwerveMap.simNavx.update(simSwerve.getCurPose(), prevRobotPose);
     }
 
 
