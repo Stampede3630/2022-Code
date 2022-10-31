@@ -1,6 +1,7 @@
 package frc.robot.swerve;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
@@ -14,7 +15,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
-
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.simulation.JoystickSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -26,7 +28,7 @@ import io.github.oblarg.oblog.annotations.Log;
 public class SwerveDrive implements Loggable {
   public boolean autoLimeLightAim = false;
   public boolean acceleratedInputs = true;
-  public boolean defensiveStop = true;
+  public boolean defensiveStop = false;
 
   public double previousXDistance = 0;
   public double previousYDistance = 0;
@@ -50,12 +52,11 @@ public class SwerveDrive implements Loggable {
   public final Translation2d m_frontRightLocation = new Translation2d(SwerveConstants.WHEEL_BASE_METERS/2, -SwerveConstants.TRACK_WIDE/2);
   public final Translation2d m_backLeftLocation = new Translation2d(-SwerveConstants.WHEEL_BASE_METERS/2, SwerveConstants.TRACK_WIDE/2);
   public final Translation2d m_backRightLocation = new Translation2d(-SwerveConstants.WHEEL_BASE_METERS/2, -SwerveConstants.TRACK_WIDE/2);
+  public final List<Translation2d> getSwerveBotTranslationList = List.of(m_frontLeftLocation, m_frontRightLocation,m_backLeftLocation, m_backRightLocation);
   public final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
   public SwerveDriveOdometry m_odometry;
 
-  public final Field2d field = new Field2d();
-  
   public static SwerveDrive getInstance() {
     return SINGLE_INSTANCE;
   }
@@ -78,7 +79,6 @@ public class SwerveDrive implements Loggable {
       getSDySpeed(), 
       getSDRotation(), 
       getSDFieldRelative());
-      field.setRobotPose(m_odometry.getPoseMeters());
     //getVelocities();
   }
   /**
@@ -112,7 +112,7 @@ public class SwerveDrive implements Loggable {
         : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
 
       SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, SwerveConstants.MAX_SPEED_METERSperSECOND);
-
+      
       if (defensiveStop && _xSpeed == 0 && _ySpeed == 0 && _rot == 0) {
         SwerveMap.FrontRightSwerveModule.setSteeringAngle(135);
         SwerveMap.FrontRightSwerveModule.mDriveMotor.set(ControlMode.PercentOutput, 0);

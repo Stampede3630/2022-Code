@@ -9,6 +9,8 @@ import java.util.List;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.swerve.SwerveConstants;
 import frc.robot.sim.SimGyroSensorModel;
 import frc.robot.sim.wpiClasses.QuadSwerveSim;
@@ -25,6 +28,7 @@ import frc.robot.swerve.SwerveDrive;
 import frc.robot.swerve.SwerveMap;
 import frc.robot.swerve.SwerveTrajectory;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj.RobotBase;
 
 
@@ -50,7 +54,10 @@ public class Robot extends TimedRobot {
   public static CompetitionLogger COMPETITIONLOGGER;
   public static AutoSegmentedWaypoints AUTOSEGMENTEDWAYPOINTS;
   public static XboxController xbox = new XboxController(0);
-  public static GenericHID ddrPad = new GenericHID(1);
+
+  @Log
+  public static Field2d field = new Field2d();
+  //public static GenericHID ddrPad = new GenericHID(1);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -62,8 +69,11 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     LiveWindow.setEnabled(false);
     LiveWindow.disableAllTelemetry();
+    SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+    SwerveMap.GYRO.reset(); 
+    
     if (RobotBase.isReal()) {
-      SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+
     } else {
       SwerveMap.simNavx = new SimGyroSensorModel();
     }
@@ -105,7 +115,7 @@ public class Robot extends TimedRobot {
     // It's a lot easier to use than standard shuffleboard syntax
  
     
-    SwerveMap.GYRO.reset(); 
+    
     // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
 
     //*Swerve method starts here*
@@ -120,6 +130,7 @@ public class Robot extends TimedRobot {
     Logger.setCycleWarningsEnabled(false);
     Logger.configureLoggingAndConfig(this, false);
     
+    field.getObject("target").setPose(new Pose2d(4, 4, new Rotation2d()));
 
   }
 
@@ -141,7 +152,7 @@ public class Robot extends TimedRobot {
     Logger.updateEntries();
 
     myWattThingy =  myWattThingy + (COMPETITIONLOGGER.getMyPD() * COMPETITIONLOGGER.batteryVoltage()) / 0.02;
-    
+    drawRobotOnField(field);
   }
   
 
@@ -239,8 +250,9 @@ public class Robot extends TimedRobot {
       }
     } else {
         for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
-            double azmthVolts = SwerveMap.RealSwerveModuleList.get(idx).mSteeringMotor.getMotorOutputVoltage();
-            double wheelVolts = SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getMotorOutputVoltage();
+            
+            double azmthVolts = SwerveMap.RealSwerveModuleList.get(idx).mSteeringMotor.getSimCollection().getMotorOutputLeadVoltage();
+            double wheelVolts = SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getSimCollection().getMotorOutputLeadVoltage();
             swerveModuleSimList.get(idx).setInputVoltages(wheelVolts, azmthVolts);
         }
     }
@@ -251,21 +263,53 @@ public class Robot extends TimedRobot {
     for (int i = 0; i< 20; i++) {
       simSwerve.update(0.001);
     }
-    
+  
         //Set the state of the sim'd hardware
     for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
       double azmthPos = swerveModuleSimList.get(idx).getAzimuthEncoderPositionRev();
       azmthPos = azmthPos / SwerveConstants.TICKSperTALONFX_STEERING_DEGREE * 2 * Math.PI;
       double wheelPos = swerveModuleSimList.get(idx).getWheelEncoderPositionRev();
       wheelPos = wheelPos / SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
-
+      
       double wheelVel = swerveModuleSimList.get(idx).getWheelEncoderVelocityRevPerSec();
+      System.out.println(wheelVel);
       wheelVel = wheelVel / SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
+      
       SwerveMap.RealSwerveModuleList.get(idx).setSimState(azmthPos, wheelPos, wheelVel);
       SwerveMap.simNavx.update(simSwerve.getCurPose(), prevRobotPose);
     }
+  }
 
+    /**
+     * A convenience method to draw the robot pose and 4 poses representing the wheels onto the field2d.
+     * @param field
+     */
+    public void drawRobotOnField(Field2d field) {
+      field.setRobotPose(getPose());
+      // Draw a pose that is based on the robot pose, but shifted by the translation of the module relative to robot center,
+      // then rotated around its own center by the angle of the module.
+      
+      field.getObject("frontLeft").setPose(
+          getPose().transformBy(new Transform2d(SWERVEDRIVE.getSwerveBotTranslationList.get(0), SwerveMap.FrontLeftSwerveModule.getState().angle)));
+      field.getObject("frontRight").setPose(
+          getPose().transformBy(new Transform2d(SWERVEDRIVE.getSwerveBotTranslationList.get(1), SwerveMap.FrontRightSwerveModule.getState().angle)));
+      field.getObject("backLeft").setPose(
+          getPose().transformBy(new Transform2d(SWERVEDRIVE.getSwerveBotTranslationList.get(2), SwerveMap.BackLeftSwerveModule.getState().angle)));
+      field.getObject("backRight").setPose(
+          getPose().transformBy(new Transform2d(SWERVEDRIVE.getSwerveBotTranslationList.get(3), SwerveMap.BackRightSwerveModule.getState().angle)));
+  }
 
+      /**
+     * Return the current position of the robot on field
+     * Based on drive encoder and gyro reading
+     */
+    public Pose2d getPose() {
+      if(RobotBase.isSimulation()) {
+          return simSwerve.getCurPose();
+      }
+      else {
+          return SWERVEDRIVE.m_odometry.getPoseMeters();
+      }
   }
 
   static List<SwerveModuleSim> swerveModuleSimList = List.of(new SwerveModuleSim(DCMotor.getFalcon500(1), 

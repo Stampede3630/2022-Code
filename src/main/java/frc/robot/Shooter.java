@@ -148,7 +148,7 @@ public class Shooter implements Loggable {
     
     public void shooterPeriodic() {
 
-        System.out.println(homocideTheBattery);
+        //System.out.println(homocideTheBattery);
         distance = (((103.0 - 36.614) / Math.tan(Math.toRadians(35.0 + NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0)))) + 12.4) / 12;
         // System.out.println(shooterDrive.getSelectedSensorVelocity(0) + " " + shooterSpeed + " " + shooterAtSpeed());
         if (!hoodAtOrigin) {

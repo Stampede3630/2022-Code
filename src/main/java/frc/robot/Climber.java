@@ -102,15 +102,15 @@ public class Climber implements Loggable{
             fullyExtended = false;
         }
 
-        if (ddrTime){  
-            if (Robot.ddrPad.getPOV() == 0 && !fullyExtended){
-                climberTalon.set(ControlMode.PercentOutput, 1); 
-            } else if (Robot.ddrPad.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())) {
-                climberTalon.set(ControlMode.PercentOutput, -1);
-            } else {
-                climberTalon.set(ControlMode.PercentOutput, 0);
-            }
-        } else {
+        // if (ddrTime){  
+        //     if (Robot.ddrPad.getPOV() == 0 && !fullyExtended){
+        //         climberTalon.set(ControlMode.PercentOutput, 1); 
+        //     } else if (Robot.ddrPad.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())) {
+        //         climberTalon.set(ControlMode.PercentOutput, -1);
+        //     } else {
+        //         climberTalon.set(ControlMode.PercentOutput, 0);
+        //     }
+        // } else {
             if (Robot.xbox.getPOV() == 0 && !fullyExtended){
                 climberTalon.set(ControlMode.PercentOutput, 1); 
             } else if (Robot.xbox.getPOV() == 180 && !(climberHomeLeft.get() || climberHomeRight.get())){
@@ -118,23 +118,23 @@ public class Climber implements Loggable{
             } else {
                 climberTalon.set(ControlMode.PercentOutput, 0);
             }
-        }
+        //}
     }
     
     private void manualClimberSolenoid(){
-        if (ddrTime){
-            if (Robot.ddrPad.getPOV() == 90 ){ 
-            openSolenoid();
-            } else if (Robot.ddrPad.getPOV() == 270 ){ 
-            closeSolenoid(); 
-            }
-        } else {
+        // if (ddrTime){
+        //     if (Robot.ddrPad.getPOV() == 90 ){ 
+        //     openSolenoid();
+        //     } else if (Robot.ddrPad.getPOV() == 270 ){ 
+        //     closeSolenoid(); 
+        //     }
+        // } else {
             if (Robot.xbox.getPOV() == 90 ){ 
                 openSolenoid();
             } else if (Robot.xbox.getPOV() == 270 ){ 
                 closeSolenoid();
             }
-        }
+        //}
     }
 
     public void openSolenoid() {
