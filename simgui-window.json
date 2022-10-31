@@ -1,11 +1,11 @@
 {
   "MainWindow": {
     "GLOBAL": {
-      "height": "1377",
+      "height": "1017",
       "maximized": "1",
       "style": "1",
       "userScale": "4",
-      "width": "1720",
+      "width": "1920",
       "xpos": "0",
       "ypos": "23"
     }
@@ -18,7 +18,7 @@
     },
     "###/Shuffleboard/Robot/field": {
       "Collapsed": "0",
-      "Pos": "391,205",
+      "Pos": "-398,-7",
       "Size": "2812,951"
     },
     "###FMS": {
@@ -29,7 +29,7 @@
     "###Joysticks": {
       "Collapsed": "0",
       "Pos": "541,91",
-      "Size": "1156,316"
+      "Size": "1156,91"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -38,7 +38,7 @@
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "2625,124",
+      "Pos": "1901,124",
       "Size": "750,972"
     },
     "###Other Devices": {

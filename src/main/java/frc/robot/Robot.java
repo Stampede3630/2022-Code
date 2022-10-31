@@ -267,14 +267,14 @@ public class Robot extends TimedRobot {
         //Set the state of the sim'd hardware
     for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
       double azmthPos = swerveModuleSimList.get(idx).getAzimuthEncoderPositionRev();
-      azmthPos = azmthPos / SwerveConstants.TICKSperTALONFX_STEERING_DEGREE * 2 * Math.PI;
+      azmthPos = azmthPos / SwerveConstants.STEERING_MOTOR_GEARING * 2 * Math.PI; //Shaft Revs per module rev, 2PI per rev
       double wheelPos = swerveModuleSimList.get(idx).getWheelEncoderPositionRev();
-      wheelPos = wheelPos / SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
+      wheelPos = wheelPos / SwerveConstants.DRIVE_MOTOR_GEARING * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
       
       double wheelVel = swerveModuleSimList.get(idx).getWheelEncoderVelocityRevPerSec();
-      System.out.println(wheelVel);
-      wheelVel = wheelVel / SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
       
+      wheelVel = wheelVel / SwerveConstants.DRIVE_MOTOR_GEARING * 2.0 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
+ 
       SwerveMap.RealSwerveModuleList.get(idx).setSimState(azmthPos, wheelPos, wheelVel);
       SwerveMap.simNavx.update(simSwerve.getCurPose(), prevRobotPose);
     }
