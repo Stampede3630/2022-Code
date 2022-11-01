@@ -302,6 +302,7 @@ public class SwerveMap {
             mDriveMotor.getSimCollection().setIntegratedSensorVelocity( (int) (wheelVel_mps/(
             SwerveConstants.METERSperWHEEL_REVOLUTION/(SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION*
             SwerveConstants.SECONDSper100MS))));
+
             mSimSteeringEncoder.setPosition(angle_rad);
             mSimDriveEncoder.setPosition(wheelPos_m);
             mSimDriveEncoder.setVelocity(wheelVel_mps);

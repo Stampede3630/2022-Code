@@ -1,13 +1,13 @@
 {
   "MainWindow": {
     "GLOBAL": {
-      "height": "1017",
-      "maximized": "1",
+      "height": "1377",
+      "maximized": "0",
       "style": "1",
       "userScale": "4",
-      "width": "1920",
+      "width": "2711",
       "xpos": "0",
-      "ypos": "23"
+      "ypos": "31"
     }
   },
   "Window": {
@@ -18,7 +18,7 @@
     },
     "###/Shuffleboard/Robot/field": {
       "Collapsed": "0",
-      "Pos": "-398,-7",
+      "Pos": "279,269",
       "Size": "2812,951"
     },
     "###FMS": {
@@ -29,7 +29,7 @@
     "###Joysticks": {
       "Collapsed": "0",
       "Pos": "541,91",
-      "Size": "1156,91"
+      "Size": "1156,316"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -38,13 +38,13 @@
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "1901,124",
+      "Pos": "1701,124",
       "Size": "750,972"
     },
     "###Other Devices": {
       "Collapsed": "0",
       "Pos": "1551,77",
-      "Size": "1147,1137"
+      "Size": "261,1137"
     },
     "###PowerDistributions": {
       "Collapsed": "0",

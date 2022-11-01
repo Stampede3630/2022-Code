@@ -62,7 +62,9 @@ public class SwerveModuleSim {
     }
 
     public double getWheelEncoderVelocityRevPerSec(){
+        //System.out.println(wheelEncGearRatio);
         return wheelMotor.getVelocity_RevPerSec() * wheelEncGearRatio;
+        
     }
 
     void reset(Pose2d initModulePose){
