@@ -315,10 +315,10 @@ public class Robot extends TimedRobot {
   static List<SwerveModuleSim> swerveModuleSimList = List.of(new SwerveModuleSim(DCMotor.getFalcon500(1), 
   DCMotor.getFalcon500(1), 
   SwerveConstants.WHEEL_RADIUS_METERS,
-  1.0/SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
-  1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.0/SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
-  1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+  SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
+  SwerveConstants.DRIVE_MOTOR_GEARING,
+  1.0, // same as motor rotations because NEO encoder is on motor shaft
+  SwerveConstants.DRIVE_MOTOR_GEARING,
   1.3,
   0.7,
   56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
@@ -326,10 +326,10 @@ public class Robot extends TimedRobot {
   ), new SwerveModuleSim(DCMotor.getFalcon500(1), 
   DCMotor.getFalcon500(1), 
   SwerveConstants.WHEEL_RADIUS_METERS,
-  1.0/SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
-  1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.0/SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
-  1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+  SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
+  SwerveConstants.DRIVE_MOTOR_GEARING,
+  1.0, // same as motor rotations because NEO encoder is on motor shaft
+  SwerveConstants.DRIVE_MOTOR_GEARING,
   1.3,
   0.7,
   56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
@@ -337,10 +337,10 @@ public class Robot extends TimedRobot {
   ), new SwerveModuleSim(DCMotor.getFalcon500(1), 
   DCMotor.getFalcon500(1), 
   SwerveConstants.WHEEL_RADIUS_METERS,
-  1.0/SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
-  1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.0/SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
-  1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+  SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
+  SwerveConstants.DRIVE_MOTOR_GEARING,
+  1.0, // same as motor rotations because NEO encoder is on motor shaft
+  SwerveConstants.DRIVE_MOTOR_GEARING,
   1.3,
   0.7,
   56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
@@ -348,10 +348,10 @@ public class Robot extends TimedRobot {
   ), new SwerveModuleSim(DCMotor.getFalcon500(1), 
   DCMotor.getFalcon500(1), 
   SwerveConstants.WHEEL_RADIUS_METERS,
-  1.0/SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
-  1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.0/SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
-  1.0/SwerveConstants.DRIVE_MOTOR_GEARING,
+  SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
+  SwerveConstants.DRIVE_MOTOR_GEARING,
+  1.0, // same as motor rotations because NEO encoder is on motor shaft
+  SwerveConstants.DRIVE_MOTOR_GEARING,
   1.3,
   0.7,
   56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
