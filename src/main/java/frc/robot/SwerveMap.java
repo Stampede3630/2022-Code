@@ -143,7 +143,7 @@ public class SwerveMap {
             driveCurrentLimitConfigurationDisable.enable = false; 
 
             driveCurrentLimitConfigurationEnable.enable = true;
-            driveCurrentLimitConfigurationEnable.triggerThresholdCurrent = 80;
+            driveCurrentLimitConfigurationEnable.triggerThresholdCurrent = 100;
             driveCurrentLimitConfigurationEnable.triggerThresholdTime = .1;
             driveCurrentLimitConfigurationEnable.currentLimit = 60;
 

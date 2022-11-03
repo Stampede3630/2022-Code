@@ -130,11 +130,13 @@ public class Robot extends TimedRobot {
     Logger.updateEntries();
 
     
-    myWattThingy += (COMPETITIONLOGGER.myPD.getTotalCurrent() * COMPETITIONLOGGER.batteryVoltage()) * (Timer.getFPGATimestamp() - previousTimestamp);
+    myWattThingy = myWattThingy + (COMPETITIONLOGGER.myPD.getTotalCurrent() * COMPETITIONLOGGER.batteryVoltage()) * (Timer.getFPGATimestamp() - previousTimestamp);
 
     myJuulPod = myWattThingy/1000;
 
-    System.out.println(myJuulPod);
+    // System.out.println(myJuulPod);
+
+    // System.out.println(COMPETITIONLOGGER.myPD.getTotalCurrent());
     
     previousTimestamp = Timer.getFPGATimestamp();
   }
@@ -171,7 +173,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    SWERVEDRIVE.enableCurrentLimiting();
+    // SWERVEDRIVE.enableCurrentLimiting();
     SWERVEDRIVE.setToBrake();
     INTAKE.intakeNow = false;
     INTAKE.shootNow = false;
