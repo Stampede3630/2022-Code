@@ -2,7 +2,10 @@ package frc.robot.swerve;
 
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 public class SwerveConstants {
-    
+    public static final boolean OPTIMIZESTEERING = true;
+    public static final boolean CHARACTERIZE_ROBOT = false;
+    public static final boolean RUN_TRAJECTORY = true;
+
     //SWERVE MODULE CHARACTERISTICS
     // OG WHEEL_RADIUS_METERS = 0.10033/2
     // NEW WHEEL_RADIUS_METERS = 0.13000/2
@@ -17,7 +20,7 @@ public class SwerveConstants {
     //SWERVE Drive Default Values
     public static final double ROBOTHoldAngleKP = 15; //Start at .7 and see where you go from there
     public static final boolean DEFAULT_HOLD_ROBOT_ANGLE = false;
-	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = true;
+	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = false;
 	public static final double DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT = 0; 
 
     //Swerve Drive Motor IDs
@@ -51,9 +54,9 @@ public class SwerveConstants {
     //Give a positive input on the joystick or phoenix tuner
     //Switch this if it goes opposite the desired direction
     //Because of the gearing the convention could be reversed (GUESS AND CHECK)
-    public static TalonFXInvertType FRInvertType = TalonFXInvertType.Clockwise;
+    public static TalonFXInvertType FRInvertType = TalonFXInvertType.CounterClockwise;
     public static TalonFXInvertType FLInvertType = TalonFXInvertType.CounterClockwise;
-    public static TalonFXInvertType BRInvertType = TalonFXInvertType.Clockwise;
+    public static TalonFXInvertType BRInvertType = TalonFXInvertType.CounterClockwise;
     public static TalonFXInvertType BLInvertType = TalonFXInvertType.CounterClockwise;
 
     //Swerve Steering PIDs (kP, kI, kD)
@@ -87,7 +90,7 @@ public class SwerveConstants {
     public static final double MAX_SPEED_METERSperSECOND = MAX_SPEED_TICKSper100MS/SECONDSper100MS/DRIVE_MOTOR_TICKSperREVOLUTION*METERSperWHEEL_REVOLUTION;
     public static final double MAX_SPEED_RADIANSperSECOND = MAX_SPEED_METERSperSECOND/METERSperROBOT_REVOLUTION*(2*Math.PI);
     public static final double TICKSperTALONFX_STEERING_DEGREE = TICKSperTALONFX_Rotation*STEERING_MOTOR_GEARING/360;
-
+    
     public static class Gains {
         public final double kP;
         public final double kI;

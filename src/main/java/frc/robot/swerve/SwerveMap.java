@@ -302,14 +302,13 @@ public class SwerveMap {
         */
         public void setSimState(double angle_rad, double wheelPos_m, double wheelVel_mps) {
             mSteeringMotor.getSimCollection().setIntegratedSensorRawPosition( (int) (Math.toDegrees(angle_rad)*SwerveConstants.TICKSperTALONFX_STEERING_DEGREE));
-            mDriveMotor.getSimCollection().setIntegratedSensorRawPosition( (int) (wheelPos_m*SwerveConstants.TICKSperTALONFX_Rotation/SwerveConstants.METERSperWHEEL_REVOLUTION));
-            mDriveMotor.getSimCollection().setIntegratedSensorVelocity( (int) (wheelVel_mps/(
-            SwerveConstants.METERSperWHEEL_REVOLUTION/(SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION*
-            SwerveConstants.SECONDSper100MS))));
+            mDriveMotor.getSimCollection().setIntegratedSensorRawPosition( (int) (wheelPos_m*SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION/SwerveConstants.METERSperWHEEL_REVOLUTION));
+            mDriveMotor.getSimCollection().setIntegratedSensorVelocity( (int) (wheelVel_mps*SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION/SwerveConstants.METERSperWHEEL_REVOLUTION/
+            SwerveConstants.SECONDSper100MS) );
 
-            mSimSteeringEncoder.setPosition(angle_rad);
-            mSimDriveEncoder.setPosition(wheelPos_m);
-            mSimDriveEncoder.setVelocity(wheelVel_mps);
+            //mSimSteeringEncoder.setPosition(angle_rad);
+            //mSimDriveEncoder.setPosition(wheelPos_m);
+            //mSimDriveEncoder.setVelocity(wheelVel_mps);
         }
 
         public void zeroSwerveAngle() {
@@ -354,12 +353,15 @@ public class SwerveMap {
 
 
         public void setDesiredState(SwerveModuleState desiredState){
+            SwerveModuleState kState = desiredState;
+            if(SwerveConstants.OPTIMIZESTEERING){
+                kState = optimize(desiredState, new Rotation2d(Math.toRadians(mSteeringMotor.getSelectedSensorPosition())));
+            }
             
-            SwerveModuleState kState = optimize(desiredState, new Rotation2d(Math.toRadians(mSteeringMotor.getSelectedSensorPosition())));
             double convertedspeed = kState.speedMetersPerSecond*(SwerveConstants.SECONDSper100MS)*SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION/(SwerveConstants.METERSperWHEEL_REVOLUTION);           
             setSteeringAngle(kState.angle.getDegrees());
             
-            if (Robot.CHARACTERIZE_ROBOT){
+            if (SwerveConstants.CHARACTERIZE_ROBOT){
 
                 mDriveMotor.set(ControlMode.PercentOutput, kState.speedMetersPerSecond/SwerveConstants.MAX_SPEED_METERSperSECOND); 
                 
@@ -367,8 +369,9 @@ public class SwerveMap {
                 
                 mDriveMotor.set(ControlMode.Velocity, convertedspeed);
             } else {
-                System.out.println(driveMotorFeedforward.calculate(kState.speedMetersPerSecond));
+                //System.out.println(driveMotorFeedforward.calculate(kState.speedMetersPerSecond));
                 mDriveMotor.setVoltage(driveMotorFeedforward.calculate(kState.speedMetersPerSecond));
+                System.out.println(mDriveMotor.getSimCollection().getMotorOutputLeadVoltage());
                 
             }
             

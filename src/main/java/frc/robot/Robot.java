@@ -26,6 +26,7 @@ import frc.robot.sim.wpiClasses.QuadSwerveSim;
 import frc.robot.sim.wpiClasses.SwerveModuleSim;
 import frc.robot.swerve.SwerveDrive;
 import frc.robot.swerve.SwerveMap;
+import frc.robot.sim.SwerveSim;
 import frc.robot.swerve.SwerveTrajectory;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
@@ -41,13 +42,11 @@ import edu.wpi.first.wpilibj.RobotBase;
   *    so probably, turn RUN_TRAJECTORY FALSE
          */
 public class Robot extends TimedRobot {
-  public static final boolean CHARACTERIZE_ROBOT = false;
-  public static final boolean RUN_TRAJECTORY = true;
-
   public static SwerveDrive SWERVEDRIVE;
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
+  public static SwerveSim SWERVESIM;
   public static double myWattThingy;
   // public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
@@ -57,7 +56,6 @@ public class Robot extends TimedRobot {
 
   @Log
   public static Field2d field = new Field2d();
-  //public static GenericHID ddrPad = new GenericHID(1);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -93,8 +91,6 @@ public class Robot extends TimedRobot {
     // AUTOWAYPOINTS.loadAutoPaths();
     AUTOSEGMENTEDWAYPOINTS.loadAutoPaths();
 
-
-
     // ****Shooter method starts here****
     SHOOTER = Shooter.getInstance();
     SHOOTER.init();
@@ -105,17 +101,12 @@ public class Robot extends TimedRobot {
     CLIMBER.init();
     CLIMBER.checkAndSetClimberCANStatus();
 
-
-    if(RUN_TRAJECTORY) {
     SWERVETRAJECTORY = SwerveTrajectory.getInstance();
-      // examplePath = PathPlanner.loadPath("New Path", 1, .8);
-    }
+    // examplePath = PathPlanner.loadPath("New Path", 1, .8);
     // Keep this statement on the BOTTOM of your robotInit
     // It's responsible for all the shuffleboard outputs.  
     // It's a lot easier to use than standard shuffleboard syntax
  
-    
-    
     // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
 
     //*Swerve method starts here*
@@ -123,6 +114,7 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE.init();
     SWERVEDRIVE.zeroSwerveDrive();
 
+    SWERVESIM = SwerveSim.getInstance();
 
     NetworkTableInstance.getDefault().getTable("limelight-intake").getEntry("camMode").setNumber(1);
 
@@ -152,7 +144,7 @@ public class Robot extends TimedRobot {
     Logger.updateEntries();
 
     myWattThingy =  myWattThingy + (COMPETITIONLOGGER.getMyPD() * COMPETITIONLOGGER.batteryVoltage()) / 0.02;
-    drawRobotOnField(field);
+    SWERVEDRIVE.drawRobotOnField(field);
   }
   
 
@@ -165,19 +157,15 @@ public class Robot extends TimedRobot {
      
 
     // For Trajectory instructions go to SwerverTrajectory.java
-    if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
+    SwerveTrajectory.resetTrajectoryStatus();
 
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    
-    // AUTOWAYPOINTS.autoPeriodic();
-    // SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.chosenPath.thisPathPLan,  SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
 
     AUTOSEGMENTEDWAYPOINTS.autoPeriodic();
-    
     INTAKE.intakePeriodic();
     SHOOTER.shooterPeriodic();
 
@@ -203,13 +191,8 @@ public class Robot extends TimedRobot {
     // Joystick Drives stores values in X,Y,Z rotation
     // Drive actually sends those values to the swerve modules
 
-    
-
     SWERVEDRIVE.swervePeriodic();
-      //intake code for teleop
-
-   CLIMBER.periodic();
-
+    CLIMBER.periodic();
     INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
     SHOOTER.shooterPeriodic();
@@ -239,7 +222,7 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationInit() {
     for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
-    swerveModuleSimList.get(idx).reset(new Pose2d());
+    SWERVESIM.swerveModuleSimList.get(idx).reset(new Pose2d());
     }
   }
 
@@ -248,124 +231,47 @@ public class Robot extends TimedRobot {
 
     if(!DriverStation.isEnabled()){
       for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
-        swerveModuleSimList.get(idx).setInputVoltages(0.0, 0.0);
+        SWERVESIM.swerveModuleSimList.get(idx).setInputVoltages(0.0, 0.0);
       }
     } else {
         for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
             
             double azmthVolts = SwerveMap.RealSwerveModuleList.get(idx).mSteeringMotor.getSimCollection().getMotorOutputLeadVoltage();
-            double wheelVolts = SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getSimCollection().getMotorOutputLeadVoltage()*Math.pow(-1, idx);
-            swerveModuleSimList.get(idx).setInputVoltages(wheelVolts, azmthVolts);
-            System.out.println("module: " + idx + " " + wheelVolts);
+            double wheelVolts = SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getSimCollection().getMotorOutputLeadVoltage();
+            SWERVESIM.swerveModuleSimList.get(idx).setInputVoltages(wheelVolts, azmthVolts);
+            //System.out.println("module: " + idx + " " + wheelVolts);
             
         }
     }
 
-    Pose2d prevRobotPose = simSwerve.getCurPose();
+    Pose2d prevRobotPose = SWERVESIM.simSwerve.getCurPose();
 
     // Update model (several small steps)
     for (int i = 0; i< 20; i++) {
-      simSwerve.update(0.001);
+      SWERVESIM.simSwerve.update(0.001);
     }
   
         //Set the state of the sim'd hardware
     for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
-      double azmthPos = swerveModuleSimList.get(idx).getAzimuthEncoderPositionRev();
+      double azmthPos = SWERVESIM.swerveModuleSimList.get(idx).getAzimuthEncoderPositionRev();
       //System.out.println(Math.toDegrees(azmthPos));
       azmthPos = azmthPos / SwerveConstants.STEERING_MOTOR_GEARING * 2 * Math.PI; //Shaft Revs per module rev, 2PI per rev
-      double wheelPos = swerveModuleSimList.get(idx).getWheelEncoderPositionRev();
+      double wheelPos = SWERVESIM.swerveModuleSimList.get(idx).getWheelEncoderPositionRev();
       wheelPos = wheelPos / SwerveConstants.DRIVE_MOTOR_GEARING * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
       
-      double wheelVel = swerveModuleSimList.get(idx).getWheelEncoderVelocityRevPerSec();
+      double wheelVel = SWERVESIM.swerveModuleSimList.get(idx).getWheelEncoderVelocityRevPerSec();
       
       wheelVel = wheelVel / SwerveConstants.DRIVE_MOTOR_GEARING * 2.0 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
-      System.out.println("module: " + idx + " " + wheelVel);
+      //.out.println("module: " + idx + " " + wheelVel);
       SwerveMap.RealSwerveModuleList.get(idx).setSimState(azmthPos, wheelPos, wheelVel);
-      SwerveMap.simNavx.update(simSwerve.getCurPose(), prevRobotPose);
+      SwerveMap.simNavx.update(SWERVESIM.simSwerve.getCurPose(), prevRobotPose);
       //System.out.println("module: " + idx + " " + simSwerve.getCurPose().getRotation().getDegrees());
     }
   }
 
-    /**
-     * A convenience method to draw the robot pose and 4 poses representing the wheels onto the field2d.
-     * @param field
-     */
-    public void drawRobotOnField(Field2d field) {
-      field.setRobotPose(getPose());
-      // Draw a pose that is based on the robot pose, but shifted by the translation of the module relative to robot center,
-      // then rotated around its own center by the angle of the module.
-      
-      field.getObject("frontLeft").setPose(
-          getPose().transformBy(new Transform2d(SWERVEDRIVE.getSwerveBotTranslationList.get(0), SwerveMap.FrontLeftSwerveModule.getState().angle)));
-      field.getObject("frontRight").setPose(
-          getPose().transformBy(new Transform2d(SWERVEDRIVE.getSwerveBotTranslationList.get(1), SwerveMap.FrontRightSwerveModule.getState().angle)));
-      field.getObject("backLeft").setPose(
-          getPose().transformBy(new Transform2d(SWERVEDRIVE.getSwerveBotTranslationList.get(2), SwerveMap.BackLeftSwerveModule.getState().angle)));
-      field.getObject("backRight").setPose(
-          getPose().transformBy(new Transform2d(SWERVEDRIVE.getSwerveBotTranslationList.get(3), SwerveMap.BackRightSwerveModule.getState().angle)));
-  }
 
-      /**
-     * Return the current position of the robot on field
-     * Based on drive encoder and gyro reading
-     */
-    public Pose2d getPose() {
-      if(RobotBase.isSimulation()) {
-          return simSwerve.getCurPose();
-      }
-      else {
-          return SWERVEDRIVE.m_odometry.getPoseMeters();
-      }
-  }
 
-  static List<SwerveModuleSim> swerveModuleSimList = List.of(new SwerveModuleSim(DCMotor.getFalcon500(1), 
-  DCMotor.getFalcon500(1), 
-  SwerveConstants.WHEEL_RADIUS_METERS,
-  SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
-  SwerveConstants.DRIVE_MOTOR_GEARING,
-  SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
-  SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.3,
-  0.7,
-  56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
-  0.01 
-  ), new SwerveModuleSim(DCMotor.getFalcon500(1), 
-  DCMotor.getFalcon500(1), 
-  SwerveConstants.WHEEL_RADIUS_METERS,
-  SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
-  SwerveConstants.DRIVE_MOTOR_GEARING,
-  SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
-  SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.3,
-  0.7,
-  56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
-  0.01 
-  ), new SwerveModuleSim(DCMotor.getFalcon500(1), 
-  DCMotor.getFalcon500(1), 
-  SwerveConstants.WHEEL_RADIUS_METERS,
-  SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
-  SwerveConstants.DRIVE_MOTOR_GEARING,
-  SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
-  SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.3,
-  0.7,
-  56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
-  0.01 
-  ), new SwerveModuleSim(DCMotor.getFalcon500(1), 
-  DCMotor.getFalcon500(1), 
-  SwerveConstants.WHEEL_RADIUS_METERS,
-  SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
-  SwerveConstants.DRIVE_MOTOR_GEARING,
-  SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
-  SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.3,
-  0.7,
-  56.6 * 9.81 / QuadSwerveSim.NUM_MODULES, 
-  0.01 
-  ));
-public static QuadSwerveSim simSwerve = new QuadSwerveSim(SwerveConstants.TRACK_WIDE, 
-  SwerveConstants.WHEEL_BASE_METERS, 
-  56.6, 1.0/12.0 * 56.6 * Math.pow((SwerveConstants.TRACK_WIDE*1.1),2) * 2, swerveModuleSimList);
+  
 
 
 } 

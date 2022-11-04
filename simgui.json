@@ -97,13 +97,18 @@
           }
         }
       },
-      "Robot": {
-        "field": {
+      "CompetitionLogger": {
+        "SwerveDriveDB": {
           "open": true
         },
         "open": true
       },
-      "Shooter": {
+      "Robot": {
+        "field": {
+          "open": true
+        }
+      },
+      "SwerveDrive": {
         "open": true
       },
       "SwerveTrajectory": {
