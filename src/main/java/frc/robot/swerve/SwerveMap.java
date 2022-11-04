@@ -24,9 +24,11 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.sim.SimEncoder;
@@ -142,11 +144,13 @@ public class SwerveMap {
         public  StatorCurrentLimitConfiguration steerCurrentLimitConfigurationDisable;
         public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationEnable;
         public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationDisable;
+        public PIDController steeringSimPidController;
 
         public SwerveModule (DriveMotor _DriveMotor, SteeringMotor _SteeringMotor, SteeringSensor _SteeringSensor){
             mSteeringMotor = _SteeringMotor;
             mSteeringSensor = _SteeringSensor;
             mDriveMotor = _DriveMotor;
+            steeringSimPidController = new PIDController(.01,0,0);
 
             mSimSteeringSimCollection = new TalonFXSimCollection(_SteeringMotor);
             mSimDriveSimCollection = new TalonFXSimCollection(_DriveMotor);
@@ -363,7 +367,7 @@ public class SwerveMap {
                 
                 mDriveMotor.set(ControlMode.Velocity, convertedspeed);
             } else {
-
+                System.out.println(driveMotorFeedforward.calculate(kState.speedMetersPerSecond));
                 mDriveMotor.setVoltage(driveMotorFeedforward.calculate(kState.speedMetersPerSecond));
                 
             }
@@ -394,8 +398,13 @@ public class SwerveMap {
               } else if (newAngleDemand - currentSensorPosition < -180.1){
                   newAngleDemand += 360;
               }
-              
-            mSteeringMotor.set(ControlMode.Position, newAngleDemand );
+            if(RobotBase.isReal())   {
+                mSteeringMotor.set(ControlMode.Position, newAngleDemand );
+            } else {
+                //System.out.println(currentSensorPosition);
+                mSteeringMotor.set(ControlMode.PercentOutput, steeringSimPidController.calculate(currentSensorPosition, newAngleDemand));
+            }
+            
         }
       
         public static SwerveModuleState optimize(

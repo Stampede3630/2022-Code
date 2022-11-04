@@ -28,7 +28,7 @@ import io.github.oblarg.oblog.annotations.Log;
 public class SwerveDrive implements Loggable {
   public boolean autoLimeLightAim = false;
   public boolean acceleratedInputs = true;
-  public boolean defensiveStop = false;
+  public boolean defensiveStop = true;
 
   public double previousXDistance = 0;
   public double previousYDistance = 0;

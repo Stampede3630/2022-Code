@@ -41,7 +41,7 @@ import edu.wpi.first.wpilibj.RobotBase;
   *    so probably, turn RUN_TRAJECTORY FALSE
          */
 public class Robot extends TimedRobot {
-  public static final boolean CHARACTERIZE_ROBOT = true;
+  public static final boolean CHARACTERIZE_ROBOT = false;
   public static final boolean RUN_TRAJECTORY = true;
 
   public static SwerveDrive SWERVEDRIVE;
@@ -238,7 +238,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationInit() {
-    
+    for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
+    swerveModuleSimList.get(idx).reset(new Pose2d());
+    }
   }
 
   @Override
@@ -252,8 +254,10 @@ public class Robot extends TimedRobot {
         for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
             
             double azmthVolts = SwerveMap.RealSwerveModuleList.get(idx).mSteeringMotor.getSimCollection().getMotorOutputLeadVoltage();
-            double wheelVolts = SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getSimCollection().getMotorOutputLeadVoltage();
+            double wheelVolts = SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getSimCollection().getMotorOutputLeadVoltage()*Math.pow(-1, idx);
             swerveModuleSimList.get(idx).setInputVoltages(wheelVolts, azmthVolts);
+            System.out.println("module: " + idx + " " + wheelVolts);
+            
         }
     }
 
@@ -267,6 +271,7 @@ public class Robot extends TimedRobot {
         //Set the state of the sim'd hardware
     for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
       double azmthPos = swerveModuleSimList.get(idx).getAzimuthEncoderPositionRev();
+      //System.out.println(Math.toDegrees(azmthPos));
       azmthPos = azmthPos / SwerveConstants.STEERING_MOTOR_GEARING * 2 * Math.PI; //Shaft Revs per module rev, 2PI per rev
       double wheelPos = swerveModuleSimList.get(idx).getWheelEncoderPositionRev();
       wheelPos = wheelPos / SwerveConstants.DRIVE_MOTOR_GEARING * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
@@ -274,9 +279,10 @@ public class Robot extends TimedRobot {
       double wheelVel = swerveModuleSimList.get(idx).getWheelEncoderVelocityRevPerSec();
       
       wheelVel = wheelVel / SwerveConstants.DRIVE_MOTOR_GEARING * 2.0 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
- 
+      System.out.println("module: " + idx + " " + wheelVel);
       SwerveMap.RealSwerveModuleList.get(idx).setSimState(azmthPos, wheelPos, wheelVel);
       SwerveMap.simNavx.update(simSwerve.getCurPose(), prevRobotPose);
+      //System.out.println("module: " + idx + " " + simSwerve.getCurPose().getRotation().getDegrees());
     }
   }
 
@@ -317,7 +323,7 @@ public class Robot extends TimedRobot {
   SwerveConstants.WHEEL_RADIUS_METERS,
   SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
   SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.0, // same as motor rotations because NEO encoder is on motor shaft
+  SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
   SwerveConstants.DRIVE_MOTOR_GEARING,
   1.3,
   0.7,
@@ -328,7 +334,7 @@ public class Robot extends TimedRobot {
   SwerveConstants.WHEEL_RADIUS_METERS,
   SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
   SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.0, // same as motor rotations because NEO encoder is on motor shaft
+  SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
   SwerveConstants.DRIVE_MOTOR_GEARING,
   1.3,
   0.7,
@@ -339,7 +345,7 @@ public class Robot extends TimedRobot {
   SwerveConstants.WHEEL_RADIUS_METERS,
   SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
   SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.0, // same as motor rotations because NEO encoder is on motor shaft
+  SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
   SwerveConstants.DRIVE_MOTOR_GEARING,
   1.3,
   0.7,
@@ -350,7 +356,7 @@ public class Robot extends TimedRobot {
   SwerveConstants.WHEEL_RADIUS_METERS,
   SwerveConstants.STEERING_MOTOR_GEARING, // steering motor rotations per wheel steer rotation
   SwerveConstants.DRIVE_MOTOR_GEARING,
-  1.0, // same as motor rotations because NEO encoder is on motor shaft
+  SwerveConstants.STEERING_MOTOR_GEARING, // same as motor rotations because NEO encoder is on motor shaft
   SwerveConstants.DRIVE_MOTOR_GEARING,
   1.3,
   0.7,

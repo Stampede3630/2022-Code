@@ -5,6 +5,31 @@
         "header": {
           "open": true
         }
+      },
+      "Talon FX[13]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[13]/Integrated Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[3]/Rev Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[4]/Rev Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[5]": {
+        "header": {
+          "open": true
+        }
       }
     },
     "PowerDistributions": {
