@@ -106,6 +106,13 @@ public class SwerveMap {
             kWheelDirectionType = _direction;
             kGAINS=_gains;
         }
+        public double getAppliedVoltage(){
+            if(RobotBase.isReal()){
+                return this.getMotorOutputVoltage();
+            } else {
+                return this.getSimCollection().getMotorOutputLeadVoltage();
+            }
+        }
     }
 
     public static class SteeringSensor extends CANCoder{
@@ -145,6 +152,7 @@ public class SwerveMap {
         public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationEnable;
         public  StatorCurrentLimitConfiguration driveCurrentLimitConfigurationDisable;
         public PIDController steeringSimPidController;
+        public SwerveModuleState mModuleState;
 
         public SwerveModule (DriveMotor _DriveMotor, SteeringMotor _SteeringMotor, SteeringSensor _SteeringSensor){
             mSteeringMotor = _SteeringMotor;
@@ -156,7 +164,7 @@ public class SwerveMap {
             mSimDriveSimCollection = new TalonFXSimCollection(_DriveMotor);
             mSimSteeringEncoder = new SimEncoder();
             mSimDriveEncoder = new SimEncoder();
-
+            storeSwerveModuleState();
             steerCurrentLimitConfigurationEnable  = new StatorCurrentLimitConfiguration();
             steerCurrentLimitConfigurationDisable = new StatorCurrentLimitConfiguration();
             driveCurrentLimitConfigurationEnable  = new StatorCurrentLimitConfiguration();
@@ -294,6 +302,8 @@ public class SwerveMap {
             mDriveMotor.setNeutralMode(NeutralMode.Brake);
             mSteeringMotor.setNeutralMode(NeutralMode.Brake);
         }
+
+
         /**
         * Set the state of the module as specified by the simulator
         * @param angle_rad
@@ -343,12 +353,15 @@ public class SwerveMap {
             mSteeringMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0,0,Constants.kDefaultTimeout);       
         }
 
-        public SwerveModuleState getState() {
-
-            return new SwerveModuleState( 
+        public void storeSwerveModuleState(){
+            mModuleState = new SwerveModuleState( 
                 mDriveMotor.getSelectedSensorVelocity()*
                 SwerveConstants.METERSperWHEEL_REVOLUTION/(SwerveConstants.DRIVE_MOTOR_TICKSperREVOLUTION*
                 SwerveConstants.SECONDSper100MS), new Rotation2d(Math.toRadians(mSteeringMotor.getSelectedSensorPosition())));
+        }
+
+        public SwerveModuleState getState() {
+            return mModuleState;
         }
 
 
@@ -370,9 +383,7 @@ public class SwerveMap {
                 mDriveMotor.set(ControlMode.Velocity, convertedspeed);
             } else {
                 //System.out.println(driveMotorFeedforward.calculate(kState.speedMetersPerSecond));
-                mDriveMotor.setVoltage(driveMotorFeedforward.calculate(kState.speedMetersPerSecond));
-                System.out.println(mDriveMotor.getSimCollection().getMotorOutputLeadVoltage());
-                
+                mDriveMotor.setVoltage(driveMotorFeedforward.calculate(kState.speedMetersPerSecond)) ;              
             }
             
         }

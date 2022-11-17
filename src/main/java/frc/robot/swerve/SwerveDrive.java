@@ -80,6 +80,10 @@ public class SwerveDrive implements Loggable {
       getSDySpeed(), 
       getSDRotation(), 
       getSDFieldRelative());
+    for (int idx=0; idx < SwerveMap.RealSwerveModuleList.size(); idx++ ) {
+      SwerveMap.RealSwerveModuleList.get(idx).storeSwerveModuleState();
+
+    }
     //getVelocities();
   }
 

@@ -196,6 +196,7 @@ public class Robot extends TimedRobot {
     INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
     SHOOTER.shooterPeriodic();
+    SWERVEDRIVE.drive(4, 0, 0, false);
   }
 
   /** This function is called once when the robot is disabled. */
@@ -217,6 +218,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
+    
   }
 
   @Override
@@ -239,6 +241,7 @@ public class Robot extends TimedRobot {
             double azmthVolts = SwerveMap.RealSwerveModuleList.get(idx).mSteeringMotor.getSimCollection().getMotorOutputLeadVoltage();
             double wheelVolts = SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getSimCollection().getMotorOutputLeadVoltage();
             SWERVESIM.swerveModuleSimList.get(idx).setInputVoltages(wheelVolts, azmthVolts);
+            
             //System.out.println("module: " + idx + " " + wheelVolts);
             
         }
@@ -260,7 +263,10 @@ public class Robot extends TimedRobot {
       wheelPos = wheelPos / SwerveConstants.DRIVE_MOTOR_GEARING * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
       
       double wheelVel = SWERVESIM.swerveModuleSimList.get(idx).getWheelEncoderVelocityRevPerSec();
-      
+      System.out.println("Module " + idx  + 
+      ": Voltage: " + SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getAppliedVoltage() + 
+      " Velocity: " + wheelVel/SwerveConstants.DRIVE_MOTOR_GEARING*SwerveConstants.METERSperWHEEL_REVOLUTION +
+      " Angle: " +  SwerveMap.RealSwerveModuleList.get(idx).mModuleState.angle);
       wheelVel = wheelVel / SwerveConstants.DRIVE_MOTOR_GEARING * 2.0 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
       //.out.println("module: " + idx + " " + wheelVel);
       SwerveMap.RealSwerveModuleList.get(idx).setSimState(azmthPos, wheelPos, wheelVel);
