@@ -1,159 +1,152 @@
 package frc.robot.sim.wpiClasses;
 
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import frc.robot.swerve.SwerveConstants;
 
 public class SwerveModuleSim {
 
-    private SimpleMotorWithMassModel azmthMotor;
-    private MotorGearboxWheelSim wheelMotor;
+    public static final double kWheelDiameter = Units.inchesToMeters(4);
+    public static final double kWheelCircumference = kWheelDiameter*Math.PI;
+    // Simulation
+    private final TalonFXSimCollection driveMotorSim;
+    private final TalonFX driveMotor;
+    private final TalonFX steerMotor;
+    public static final SimpleMotorFeedforward kDriveFF = new SimpleMotorFeedforward( // real
+    0.2, // Voltage to break static friction
+    2.25, // Volts per meter per second
+    0.17 // Volts per meter per second squared
+    );
+    // Steer feed forward
+    public static final SimpleMotorFeedforward kSteerFF = new SimpleMotorFeedforward( // real
+        0.55, // Voltage to break static friction
+        0.23, // Volts per radian per second
+        0.0056 // Volts per radian per second squared
+    );
+    private final FlywheelSim driveWheelSim = new FlywheelSim(
+        LinearSystemId.identifyVelocitySystem(
+            kDriveFF.kv * kWheelCircumference / (2*Math.PI),
+            kDriveFF.ka * kWheelCircumference / (2*Math.PI)
+        ),
+        DCMotor.getFalcon500(1),
+        SwerveConstants.DRIVE_MOTOR_GEARING
+    );
+    private final TalonFXSimCollection steerMotorSim;
+    private final FlywheelSim steeringSim = new FlywheelSim(
+        LinearSystemId.identifyVelocitySystem(kSteerFF.kv, kSteerFF.ka),
+        DCMotor.getFalcon500(1),
+        SwerveConstants.STEERING_MOTOR_GEARING
+    );
+    public SwerveModuleSim(TalonFX driveMotor, TalonFX steerMotor) {
+        this.driveMotor= driveMotor;
+        this.steerMotor= steerMotor;
 
-    private final double azimuthEncGearRatio;    //Motor-to-azimuth-encoder reduction
-    private final double wheelEncGearRatio;      //Motor-to-wheel-encoder reduction
-    private final double treadStaticFricForce;
-    private final double treadKineticFricForce;
-    private final double wheelGearboxLossFactor = 0.01;
-    Pose2d prevModulePose = null;
-    Pose2d curModulePose  = null;
-    double curLinearSpeed_mps = 0; //Positive = in curAngle_deg, Negative = opposite of curAngle_deg
-    Rotation2d curAzmthAngle = Rotation2d.fromDegrees(0); //0 = toward front, 90 = toward left, 180 = toward back, 270 = toward right
-
-    double crossTreadFricForceMag = 0;
-    double crossTreadVelMag = 0;
-    double crossTreadForceMag = 0;
-
-    double wheelVoltage;
-    double azmthVoltage;
-
-    public SwerveModuleSim(
-        DCMotor azimuthMotor,
-        DCMotor wheelMotor, 
-        double wheelRadius_m,
-        double azimuthGearRatio,      // Motor rotations per one azimuth module rotation. Should be greater than zero
-        double wheelGearRatio,        // Motor rotations per one wheel rotation. Should be greater than zero
-        double azimuthEncGearRatio,   // Encoder rotations per one azimuth module rotation. Should be 1.0 if you have a good swerve module.
-        double wheelEncGearRatio,     // Encoder rotations per one wheel rotation.
-        double treadStaticCoefFric,
-        double treadKineticCoefFric,
-        double moduleNormalForce,
-        double azimuthEffectiveMOI
-    ){
-        this.azmthMotor = new SimpleMotorWithMassModel(azimuthMotor, azimuthGearRatio, azimuthEffectiveMOI);
-        this.wheelMotor = new MotorGearboxWheelSim(wheelMotor, wheelGearRatio, wheelRadius_m, wheelGearboxLossFactor);
-     
-        this.azimuthEncGearRatio   = azimuthEncGearRatio; 
-        this.wheelEncGearRatio     = wheelEncGearRatio;   
-        this.treadStaticFricForce  = treadStaticCoefFric*moduleNormalForce;
-        this.treadKineticFricForce = treadKineticCoefFric*moduleNormalForce; 
+        driveMotorSim = driveMotor.getSimCollection();
+        steerMotorSim = steerMotor.getSimCollection();
     }
 
-    public void setInputVoltages(double wheelVoltage, double azmthVoltage){
-        this.wheelVoltage = wheelVoltage;
-        this.azmthVoltage = azmthVoltage;
-    }
+    public void simulationPeriodic(){
+        // apply our commanded voltage to our simulated physics mechanisms
+        double driveVoltage = driveMotorSim.getMotorOutputLeadVoltage();
+        if(driveVoltage >= 0) driveVoltage = Math.max(0, driveVoltage-kSteerFF.ks);
+        else driveVoltage = Math.min(0, driveVoltage+kSteerFF.ks);
+        driveWheelSim.setInputVoltage(driveVoltage);
 
-    public double getAzimuthEncoderPositionRev(){
+        double steerVoltage = steerMotorSim.getMotorOutputLeadVoltage();
+        if(steerVoltage >= 0) steerVoltage = Math.max(0, steerVoltage-kSteerFF.ks);
+        else steerVoltage = Math.min(0, steerVoltage+kSteerFF.ks);
+        steeringSim.setInputVoltage(steerVoltage);
         
-    //System.out.println(azimuthEncGearRatio);
-    return azmthMotor.getMechanismPosition_Rev() * azimuthEncGearRatio;
+        driveWheelSim.update(0.02);
+        steeringSim.update(0.02);
 
-    }
+        // update our simulated devices with our simulated physics results
+        double driveMotorVelocityNative = rotationsToVelocity(driveWheelSim.getAngularVelocityRPM()/60, SwerveConstants.DRIVE_MOTOR_GEARING);
+        double driveMotorPositionDeltaNative = driveMotorVelocityNative*10*0.02;
+        driveMotorSim.setIntegratedSensorVelocity((int)driveMotorVelocityNative);
+        driveMotorSim.addIntegratedSensorPosition((int)(driveMotorPositionDeltaNative));
+        driveMotorSim.setSupplyCurrent(driveWheelSim.getCurrentDrawAmps()/2);
 
-    public double getWheelEncoderPositionRev(){
-        return wheelMotor.getPosition_Rev() * wheelEncGearRatio;
-    }
-
-    public double getWheelEncoderVelocityRevPerSec(){
+        //SmartDashboard.putNumber("Steer Sim Model Velocity", steeringSim.getAngularVelocityRPM());
+        double steerMotorVelocityNative = rotationsToVelocity(steeringSim.getAngularVelocityRPM()/60, SwerveConstants.STEERING_MOTOR_GEARING);
+        double steerMotorPositionDeltaNative = steerMotorVelocityNative*10*0.02;
+        steerMotorSim.setIntegratedSensorVelocity((int)steerMotorVelocityNative);
+        steerMotorSim.addIntegratedSensorPosition((int)(steerMotorPositionDeltaNative));
+        steerMotorSim.setSupplyCurrent(steeringSim.getCurrentDrawAmps()/2);
         
-        //System.out.println(wheelEncGearRatio);
-        return wheelMotor.getVelocity_RevPerSec() * wheelEncGearRatio;
-        
+        //steerEncoderSim.setVelocity((int)(rotationsToVelocity(steeringSim.getAngularVelocityRPM()/60, 1)*2));
+        //steerEncoderSim.setRawPosition((int)(getIntegratedHeading().getDegrees()/360.0*4096));
+
+        driveMotorSim.setBusVoltage(RobotController.getBatteryVoltage());
+        steerMotorSim.setBusVoltage(RobotController.getBatteryVoltage());
+        //steerEncoderSim.setBusVoltage(RobotController.getBatteryVoltage());
     }
 
-   public  void reset(Pose2d initModulePose){
-        prevModulePose = curModulePose = initModulePose;
-        curLinearSpeed_mps = 0;
-        curAzmthAngle = Rotation2d.fromDegrees(0);
+    public double getDriveCurrentDraw(){
+        return driveMotor.getSupplyCurrent();
+    }
+    public double getSteerCurrentDraw(){
+        return steerMotor.getSupplyCurrent();
     }
 
-    void update(double dtSeconds){
-
-        Vector2d azimuthUnitVec = new Vector2d(1,0);
-        azimuthUnitVec.rotate(curAzmthAngle.getDegrees());
-
-        // Assume the wheel does not lose traction along its wheel direction (on-tread)
-        double velocityAlongAzimuth = getModuleRelativeTranslationVelocity(dtSeconds).dot(azimuthUnitVec);
-
-        wheelMotor.update(velocityAlongAzimuth, wheelVoltage, dtSeconds);
-        azmthMotor.update(azmthVoltage, dtSeconds);
-
-        // Assume idealized azimuth control - no "twist" force at contact patch from friction or robot motion.
-        curAzmthAngle = Rotation2d.fromDegrees(azmthMotor.getMechanismPosition_Rev() * 360);
+    public static double positionToRotations(double nativePosition, double motorRotationsPerMechanismRotation){
+        return nativePosition / 2048 / motorRotationsPerMechanismRotation;
+    }
+    public static double positionToDegrees(double nativePosition, double motorRotationsPerMechanismRotation){
+        return positionToRotations(nativePosition, motorRotationsPerMechanismRotation) * 360;
+    }
+    public static double positionToRadians(double nativePosition, double motorRotationsPerMechanismRotation){
+        return positionToRotations(nativePosition, motorRotationsPerMechanismRotation) * 2 * Math.PI;
+    }
+    public static double positionToMeters(double nativePosition, double motorRotationsPerMechanismRotation, double circumferenceMeters){
+        return positionToRotations(nativePosition, motorRotationsPerMechanismRotation) * circumferenceMeters;
+    }
+    public static double rotationsToPosition(double rotations, double motorRotationsPerMechanismRotation){
+        return rotations * 2048 * motorRotationsPerMechanismRotation;
+    }
+    public static double degreesToPosition(double degrees, double motorRotationsPerMechanismRotation){
+        return rotationsToPosition(degrees/(360), motorRotationsPerMechanismRotation);
+    }
+    public static double radiansToPosition(double radians, double motorRotationsPerMechanismRotation){
+        return rotationsToPosition(radians/(2*Math.PI), motorRotationsPerMechanismRotation);
+    }
+    public static double metersToPosition(double meters, double motorRotationsPerMechanismRotation, double circumferenceMeters){
+        return rotationsToPosition(meters/(circumferenceMeters), motorRotationsPerMechanismRotation);
     }
 
-    
-    /** Get a vector of the velocity of the module's contact patch moving across the field. */
-    Vector2d getModuleRelativeTranslationVelocity(double dtSeconds){
-        double xVel = (curModulePose.getTranslation().getX() - prevModulePose.getTranslation().getX())/dtSeconds;
-        double yVel = (curModulePose.getTranslation().getY() - prevModulePose.getTranslation().getY())/dtSeconds;
-        Vector2d moduleTranslationVec= new Vector2d(xVel,yVel);
-        moduleTranslationVec.rotate(-1.0*curModulePose.getRotation().getDegrees());
-        return moduleTranslationVec;
+    public static double velocityToRotations(double nativeVelocity, double motorRotationsPerMechanismRotation){
+        return nativeVelocity * 10 / 2048 / motorRotationsPerMechanismRotation;
+    }
+    public static double velocityToDegrees(double nativeVelocity, double motorRotationsPerMechanismRotation){
+        return velocityToRotations(nativeVelocity, motorRotationsPerMechanismRotation) * 360;
+    }
+    public static double velocityToRadians(double nativeVelocity, double motorRotationsPerMechanismRotation){
+        return velocityToRotations(nativeVelocity, motorRotationsPerMechanismRotation) * 2 * Math.PI;
+    }
+    public static double velocityToMeters(double nativeVelocity, double motorRotationsPerMechanismRotation, double circumferenceMeters){
+        return velocityToRotations(nativeVelocity, motorRotationsPerMechanismRotation) * circumferenceMeters;
+    }
+    public static double rotationsToVelocity(double rotations, double motorRotationsPerMechanismRotation){
+        return rotations * 2048 / 10 * motorRotationsPerMechanismRotation;
+    }
+    public static double degreesToVelocity(double degrees, double motorRotationsPerMechanismRotation){
+        return rotationsToVelocity(degrees/(360), motorRotationsPerMechanismRotation);
+    }
+    public static double radiansToVelocity(double radians, double motorRotationsPerMechanismRotation){
+        return rotationsToVelocity(radians/(2*Math.PI), motorRotationsPerMechanismRotation);
+    }
+    public static double metersToVelocity(double meters, double motorRotationsPerMechanismRotation, double circumferenceMeters){
+        return rotationsToVelocity(meters/(circumferenceMeters), motorRotationsPerMechanismRotation);
     }
 
-    /**
-     * Given a net force on a particular module, calculate the friction force
-     * generated by the tread interacting with the ground in the direction
-     * perpendicular to the wheel's rotation.
-     * @param netForce_in
-     * @return 
-     */
-    ForceAtPose2d getCrossTreadFrictionalForce(Force2d netForce_in, double dtSeconds){
-
-        //Project net force onto cross-tread vector
-        Vector2d crossTreadUnitVector = new Vector2d(0,1);
-        crossTreadUnitVector.rotate(curAzmthAngle.getDegrees());
-        crossTreadVelMag = getModuleRelativeTranslationVelocity(dtSeconds).dot(crossTreadUnitVector);
-        crossTreadForceMag = netForce_in.getVector2d().dot(crossTreadUnitVector);
-
-        Force2d fricForce = new Force2d();
-        
-        if(Math.abs(crossTreadForceMag) > treadStaticFricForce || Math.abs(crossTreadVelMag) > 0.001){
-            // Force is great enough to overcome static friction, or we're already moving
-            // In either case, use kinetic frictional model
-            crossTreadFricForceMag = -1.0 * Math.signum(crossTreadVelMag) * treadKineticFricForce;
-        } else {
-            // Static Friction Model
-            crossTreadFricForceMag = -1.0 * crossTreadForceMag;
-        }
-        
-        fricForce = new Force2d(crossTreadUnitVector);
-        fricForce = fricForce.times(crossTreadFricForceMag);
-
-        return new ForceAtPose2d(fricForce, curModulePose);
-    }
-
-        
-    /** Gets the modules on-axis (along wheel direction) force, which comes from the rotation of the motor. */
-    ForceAtPose2d getWheelMotiveForce(){
-        return new ForceAtPose2d(new Force2d(wheelMotor.getGroundForce_N(), curAzmthAngle), curModulePose);
-    }
-
-    /** Set the motion of each module in the field reference frame */
-    void setModulePose(Pose2d curPos){
-        //Handle init'ing module position history to current on first pass
-        if(prevModulePose == null){
-            prevModulePose = curPos;
-        } else {
-            prevModulePose = curModulePose;
-        }
-
-        curModulePose = curPos;
-    }
-
-    Pose2d getModulePose(){
-        return curModulePose;
-    }
 
 }
