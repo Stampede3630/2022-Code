@@ -5,7 +5,7 @@
       "maximized": "0",
       "style": "1",
       "userScale": "2",
-      "width": "1718",
+      "width": "1350",
       "xpos": "1",
       "ypos": "31"
     }
@@ -38,12 +38,12 @@
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "953,30",
+      "Pos": "703,405",
       "Size": "750,972"
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1031,72",
+      "Pos": "634,42",
       "Size": "622,1138"
     },
     "###PowerDistributions": {

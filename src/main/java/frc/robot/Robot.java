@@ -22,11 +22,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.swerve.SwerveConstants;
 import frc.robot.sim.SimGyroSensorModel;
-import frc.robot.sim.wpiClasses.QuadSwerveSim;
 import frc.robot.sim.wpiClasses.SwerveModuleSim;
 import frc.robot.swerve.SwerveDrive;
 import frc.robot.swerve.SwerveMap;
-import frc.robot.sim.SwerveSim;
 import frc.robot.swerve.SwerveTrajectory;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
@@ -46,7 +44,7 @@ public class Robot extends TimedRobot {
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
-  public static SwerveSim SWERVESIM;
+
   public static double myWattThingy;
   // public static AutoWaypoints AUTOWAYPOINTS;
   public static SwerveTrajectory SWERVETRAJECTORY;
@@ -70,11 +68,6 @@ public class Robot extends TimedRobot {
     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
     SwerveMap.GYRO.reset(); 
     
-    if (RobotBase.isReal()) {
-
-    } else {
-      SwerveMap.simNavx = new SimGyroSensorModel();
-    }
     SwerveMap.checkAndSetSwerveCANStatus();
 
     //**Intake method starts here**
@@ -113,8 +106,6 @@ public class Robot extends TimedRobot {
     SWERVEDRIVE = SwerveDrive.getInstance();
     SWERVEDRIVE.init();
     SWERVEDRIVE.zeroSwerveDrive();
-
-    SWERVESIM = SwerveSim.getInstance();
 
     NetworkTableInstance.getDefault().getTable("limelight-intake").getEntry("camMode").setNumber(1);
 
@@ -196,7 +187,7 @@ public class Robot extends TimedRobot {
     INTAKE.intakePeriodic();
     // SHOOTER INSTANCE LOOP
     SHOOTER.shooterPeriodic();
-    SWERVEDRIVE.drive(4, 0, 0, false);
+    
   }
 
   /** This function is called once when the robot is disabled. */
@@ -223,56 +214,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationInit() {
-    for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
-    SWERVESIM.swerveModuleSimList.get(idx).reset(new Pose2d());
-    }
+
   }
 
   @Override
   public void simulationPeriodic() {
-
-    if(!DriverStation.isEnabled()){
-      for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
-        SWERVESIM.swerveModuleSimList.get(idx).setInputVoltages(0.0, 0.0);
-      }
-    } else {
-        for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
-            
-            double azmthVolts = SwerveMap.RealSwerveModuleList.get(idx).mSteeringMotor.getSimCollection().getMotorOutputLeadVoltage();
-            double wheelVolts = SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getSimCollection().getMotorOutputLeadVoltage();
-            SWERVESIM.swerveModuleSimList.get(idx).setInputVoltages(wheelVolts, azmthVolts);
-            
-            //System.out.println("module: " + idx + " " + wheelVolts);
-            
-        }
-    }
-
-    Pose2d prevRobotPose = SWERVESIM.simSwerve.getCurPose();
-
-    // Update model (several small steps)
-    for (int i = 0; i< 20; i++) {
-      SWERVESIM.simSwerve.update(0.001);
-    }
-  
-        //Set the state of the sim'd hardware
-    for(int idx = 0; idx < QuadSwerveSim.NUM_MODULES; idx++){
-      double azmthPos = SWERVESIM.swerveModuleSimList.get(idx).getAzimuthEncoderPositionRev();
-      //System.out.println(Math.toDegrees(azmthPos));
-      azmthPos = azmthPos / SwerveConstants.STEERING_MOTOR_GEARING * 2 * Math.PI; //Shaft Revs per module rev, 2PI per rev
-      double wheelPos = SWERVESIM.swerveModuleSimList.get(idx).getWheelEncoderPositionRev();
-      wheelPos = wheelPos / SwerveConstants.DRIVE_MOTOR_GEARING * 2 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
-      
-      double wheelVel = SWERVESIM.swerveModuleSimList.get(idx).getWheelEncoderVelocityRevPerSec();
-      System.out.println("Module " + idx  + 
-      ": Voltage: " + SwerveMap.RealSwerveModuleList.get(idx).mDriveMotor.getAppliedVoltage() + 
-      " Velocity: " + wheelVel/SwerveConstants.DRIVE_MOTOR_GEARING*SwerveConstants.METERSperWHEEL_REVOLUTION +
-      " Angle: " +  SwerveMap.RealSwerveModuleList.get(idx).mModuleState.angle);
-      wheelVel = wheelVel / SwerveConstants.DRIVE_MOTOR_GEARING * 2.0 * Math.PI * SwerveConstants.WHEEL_RADIUS_METERS;
-      //.out.println("module: " + idx + " " + wheelVel);
-      SwerveMap.RealSwerveModuleList.get(idx).setSimState(azmthPos, wheelPos, wheelVel);
-      SwerveMap.simNavx.update(SWERVESIM.simSwerve.getCurPose(), prevRobotPose);
-      //System.out.println("module: " + idx + " " + simSwerve.getCurPose().getRotation().getDegrees());
-    }
+    SWERVEDRIVE.simulationPeriodic();
   }
 
 

@@ -25,11 +25,6 @@
         "header": {
           "open": true
         }
-      },
-      "Talon FX[5]": {
-        "header": {
-          "open": true
-        }
       }
     },
     "PowerDistributions": {
@@ -120,8 +115,7 @@
       "CompetitionLogger": {
         "SwerveDriveDB": {
           "open": true
-        },
-        "open": true
+        }
       },
       "Robot": {
         "field": {
