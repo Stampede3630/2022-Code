@@ -1,27 +1,7 @@
 {
   "HALProvider": {
     "Other Devices": {
-      "Talon FX[12]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX[13]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX[13]/Integrated Sensor": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX[3]/Rev Limit": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX[4]/Rev Limit": {
+      "navX-Sensor[0]": {
         "header": {
           "open": true
         }
@@ -91,6 +71,44 @@
         }
       },
       "/Shuffleboard/Robot/field": {
+        "Robot": {
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "length": 0.6159999966621399,
+          "width": 0.6259999871253967
+        },
+        "backLeft": {
+          "arrowSize": 10,
+          "arrowWeight": 2.0,
+          "length": 0.25,
+          "weight": 2.0,
+          "width": 0.25
+        },
+        "backRight": {
+          "arrowSize": 10,
+          "arrowWeight": 0.10000000149011612,
+          "length": 0.25,
+          "weight": 2.0,
+          "width": 0.25
+        },
+        "frontLeft": {
+          "arrowSize": 10,
+          "arrowWeight": 0.10000000149011612,
+          "length": 0.25,
+          "weight": 0.25,
+          "width": 0.25
+        },
+        "frontRight": {
+          "arrowSize": 10,
+          "arrowWeight": 0.10000000149011612,
+          "length": 0.25,
+          "weight": 2.0,
+          "width": 0.25
+        },
+        "image": "C:\\Users\\Sam\\Downloads\\2022-field.png",
+        "target": {
+          "width": 0.6800000071525574
+        },
         "window": {
           "visible": true
         }
@@ -120,7 +138,8 @@
       "Robot": {
         "field": {
           "open": true
-        }
+        },
+        "open": true
       },
       "SwerveDrive": {
         "open": true

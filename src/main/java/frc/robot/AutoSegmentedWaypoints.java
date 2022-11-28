@@ -5,6 +5,10 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -78,8 +82,11 @@ public class AutoSegmentedWaypoints implements Loggable {
     }
 
     public void init() {
+        StateHasInitialized = false;
+        StateHasFinished = false;
         SwerveMap.GYRO.reset();
-    
+        SwerveMap.simNavx.resetToPose(new Pose2d(new Translation2d(), new Rotation2d())
+        );
         if (m_autoChooser.getSelected()==null){
             chosenPath = myAutoContainer[0];
         } else {
@@ -87,11 +94,18 @@ public class AutoSegmentedWaypoints implements Loggable {
         }
 
         chosenWaypoints = chosenPath.thisWPset;
-        SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
+        
+
         Robot.SHOOTER.homocideTheBattery = true;
         currentWaypointNumber = 0;
         PathPlannerState initalPathPose =((PathPlannerState)chosenWaypoints[0].pathPlannerSegment.getInitialState());
-        Robot.SWERVEDRIVE.resetOdometry(initalPathPose.poseMeters, initalPathPose.poseMeters.getRotation()); 
+        
+        Robot.SWERVEDRIVE.resetOdometry(new Pose2d(initalPathPose.poseMeters.getTranslation(), edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-chosenPath.thisRot)), edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-chosenPath.thisRot)); 
+        if (RobotBase.isSimulation()){
+            SwerveMap.simNavx.resetToPose(new Pose2d(new Translation2d(), edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-chosenPath.thisRot)));
+        } 
+        SwerveMap.GYRO.setAngleAdjustment(chosenPath.thisRot);
+    
     }
     
     public void autoPeriodic() {
@@ -254,7 +268,7 @@ public class AutoSegmentedWaypoints implements Loggable {
         }
 
         if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Timer.getFPGATimestamp() - autoDelay > 1.5)) {
-            System.out.println("hi!");
+            //System.out.println("hi!");
             Robot.SWERVEDRIVE.autoLimeLightAim = false;
             if (chosenWaypoints.length != currentWaypointNumber+1){
                 Robot.INTAKE.intakeNow = false;
@@ -291,7 +305,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     public void done(){
         //ADDED TO NOT GO OUT OF BOUNDS IN A ARRAY WAYPOINT RUNNER
         //FEEL FREE TO ADD THING TO THE DONE STATE
-        System.out.println("delete me if you see this");
+        System.out.println("waypoint reached DONE");
     }
 
     public double getDistance(double X1, double Y1, double X2, double Y2) { //just the distance formula - uses current x and y positions
@@ -306,7 +320,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             StateHasInitialized = true;
         }
         
-        SwerveTrajectory.PathPlannerRunner(Robot.SWERVEDRIVE, thisWaypointSet[currentWaypointNumber].pathPlannerSegment,  Robot.SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+        SwerveTrajectory.PathPlannerRunner(Robot.SWERVEDRIVE, thisWaypointSet[currentWaypointNumber].pathPlannerSegment,  Robot.SWERVEDRIVE.m_poseEstimator, SwerveMap.getRobotAngle());
         thisWaypointSet[currentWaypointNumber].action.run();
 
         if (StateHasFinished){

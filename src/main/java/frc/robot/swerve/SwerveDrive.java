@@ -63,7 +63,6 @@ public class SwerveDrive implements Loggable {
   public final List<Translation2d> getSwerveBotTranslationList = List.of(m_frontLeftLocation, m_frontRightLocation,m_backLeftLocation, m_backRightLocation);
   public final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
-  public SwerveDriveOdometry m_odometry;
   public SwerveDrivePoseEstimator m_poseEstimator;
 
   public static SwerveDrive getInstance() {
@@ -73,7 +72,6 @@ public class SwerveDrive implements Loggable {
   public void init(){
     velocities.add(0.0);
     velocities.add(0.0);
-    m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.getRobotAngle());
     holdRobotAngleController.disableContinuousInput();
     holdRobotAngleController.setTolerance(Math.toRadians(2));
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
@@ -93,10 +91,9 @@ public class SwerveDrive implements Loggable {
   }
 
   public void simulationPeriodic(){
-    for(SwerveModule module : SwerveMap.RealSwerveModuleList) {
+       for(SwerveModule module : SwerveMap.RealSwerveModuleList) {
         module.simModule.simulationPeriodic();
       }
-    getPose().getRotation();
     }
 
   /**
@@ -128,7 +125,6 @@ public class SwerveDrive implements Loggable {
           m_kinematics.toSwerveModuleStates( _fieldRelative ? 
           ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, SwerveMap.getRobotAngle())
           : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
-    System.out.println(_xSpeed);
     SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, SwerveConstants.MAX_SPEED_METERSperSECOND);
       
     if (defensiveStop && _xSpeed == 0 && _ySpeed == 0 && _rot == 0) {
@@ -241,7 +237,8 @@ public class SwerveDrive implements Loggable {
   }
 
   public double limelightTX() {  
-    return NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+    double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+    return tx;
   } //Testing kP=1.5
 
 /**Sets the robots speed parameters to zero */
@@ -298,6 +295,7 @@ public class SwerveDrive implements Loggable {
    */
   public void drawRobotOnField(Field2d field) {
     field.setRobotPose(getPose());
+    
     // Draw a pose that is based on the robot pose, but shifted by the translation of the module relative to robot center,
     // then rotated around its own center by the angle of the module.
     
@@ -379,11 +377,11 @@ public class SwerveDrive implements Loggable {
   }
 
   public void resetOdometry(){
-    m_odometry.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
+    m_poseEstimator.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
   }
 
   public void resetOdometry(Pose2d _Pose2d, Rotation2d _Rotation2d){
-    m_odometry.resetPosition(_Pose2d, _Rotation2d);
+    m_poseEstimator.resetPosition(_Pose2d, _Rotation2d);
   }
 
 
@@ -427,11 +425,11 @@ public class SwerveDrive implements Loggable {
   */
   @Log(rowIndex = 0, columnIndex = 5, height = 1, width = 1)
   public double getXPos(){
-    return m_odometry.getPoseMeters().getX();
+    return m_poseEstimator.getEstimatedPosition().getTranslation().getX();
   }
   @Log(rowIndex = 0, columnIndex = 6, height = 1, width = 1)
   public double getYPos(){
-    return m_odometry.getPoseMeters().getY();
+    return m_poseEstimator.getEstimatedPosition().getTranslation().getY();
   }
   /*
   @Log.BooleanBox(rowIndex = 1, columnIndex = 5)
@@ -443,16 +441,7 @@ public class SwerveDrive implements Loggable {
     joystickDriveGovernor = _input;
   }
 */
-  @Config.ToggleButton(name="ResetGyroAndOdometry", defaultValue = false, rowIndex = 3, columnIndex = 0, height = 1, width = 2)
-  public void resetGyroAndOdometry(boolean _input){
-    if(_input){
-    SwerveMap.GYRO.reset();
-    holdRobotAngleSetpoint = 0;
-    Robot.SWERVEDRIVE.m_odometry.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
-    _input = false;
-    SwerveMap.GYRO.setAngleAdjustment(0);
-    }
-  }
+
 
   @Config.ToggleButton(name="RE-Zero Swerve Angle", defaultValue = false, rowIndex = 4, columnIndex = 0, height = 1, width = 2)
   public void reZeroSwerveDrive(boolean _input){

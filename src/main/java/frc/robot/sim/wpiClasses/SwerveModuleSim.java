@@ -11,7 +11,9 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import frc.robot.Robot;
 import frc.robot.swerve.SwerveConstants;
+import frc.robot.swerve.SwerveMap;
 
 public class SwerveModuleSim {
 
@@ -66,19 +68,19 @@ public class SwerveModuleSim {
         else steerVoltage = Math.min(0, steerVoltage+kSteerFF.ks);
         steeringSim.setInputVoltage(steerVoltage);
         
-        driveWheelSim.update(0.02);
-        steeringSim.update(0.02);
+        driveWheelSim.update(Robot.deltaTime);
+        steeringSim.update(Robot.deltaTime);
 
         // update our simulated devices with our simulated physics results
         double driveMotorVelocityNative = rotationsToVelocity(driveWheelSim.getAngularVelocityRPM()/60, SwerveConstants.DRIVE_MOTOR_GEARING);
-        double driveMotorPositionDeltaNative = driveMotorVelocityNative*10*0.02;
+        double driveMotorPositionDeltaNative = driveMotorVelocityNative*10*Robot.deltaTime;
         driveMotorSim.setIntegratedSensorVelocity((int)driveMotorVelocityNative);
         driveMotorSim.addIntegratedSensorPosition((int)(driveMotorPositionDeltaNative));
         driveMotorSim.setSupplyCurrent(driveWheelSim.getCurrentDrawAmps()/2);
 
         //SmartDashboard.putNumber("Steer Sim Model Velocity", steeringSim.getAngularVelocityRPM());
         double steerMotorVelocityNative = rotationsToVelocity(steeringSim.getAngularVelocityRPM()/60, SwerveConstants.STEERING_MOTOR_GEARING);
-        double steerMotorPositionDeltaNative = steerMotorVelocityNative*10*0.02;
+        double steerMotorPositionDeltaNative = steerMotorVelocityNative*10*Robot.deltaTime;
         steerMotorSim.setIntegratedSensorVelocity((int)steerMotorVelocityNative);
         steerMotorSim.addIntegratedSensorPosition((int)(steerMotorPositionDeltaNative));
         steerMotorSim.setSupplyCurrent(steeringSim.getCurrentDrawAmps()/2);

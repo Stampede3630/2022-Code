@@ -28,7 +28,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.sim.SimEncoder;
@@ -37,6 +39,9 @@ import frc.robot.sim.wpiClasses.SwerveModuleSim;
 
 public class SwerveMap {
     public static AHRS GYRO;
+    public static SimGyroSensorModel simNavx = new SimGyroSensorModel();
+
+
     public static TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
     public static SimpleMotorFeedforward driveMotorFeedforward = new SimpleMotorFeedforward(SwerveConstants.kS, SwerveConstants.kV, SwerveConstants.kA);
     public static final SwerveModule FrontRightSwerveModule = new SwerveModule(
@@ -56,17 +61,21 @@ public class SwerveMap {
         new SteeringMotor(SwerveConstants.BLSteerID, SwerveConstants.BLSteerGains), 
         new SteeringSensor(SwerveConstants.BLSensorID,SwerveConstants.BLSensorOffset));
     public static final List<SwerveModule> RealSwerveModuleList = List.of(FrontLeftSwerveModule, FrontRightSwerveModule, BackLeftSwerveModule, BackRightSwerveModule);
-
     public static Rotation2d getRobotAngle(){
-        if (RobotBase.isSimulation()){
-            try {
-                return Robot.SWERVEDRIVE.getPose().getRotation();
-            } catch (Exception e) {
-                return new Rotation2d();
-            }
-        } else { return GYRO.getRotation2d();}
-        //return new Rotation2d(-Math.toRadians(GYRO.getAngle()));
+        if (GYRO.isConnected() && RobotBase.isReal()){
+            return GYRO.getRotation2d();
+        } else {
+
+        try {
+         //System.out.println( deltaTime);
+         return Robot.SWERVEDRIVE.m_poseEstimator.getEstimatedPosition().getRotation().rotateBy(new Rotation2d(Robot.SWERVEDRIVE.m_kinematics.toChassisSpeeds(Robot.SWERVEDRIVE.getModuleStates()).omegaRadiansPerSecond *Robot.deltaTime));
+        } catch (Exception e) {
+        return new Rotation2d();        }
+            
+        
+        }
     }
+        //return new Rotation2d(-Math.toRadians(GYRO.getAngle()));
     //SJV MAYBE DESIGN A METHOD THAT SETS IT TO CANCODER DRIVING?
     public static void checkAndSetSwerveCANStatus(){
         FrontRightSwerveModule.setSWERVEMODULECANStatusFrames();

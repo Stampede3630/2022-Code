@@ -2,7 +2,7 @@ package frc.robot.swerve;
 
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 public class SwerveConstants {
-    public static final boolean OPTIMIZESTEERING = true;
+    public static final boolean OPTIMIZESTEERING = false;
     public static final boolean CHARACTERIZE_ROBOT = false;
     public static final boolean RUN_TRAJECTORY = true;
 
@@ -20,7 +20,7 @@ public class SwerveConstants {
     //SWERVE Drive Default Values
     public static final double ROBOTHoldAngleKP = 15; //Start at .7 and see where you go from there
     public static final boolean DEFAULT_HOLD_ROBOT_ANGLE = false;
-	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = false;
+	public static final boolean DEFAULT_FIELD_RELATIVE_DRIVE = true;
 	public static final double DEFAULT_HOLD_ROBOT_ANGLE_SETPOINT = 0; 
 
     //Swerve Drive Motor IDs

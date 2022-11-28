@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -44,6 +45,8 @@ public class Robot extends TimedRobot {
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
+  public static double deltaTime = 0;
+  public static double prevTime = 0;
 
   public static double myWattThingy;
   // public static AutoWaypoints AUTOWAYPOINTS;
@@ -126,6 +129,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    deltaTime = Timer.getFPGATimestamp() - prevTime;
+    prevTime = Timer.getFPGATimestamp();
     SWERVEDRIVE.updateOdometry();
     SwerveMap.checkAndSetSwerveCANStatus();
     SwerveMap.checkAndZeroSwerveAngle();

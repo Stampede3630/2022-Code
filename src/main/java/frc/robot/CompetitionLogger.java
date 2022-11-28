@@ -44,13 +44,9 @@ public class CompetitionLogger implements Loggable {
         // public void HoldRobotAngle(boolean _input){
         //     Robot.SWERVEDRIVE.holdRobotAngleEnabled = _input;
         // }
-        @Config(defaultValueBoolean = false)
+        @Config(defaultValueBoolean = true)
         public void FieldRelativeDrive(boolean _input){
             Robot.SWERVEDRIVE.SDFieldRelative = _input;
-        }
-        @Config
-        public void ResetGyroAndOdometry(boolean _input){
-            Robot.SWERVEDRIVE.resetGyroAndOdometry(_input);
         }
 
         @Config(defaultValueBoolean = false)

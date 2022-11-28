@@ -48,7 +48,7 @@ public class SwerveTrajectory implements Loggable {
      * @param _odometry SwerveDrive.java's odometry
      * @param _rotation2d Pass in the current angle of the robot
      */
-    public static void PathPlannerRunner(SwerveDrive swerveDrive, PathPlannerTrajectory _pathTraj, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
+    public static void PathPlannerRunner(SwerveDrive swerveDrive, PathPlannerTrajectory _pathTraj, SwerveDrivePoseEstimator _odometry, Rotation2d _rotation2d){
         elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
         switch (trajectoryStatus) {
             case "setup":    
@@ -61,7 +61,7 @@ public class SwerveTrajectory implements Loggable {
                 
                 if (elapsedTime <  ((PathPlannerState) _pathTraj.getEndState()).timeSeconds){
                     ChassisSpeeds _speeds = HDC.calculate(
-                        _odometry.getPoseMeters(), 
+                        _odometry.getEstimatedPosition(), 
                         ((PathPlannerState) _pathTraj.sample(elapsedTime)),((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
                         swerveDrive.drive(_speeds.vxMetersPerSecond,
                     _speeds.vyMetersPerSecond, 
@@ -69,7 +69,9 @@ public class SwerveTrajectory implements Loggable {
                     
                 } else {
                     swerveDrive.drive(0,0,0,false);
-                    swerveDrive.setHoldRobotAngleSetpoint(((PathPlannerState) _pathTraj.getEndState()).holonomicRotation.getRadians());
+                    double holdRobotAngleSetpoint = ((PathPlannerState) _pathTraj.getEndState()).holonomicRotation.getRadians();
+                    System.out.println(Math.toDegrees(holdRobotAngleSetpoint));
+                    swerveDrive.setHoldRobotAngleSetpoint(holdRobotAngleSetpoint);
                     trajectoryStatus = "done";
 
                 }
