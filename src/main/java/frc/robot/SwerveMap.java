@@ -23,6 +23,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class SwerveMap {
@@ -304,8 +305,12 @@ public class SwerveMap {
                 Constants.METERSperWHEEL_REVOLUTION/(Constants.DRIVE_MOTOR_TICKSperREVOLUTION*
                 Constants.SECONDSper100MS), new Rotation2d(Math.toRadians(mSteeringMotor.getSelectedSensorPosition())));
         }
-
-
+        public SwerveModulePosition getPosition() {
+            return new SwerveModulePosition(
+                    mDriveMotor.getSelectedSensorPosition() / Constants.DRIVE_MOTOR_TICKSperREVOLUTION
+                            * Constants.METERSperWHEEL_REVOLUTION,
+                    new Rotation2d(Math.toRadians(mSteeringMotor.getSelectedSensorPosition())));
+        }
         public void setDesiredState(SwerveModuleState desiredState){
             SwerveModuleState kState = optimize(desiredState, new Rotation2d(Math.toRadians(mSteeringMotor.getSelectedSensorPosition())));
             double convertedspeed = kState.speedMetersPerSecond*(Constants.SECONDSper100MS)*Constants.DRIVE_MOTOR_TICKSperREVOLUTION/(Constants.METERSperWHEEL_REVOLUTION);           

@@ -76,6 +76,7 @@ public class Shooter implements Loggable {
         rotComplete = false;
         hoodAtOrigin = false;
 
+        hoodMotor = new WPI_TalonFX(279); // TODO: get actual ID
         homocideTheBattery = false;
         
         leftHoodSwitch = new DigitalInput(Constants.LeftHoodSwitchID);

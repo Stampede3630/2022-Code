@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -59,9 +60,7 @@ public class SwerveDrive implements Loggable {
   }
 
   public void init(){
-    velocities.add(0.0);
-    velocities.add(0.0);
-    m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.getRobotAngle());
+    m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.getRobotAngle(), getModulePositions(), new Pose2d());
     holdRobotAngleController.disableContinuousInput();
     holdRobotAngleController.setTolerance(Math.toRadians(2));
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
@@ -184,6 +183,14 @@ public class SwerveDrive implements Loggable {
     NeutralMode = "Brake";
   }
 
+  public SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
+      SwerveMap.FrontLeftSwerveModule.getPosition(),
+      SwerveMap.FrontRightSwerveModule.getPosition(),
+      SwerveMap.BackLeftSwerveModule.getPosition(),
+      SwerveMap.BackRightSwerveModule.getPosition()
+    };
+  }
   public void enableCurrentLimiting(){
     SwerveMap.FrontRightSwerveModule.enableCurrentLimiting();
     SwerveMap.BackRightSwerveModule.enableCurrentLimiting();
@@ -228,13 +235,19 @@ public class SwerveDrive implements Loggable {
     m_odometry.update(
       
       SwerveMap.getRobotAngle(),
-    SwerveMap.FrontLeftSwerveModule.getState(),
-    SwerveMap.FrontRightSwerveModule.getState(),
-    SwerveMap.BackLeftSwerveModule.getState(),
-    SwerveMap.BackRightSwerveModule.getState());
+      getModulePositions());
     //System.out.println("x= " + m_odometry.getPoseMeters().getX() + " y="+m_odometry.getPoseMeters().getY());
     //System.out.println("FL: " + Math.round(SwerveMap.FrontLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " FR: " +Math.round(SwerveMap.FrontRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
     //System.out.println("BL: " + Math.round(SwerveMap.BackLeftSwerveModule.mDriveMotor.getSelectedSensorVelocity()) + " BR: " +Math.round(SwerveMap.BackRightSwerveModule.mDriveMotor.getSelectedSensorVelocity()));
+  }
+
+  public double getCurrentSpeed() {
+    double xSpeed = getSDxSpeed();
+    double ySpeed = getSDySpeed();
+
+    double speed = Math.sqrt((xSpeed * xSpeed) + (ySpeed * ySpeed));
+
+    return speed;
   }
   
   @Log.Gyro(name = "Robot Angle", rowIndex = 2, columnIndex = 5)
@@ -297,11 +310,11 @@ public class SwerveDrive implements Loggable {
   }
 
   public void resetOdometry(){
-    m_odometry.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
+    m_odometry.resetPosition(SwerveMap.getRobotAngle(), getModulePositions(), new Pose2d());
   }
 
   public void resetOdometry(Pose2d _Pose2d, Rotation2d _Rotation2d){
-    m_odometry.resetPosition(_Pose2d, _Rotation2d);
+    m_odometry.resetPosition(_Rotation2d,getModulePositions(), _Pose2d);
   }
 
   public void getVelocities() {
@@ -371,7 +384,7 @@ public class SwerveDrive implements Loggable {
     if(_input){
     SwerveMap.GYRO.reset();
     holdRobotAngleSetpoint = 0;
-    Robot.SWERVEDRIVE.m_odometry.resetPosition(new Pose2d(), SwerveMap.getRobotAngle());
+    Robot.SWERVEDRIVE.m_odometry.resetPosition(SwerveMap.getRobotAngle(),getModulePositions(), new Pose2d());
     _input = false;
     SwerveMap.GYRO.setAngleAdjustment(0);
     }
