@@ -1,5 +1,8 @@
 package frc.robot;
 
+import java.util.ArrayList;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -12,16 +15,28 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
+
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
 
 public class SwerveDrive implements Loggable {
-  private static SwerveDrive SINGLE_INSTANCE = new SwerveDrive();
+  public boolean autoLimeLightAim = false;
+  public boolean acceleratedInputs = true;
+  public boolean defensiveStop = true;
+
+  public double previousXDistance = 0;
+  public double previousYDistance = 0;
+  public double previousTimestamp = 0;
   private double SDxSpeed=0;
   private double SDySpeed=0;
   private double SDrotation=0;
+
+  public ArrayList<Double> velocities = new ArrayList<Double>();
+  private static SwerveDrive SINGLE_INSTANCE = new SwerveDrive();
+  
   public boolean SDFieldRelative= Constants.DEFAULT_FIELD_RELATIVE_DRIVE;
   public boolean holdRobotAngleEnabled = Constants.DEFAULT_HOLD_ROBOT_ANGLE;
   public PIDController holdRobotAngleController = new PIDController(Constants.ROBOTHoldAngleKP, 0, 0);
@@ -37,19 +52,22 @@ public class SwerveDrive implements Loggable {
   public final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
   public SwerveDriveOdometry m_odometry;
+
+  public final Field2d field = new Field2d();
   
   public static SwerveDrive getInstance() {
     return SINGLE_INSTANCE;
   }
 
   public void init(){
-    m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.getRobotAngle(), null, null);
+    m_odometry = new SwerveDriveOdometry(m_kinematics, SwerveMap.getRobotAngle(), getModulePositions(), new Pose2d());
     holdRobotAngleController.disableContinuousInput();
     holdRobotAngleController.setTolerance(Math.toRadians(2));
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
   }
-  
+
+
   public void swervePeriodic() {
     joystickDrive();
     drive(
@@ -57,6 +75,8 @@ public class SwerveDrive implements Loggable {
       getSDySpeed(), 
       getSDRotation(), 
       getSDFieldRelative());
+      field.setRobotPose(m_odometry.getPoseMeters());
+    //getVelocities();
   }
   /**
   * Method to drive the robot using the following params
@@ -68,34 +88,64 @@ public class SwerveDrive implements Loggable {
   */
   @SuppressWarnings("ParameterName")
   public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative) {
-    if (Robot.xbox.getRightBumper()){
+    if (Robot.xbox.getRightStickButton() || autoLimeLightAim){
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
       _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), ((getRobotAngleDegrees() - limelightTX())/360)*(2*Math.PI));
       holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
-    // } else if (_rot == 0 && holdRobotAngleEnabled){
-    //   _rot = holdRobotAngleController.calculate(SwerveMap.getRobotAngle().getRadians(), holdRobotAngleSetpoint);
+    //  System.out.println(limelightTX());
+    // } else if (_xSpeed == 0 && _ySpeed == 0 && _rot == 0 && holdRobotAngleEnabled) {
+    //   System.out.println("Evan sucks booty%");
+    
     //   NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
-    } else {
-      holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
-      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
-    }
-    SwerveModuleState[] moduleStates =
-      m_kinematics.toSwerveModuleStates( _fieldRelative ? 
+  } else if (Robot.xbox.getLeftStickButton()){
+    _fieldRelative = false;
+  } else {
+    holdRobotAngleSetpoint = SwerveMap.getRobotAngle().getRadians();
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
+  }
+  SwerveModuleState[] moduleStates =
+  m_kinematics.toSwerveModuleStates( _fieldRelative ? 
         ChassisSpeeds.fromFieldRelativeSpeeds(_xSpeed, _ySpeed, _rot, SwerveMap.getRobotAngle())
         : new ChassisSpeeds(_xSpeed, _ySpeed, _rot));
 
       SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, Constants.MAX_SPEED_METERSperSECOND);
 
-      SwerveMap.FrontLeftSwerveModule.setDesiredState(moduleStates[0]);
-      SwerveMap.FrontRightSwerveModule.setDesiredState(moduleStates[1]);
-      SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
-      SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
+      if (defensiveStop && _xSpeed == 0 && _ySpeed == 0 && _rot == 0) {
+        SwerveMap.FrontRightSwerveModule.setSteeringAngle(135);
+        SwerveMap.FrontRightSwerveModule.mDriveMotor.set(ControlMode.PercentOutput, 0);
+
+        SwerveMap.FrontLeftSwerveModule.setSteeringAngle(45);
+        SwerveMap.FrontLeftSwerveModule.mDriveMotor.set(ControlMode.PercentOutput, 0);
+
+        SwerveMap.BackRightSwerveModule.setSteeringAngle(45);
+        SwerveMap.BackRightSwerveModule.mDriveMotor.set(ControlMode.PercentOutput, 0);
+
+        SwerveMap.BackLeftSwerveModule.setSteeringAngle(135);
+        SwerveMap.BackLeftSwerveModule.mDriveMotor.set(ControlMode.PercentOutput, 0);
+
+      } else {
+        SwerveMap.FrontLeftSwerveModule.setDesiredState(moduleStates[0]);
+        SwerveMap.FrontRightSwerveModule.setDesiredState(moduleStates[1]);
+        SwerveMap.BackLeftSwerveModule.setDesiredState(moduleStates[2]);
+        SwerveMap.BackRightSwerveModule.setDesiredState(moduleStates[3]);
+
+      }
     }
   /**This ONLY saves speeds.  You must also call the drive method */  
   public void joystickDrive(){
-    double x = -Robot.xbox.getLeftY();
-    double y = -Robot.xbox.getLeftX();
-    double rot = -Robot.xbox.getRightX();
+    double x;
+    double y;
+    double rot;
+
+    if (acceleratedInputs) {
+      x = -Robot.xbox.getLeftY();
+      y = -Robot.xbox.getLeftX();
+      rot = -Robot.xbox.getRightX();
+    } else {
+      x = -Math.signum(Robot.xbox.getLeftY()) * Math.sqrt(Math.abs(Robot.xbox.getLeftY()));
+      y = -Math.signum(Robot.xbox.getLeftX()) * Math.sqrt(Math.abs(Robot.xbox.getLeftX()));
+      rot = -Math.signum(Robot.xbox.getRightX()) * Math.sqrt(Math.abs(Robot.xbox.getRightX()));
+    }
 
     SDxSpeed = convertToMetersPerSecond(deadband(x))*joystickDriveGovernor;
     SDySpeed = convertToMetersPerSecond(deadband(y))*joystickDriveGovernor;
@@ -103,10 +153,6 @@ public class SwerveDrive implements Loggable {
     //System.out.println(SDrotation);
     
   }
-
-  
-
-
 
   /**
    * MUST BE ADDED TO PERIODIC (NOT INIT METHODS)
@@ -144,6 +190,19 @@ public class SwerveDrive implements Loggable {
       SwerveMap.BackLeftSwerveModule.getPosition(),
       SwerveMap.BackRightSwerveModule.getPosition()
     };
+  }
+  public void enableCurrentLimiting(){
+    SwerveMap.FrontRightSwerveModule.enableCurrentLimiting();
+    SwerveMap.BackRightSwerveModule.enableCurrentLimiting();
+    SwerveMap.FrontLeftSwerveModule.enableCurrentLimiting();
+    SwerveMap.BackLeftSwerveModule.enableCurrentLimiting();
+  }
+
+  public void disableCurrentLimiting(){
+    SwerveMap.FrontRightSwerveModule.disableCurrentLimiting();
+    SwerveMap.BackRightSwerveModule.disableCurrentLimiting();
+    SwerveMap.FrontLeftSwerveModule.disableCurrentLimiting();
+    SwerveMap.BackLeftSwerveModule.disableCurrentLimiting();
   }
 
   public double limelightTX() {  
@@ -222,6 +281,11 @@ public class SwerveDrive implements Loggable {
     return SDrotation;
   }
 
+  @Config(defaultValueBoolean = true)
+  public void setAcceleratedInput(boolean _input) {
+    acceleratedInputs = _input;
+  }
+
   @Config.ToggleButton(name = "FieldOriented?", defaultValue = true, rowIndex = 1, columnIndex =0, height = 1, width = 2)
   public void setSDFieldRelative(boolean _input) {
     SDFieldRelative = _input;
@@ -253,7 +317,14 @@ public class SwerveDrive implements Loggable {
     m_odometry.resetPosition(_Rotation2d,getModulePositions(), _Pose2d);
   }
 
-  @Log.NumberBar(name = "FL Speed", min=-5,max=5 , rowIndex = 2, columnIndex =4, height = 1, width = 1)
+  public void getVelocities() {
+    ChassisSpeeds mySpeeds = m_kinematics.toChassisSpeeds(SwerveMap.FrontLeftSwerveModule.getState(), SwerveMap.FrontRightSwerveModule.getState(), SwerveMap.BackLeftSwerveModule.getState(),SwerveMap.BackRightSwerveModule.getState()) ;
+    velocities.set(0, mySpeeds.vxMetersPerSecond);
+    velocities.set(1, mySpeeds.vyMetersPerSecond);
+  }
+
+
+ /* @Log.NumberBar(name = "FL Speed", min=-5,max=5 , rowIndex = 2, columnIndex =4, height = 1, width = 1)
   public double getFrontLeftSpeed(){
     return SwerveMap.FrontLeftSwerveModule.getState().speedMetersPerSecond;
   }
@@ -289,7 +360,7 @@ public class SwerveDrive implements Loggable {
   public double getBackRightAngle(){
     return Math.IEEEremainder(SwerveMap.BackRightSwerveModule.getState().angle.getDegrees(),180);
   }
-  
+  */
   @Log(rowIndex = 0, columnIndex = 5, height = 1, width = 1)
   public double getXPos(){
     return m_odometry.getPoseMeters().getX();
@@ -298,15 +369,16 @@ public class SwerveDrive implements Loggable {
   public double getYPos(){
     return m_odometry.getPoseMeters().getY();
   }
+  /*
   @Log.BooleanBox(rowIndex = 1, columnIndex = 5)
   public boolean getGyroInterference(){
     return SwerveMap.GYRO.isMagneticDisturbance();
   }
-  @Config.NumberSlider(name="Governor", defaultValue = .51, min = 0, max = 1, rowIndex = 2, columnIndex = 0, height = 1, width = 2)
+  @Config.NumberSlider(name="Governor", defaultValue = 1, min = 0, max = 1, rowIndex = 2, columnIndex = 0, height = 1, width = 2)
   public void setJoystickGovernor(double _input){
     joystickDriveGovernor = _input;
   }
-
+*/
   @Config.ToggleButton(name="ResetGyroAndOdometry", defaultValue = false, rowIndex = 3, columnIndex = 0, height = 1, width = 2)
   public void resetGyroAndOdometry(boolean _input){
     if(_input){
@@ -314,6 +386,7 @@ public class SwerveDrive implements Loggable {
     holdRobotAngleSetpoint = 0;
     Robot.SWERVEDRIVE.m_odometry.resetPosition(SwerveMap.getRobotAngle(),getModulePositions(), new Pose2d());
     _input = false;
+    SwerveMap.GYRO.setAngleAdjustment(0);
     }
   }
 
@@ -327,5 +400,6 @@ public class SwerveDrive implements Loggable {
     _input = false;
     }
   }
+  
 
 }

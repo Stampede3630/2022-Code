@@ -3,13 +3,20 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+import edu.wpi.first.wpilibj.Timer;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.buttons.POVButton;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Log;
 
  /*For starting a new Stampede swerve project
   * 1. Zero out the following constants: ks, kv
@@ -27,14 +34,20 @@ public class Robot extends TimedRobot {
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
+<<<<<<< HEAD
   public static Limelight LIMELIGHT;
   public static AutoWaypoints AUTOWAYPOINTS;
+=======
+  public static double myWattThingy = 0;
+  public static double myJuulPod = 0;
+  public double previousTimestamp;
+  // public static AutoWaypoints AUTOWAYPOINTS;
+>>>>>>> CompBot
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
-
+  public static AutoSegmentedWaypoints AUTOSEGMENTEDWAYPOINTS;
   public static XboxController xbox = new XboxController(0);
-
-  // public static PathPlannerTrajectory examplePath; 
+  public static GenericHID ddrPad = new GenericHID(1);
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -43,45 +56,72 @@ public class Robot extends TimedRobot {
    // --- INIT METHOD ---
   @Override
   public void robotInit() {
-     SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
-     SwerveMap.driveRobotInit();
-     SwerveMap.GYRO.reset();
-    // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
+    LiveWindow.setEnabled(false);
+    LiveWindow.disableAllTelemetry();
+    SwerveMap.GYRO = new AHRS(SPI.Port.kMXP);
+    SwerveMap.checkAndSetSwerveCANStatus();
 
-    //*Swerve method starts here*
-     SWERVEDRIVE = SwerveDrive.getInstance();
-     SWERVEDRIVE.init();
-     SWERVEDRIVE.zeroSwerveDrive();
+    previousTimestamp = Timer.getFPGATimestamp();
 
     //**Intake method starts here**
-    // INTAKE = Intake.getInstance();
-    // INTAKE.init();
+    INTAKE = Intake.getInstance();
+    INTAKE.init();
+    INTAKE.checkAndSetIntakeCANStatus();
 
     //*** Auto Container method starts here***
-    AUTOWAYPOINTS = AutoWaypoints.getInstance();
-    AUTOWAYPOINTS.init();
+    // AUTOWAYPOINTS = AutoWaypoints.getInstance();
+    AUTOSEGMENTEDWAYPOINTS = AutoSegmentedWaypoints.getInstance();
+    // 
+    //loads the selected pathplanner path
+    SwerveMap.driveRobotInit();
+    // AUTOWAYPOINTS.loadAutoPaths();
+    AUTOSEGMENTEDWAYPOINTS.loadAutoPaths();
+
+
 
     // ****Shooter method starts here****
-    // SHOOTER = Shooter.getInstance();
-    // SHOOTER.init();
+    SHOOTER = Shooter.getInstance();
+    SHOOTER.init();
+    SHOOTER.checkAndSetShooterCANStatus();
 
     // // *****test climber method starts here*****
-    // CLIMBER = Climber.getInstance();
-    // CLIMBER.init();
+    CLIMBER = Climber.getInstance();
+    CLIMBER.init();
+    CLIMBER.checkAndSetClimberCANStatus();
 
+<<<<<<< HEAD
     LIMELIGHT = Limelight.getInstance();
 
     // if(RUN_TRAJECTORY) {
       // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
+=======
+
+    if(RUN_TRAJECTORY) {
+    SWERVETRAJECTORY = SwerveTrajectory.getInstance();
+>>>>>>> CompBot
       // examplePath = PathPlanner.loadPath("New Path", 1, .8);
-    // }
+    }
     // Keep this statement on the BOTTOM of your robotInit
     // It's responsible for all the shuffleboard outputs.  
     // It's a lot easier to use than standard shuffleboard syntax
+ 
+    
+    SwerveMap.GYRO.reset(); 
+    // we do singleton methodologies to allow the shuffleboard (Oblarg) logger to detect the existence of these. #askSam
+
+    //*Swerve method starts here*
+    SWERVEDRIVE = SwerveDrive.getInstance();
+    SWERVEDRIVE.init();
+    SWERVEDRIVE.zeroSwerveDrive();
+
+
+    NetworkTableInstance.getDefault().getTable("limelight-intake").getEntry("camMode").setNumber(1);
 
     COMPETITIONLOGGER = CompetitionLogger.getInstance();
-    
+    Logger.setCycleWarningsEnabled(false);
     Logger.configureLoggingAndConfig(this, false);
+    
+
   }
 
   /**
@@ -93,17 +133,37 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-     SWERVEDRIVE.updateOdometry();
+    SWERVEDRIVE.updateOdometry();
+    SwerveMap.checkAndSetSwerveCANStatus();
+    SwerveMap.checkAndZeroSwerveAngle();
+    INTAKE.checkAndSetIntakeCANStatus();
+    SHOOTER.checkAndSetShooterCANStatus();
+    CLIMBER.checkAndSetClimberCANStatus();
     Logger.updateEntries();
+
+    
+    myWattThingy = myWattThingy + (COMPETITIONLOGGER.myPD.getTotalCurrent() * COMPETITIONLOGGER.batteryVoltage()) * (Timer.getFPGATimestamp() - previousTimestamp);
+
+    myJuulPod = myWattThingy/1000;
+
+    // System.out.println(myJuulPod);
+
+    // System.out.println(COMPETITIONLOGGER.myPD.getTotalCurrent());
+    
+    previousTimestamp = Timer.getFPGATimestamp();
   }
+  
 
   @Override
   public void autonomousInit() {
-     SWERVEDRIVE.setToBrake();
+    SWERVEDRIVE.disableCurrentLimiting();
+    SWERVEDRIVE.setToBrake();
+    // AUTOWAYPOINTS.init();
+    AUTOSEGMENTEDWAYPOINTS.init();
      
 
     // For Trajectory instructions go to SwerverTrajectory.java
-     if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
+    if(RUN_TRAJECTORY) {SwerveTrajectory.resetTrajectoryStatus();}
 
   }
 
@@ -111,16 +171,28 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     
-    AUTOWAYPOINTS.autoPeriodic();
-    if(RUN_TRAJECTORY){
-    SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.fourBallAutoPath, SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
-    }
+    // AUTOWAYPOINTS.autoPeriodic();
+    // SwerveTrajectory.PathPlannerRunner(AUTOWAYPOINTS.chosenPath.thisPathPLan,  SWERVEDRIVE.m_odometry, SwerveMap.getRobotAngle());
+
+    AUTOSEGMENTEDWAYPOINTS.autoPeriodic();
+    
+    INTAKE.intakePeriodic();
+    SHOOTER.shooterPeriodic();
+
   }
+
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    // SWERVEDRIVE.enableCurrentLimiting();
     SWERVEDRIVE.setToBrake();
+    INTAKE.intakeNow = false;
+    INTAKE.shootNow = false;
+    // SHOOTER.homocideTheBattery = false;
+    SWERVEDRIVE.autoLimeLightAim = false;
+    SHOOTER.homocideTheBattery = true;
+    
   }
 
   /** This function is called periodically during operator control. */
@@ -128,15 +200,22 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Joystick Drives stores values in X,Y,Z rotation
     // Drive actually sends those values to the swerve modules
+
+    
+
     SWERVEDRIVE.swervePeriodic();
-      //intake code for teleop
-
-    // CLIMBER.periodic();
-
-    // INTAKE.intakePeriodic();
+    
+    CLIMBER.periodic();
+    
+    INTAKE.intakePeriodic();
+    //intake code for teleop
+    SHOOTER.shooterPeriodic();
     // SHOOTER INSTANCE LOOP
+<<<<<<< HEAD
     // SHOOTER.shoot();
     // SHOOTER.rotateHood();
+=======
+>>>>>>> CompBot
   }
 
   /** This function is called once when the robot is disabled. */
@@ -160,5 +239,9 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
 
+  @Log (rowIndex = 3, columnIndex = 7, tabName = "CompetitionLogger")
+  public double getMyPD() {
+      return Robot.myWattThingy;
+  }
 
 } 

@@ -15,10 +15,11 @@ import io.github.oblarg.oblog.Loggable;
 
 public class SwerveTrajectory implements Loggable {
     // Create config for trajectory
-    private static double timetrajectoryStarted;
-    private static String trajectoryStatus="";
-    private static SwerveTrajectory SINGLE_INSTANCE = new SwerveTrajectory();    
+    public static double timetrajectoryStarted;
+    public static String trajectoryStatus="";
+    public static SwerveTrajectory SINGLE_INSTANCE = new SwerveTrajectory();    
 
+    
     public static double elapsedTime;
 
     public static SwerveTrajectory getInstance(){
@@ -49,8 +50,9 @@ public class SwerveTrajectory implements Loggable {
     public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
         elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
         switch (trajectoryStatus) {
-            case "setup":
-                Robot.SWERVEDRIVE.resetOdometry(((PathPlannerState) _pathTraj.getInitialState()).poseMeters, ((PathPlannerState) _pathTraj.getInitialState()).poseMeters.getRotation()); 
+            case "setup":    
+            // PathPlannerState helloPath =((PathPlannerState)_pathTraj.getInitialState());
+
                 timetrajectoryStarted = Timer.getFPGATimestamp();
                 trajectoryStatus = "execute";
                 break;

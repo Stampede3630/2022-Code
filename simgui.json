@@ -11,10 +11,26 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/DigitalInput[0]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[1]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[2]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[3]": "Digital Input",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
       "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro",
       "/Shuffleboard/CompetitionLogger/autoChooser": "String Chooser",
+      "/Shuffleboard/CompetitionLogger/field2022": "Field2d",
+      "/Shuffleboard/CompetitionLogger/m_autoChooser": "String Chooser",
       "/Shuffleboard/SwerveDrive/Robot Angle": "Gyro"
+    },
+    "windows": {
+      "/Shuffleboard/CompetitionLogger/m_autoChooser": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
@@ -27,11 +43,22 @@
     "Shuffleboard": {
       ".metadata": {
         "SwerveDrive": {
-          "open": true
+          "Current Robot Angle": {
+            "open": true
+          }
         },
         "open": true
       },
+      "Shooter": {
+        "open": true
+      },
+      "open": true
+    },
+    "limelight": {
       "open": true
     }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
