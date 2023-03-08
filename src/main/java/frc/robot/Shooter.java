@@ -26,16 +26,12 @@ public class Shooter implements Loggable {
     private double hoodAngleOffset = 0;
     private WPI_TalonFX shooterDrive;
     private WPI_TalonFX hoodMotor;
-<<<<<<< HEAD
-
-=======
     // SWITCHES DEFAULT TO TRUE WHEN NOT PRESSED
     // TRUE = SHOOTER NOT AT HOME, FALSE = SHOOTER AT HOME
     private DigitalInput leftHoodSwitch;
     private DigitalInput rightHoodSwitch;
     private boolean hoodAtOrigin = false;
     private boolean rotComplete = false;
->>>>>>> CompBot
     public boolean homocideTheBattery;
     public boolean limelightShooting = true;
     public boolean bloopShot = false;
@@ -165,14 +161,6 @@ public class Shooter implements Loggable {
             rotateHood(hoodAngle + hoodAngleOffset);
 
         }
-<<<<<<< HEAD
-    }
-
-    public void shoot() {
-        if (Robot.xbox.getLeftTriggerAxis() > 0 || Robot.INTAKE.shootNow || homocideTheBattery) {
-            shooterDrive.set(ControlMode.Velocity, shooterSpeed);
-            turnToShooter();
-=======
         
         //bloop shot
         
@@ -181,7 +169,6 @@ public class Shooter implements Loggable {
         } else if (Robot.INTAKE.shootNow || Robot.xbox.getLeftTriggerAxis() > 0 || (homocideTheBattery && !Robot.INTAKE.topLimitSwitch.get())) { ///SJV dont like this logic completely
             // if (Robot.xbox.getLeftTriggerAxis() > 0 || homocideTheBattery) {
             shooterDrive.set(ControlMode.Velocity, shooterSpeed, DemandType.ArbitraryFeedForward, (shooterMotorFeedforward.calculate(shooterSpeed / 2048.0 * 10.0) / 12.0 - 0.03));
->>>>>>> CompBot
         } else {
             shooterDrive.set(0);
         }
@@ -194,32 +181,6 @@ public class Shooter implements Loggable {
         if(shooterDrive.getSelectedSensorVelocity(0)<=shooterSpeed*1.02 && shooterDrive.getSelectedSensorVelocity() >= shooterSpeed * 0.96){
             return true;
 
-<<<<<<< HEAD
-    // Find shooter angle based on distance from hub
-    private double calculateShooterAngle() {
-        double distance = Limelight.Hub.getxDistance();
-        double shooterAngle = 0;
-        // placeholder equation
-        // double shooterAngle: y = m(distanceToHub) + b
-
-        return shooterAngle;
-    }
-
-    // Find shooter speed based on shooter angle
-    private double calculateShooterSpeed(double shooterAngle) {
-        // placeholder equation
-        // double shooterSpeed: y = m(shooterAngle) + b
-        // shooterSpeed * ticks (for converting to ticks)
-        return 0;
-    }
-
-    public void turnToShooter() {
-        Robot.INTAKE.limelightSolenoid.set(Value.kForward);
-        //Make shooter pipeline
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
-        Robot.INTAKE.limelightIsOpen = true;
-        // Figure out which way later
-=======
         } else {
             return false;
         }
@@ -294,7 +255,6 @@ public class Shooter implements Loggable {
     @Log
     public double getIPSpeed(){
         return shooterSpeed;
->>>>>>> CompBot
     }
 
     public void rotateHood(double angle) {
