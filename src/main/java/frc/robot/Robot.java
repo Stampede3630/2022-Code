@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
@@ -34,15 +33,10 @@ public class Robot extends TimedRobot {
   public static Intake INTAKE;
   public static Shooter SHOOTER;
   public static Climber CLIMBER;
-<<<<<<< HEAD
-  public static Limelight LIMELIGHT;
-  public static AutoWaypoints AUTOWAYPOINTS;
-=======
   public static double myWattThingy = 0;
   public static double myJuulPod = 0;
   public double previousTimestamp;
   // public static AutoWaypoints AUTOWAYPOINTS;
->>>>>>> CompBot
   public static SwerveTrajectory SWERVETRAJECTORY;
   public static CompetitionLogger COMPETITIONLOGGER;
   public static AutoSegmentedWaypoints AUTOSEGMENTEDWAYPOINTS;
@@ -89,16 +83,9 @@ public class Robot extends TimedRobot {
     CLIMBER.init();
     CLIMBER.checkAndSetClimberCANStatus();
 
-<<<<<<< HEAD
-    LIMELIGHT = Limelight.getInstance();
-
-    // if(RUN_TRAJECTORY) {
-      // SWERVETRAJECTORY = SwerveTrajectory.getInstance();
-=======
 
     if(RUN_TRAJECTORY) {
     SWERVETRAJECTORY = SwerveTrajectory.getInstance();
->>>>>>> CompBot
       // examplePath = PathPlanner.loadPath("New Path", 1, .8);
     }
     // Keep this statement on the BOTTOM of your robotInit
@@ -211,11 +198,6 @@ public class Robot extends TimedRobot {
     //intake code for teleop
     SHOOTER.shooterPeriodic();
     // SHOOTER INSTANCE LOOP
-<<<<<<< HEAD
-    // SHOOTER.shoot();
-    // SHOOTER.rotateHood();
-=======
->>>>>>> CompBot
   }
 
   /** This function is called once when the robot is disabled. */

@@ -4,7 +4,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -322,7 +321,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             autoDelay = Timer.getFPGATimestamp();
         }
 
-        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") && (Robot.INTAKE.colorSensor.getBlue()<500 && Robot.INTAKE.colorSensor.getRed()<1000) && (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
+        if (SwerveTrajectory.trajectoryStatus.equals("done") && Robot.INTAKE.indexState.equals("default") &&  (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
             System.out.println("hi!");
             Robot.SWERVEDRIVE.autoLimeLightAim = false;
             if (chosenWaypoints.length != currentWaypointNumber+1){

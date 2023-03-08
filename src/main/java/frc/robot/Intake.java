@@ -20,7 +20,7 @@ import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import com.revrobotics.ColorSensorV3;
+
 
 public class Intake implements Loggable {
   
@@ -37,7 +37,6 @@ public class Intake implements Loggable {
   public DigitalInput bottomLimitSwitch;
   public DigitalInput topLimitSwitch;
 
-  public ColorSensorV3 colorSensor;
   private boolean cargoInTransit = false;
   @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 3)
   public boolean intakeNow = false;
@@ -70,7 +69,7 @@ public class Intake implements Loggable {
     bottomLimitSwitch = new DigitalInput(Constants.BottomIntakeSwitchID);
     topLimitSwitch = new DigitalInput(Constants.TopIntakeSwitchID);
 
-    colorSensor = new ColorSensorV3(i2cPort);
+
 
     intakeDrive = new WPI_TalonFX(Constants.IntakeMotorID);
         intakeDrive.setInverted(TalonFXInvertType.Clockwise);
@@ -90,11 +89,6 @@ public class Intake implements Loggable {
 
   private void intake() {
     if (Robot.xbox.getRightTriggerAxis() > 0 || intakeNow) {  // Right trigger held --> intake goes down and spins intake motor
-<<<<<<< HEAD
-      intakeSolenoid.set(Value.kReverse);
-      intakeDrive.set(ControlMode.PercentOutput, calculateIntakeSpeed(Robot.SWERVEDRIVE.getCurrentSpeed()));
-      turnToIntake();
-=======
       if (!intakeIsOut) {
         intakeSolenoid.set(Value.kForward);
         intakeIsOut = true;
@@ -114,7 +108,6 @@ public class Intake implements Loggable {
         intakeSolenoid.set(Value.kReverse);
         intakeIsOut = false; // Pulls intake back up and stops spinning
       } 
->>>>>>> CompBot
 
       intakeDrive.set(ControlMode.PercentOutput, 0);
     }
@@ -131,7 +124,7 @@ public class Intake implements Loggable {
     // Once shooter gets up to speed AND left trigger held OR shooting during Auto, balls fed to shooter
     if (Robot.xbox.getLeftBumper() || (Robot.SHOOTER.shooterAtSpeed() && (Robot.xbox.getLeftTriggerAxis() > 0 || shootNow))) {  
       // If there's only one ball being shot
-      if (!bottomLimitSwitch.get() && !topLimitSwitch.get() && (colorSensor.getRed()>1000 && colorSensor.getBlue()>500)) {
+      if (!bottomLimitSwitch.get() && !topLimitSwitch.get()  ) {
         indexTop.set(ControlMode.PercentOutput, -0.2); 
       } else {
         // If two balls are being shot
@@ -194,14 +187,6 @@ public class Intake implements Loggable {
       return "Reverse Intake";
 
     // Reject Red Balls when in Blue Alliance
-    } else if(DriverStation.getAlliance() == Alliance.Blue && 
-    (colorSensor.getBlue() < colorSensor.getRed()) && colorSensor.getRed() > 1000 && ballReject) {
-      return "Ball Reject";
-
-    // Reject Blue Balls when in Red Alliance
-    } else if(DriverStation.getAlliance() == Alliance.Red && 
-    (colorSensor.getRed() < colorSensor.getBlue()) && colorSensor.getBlue() > 1000 && ballReject) {
-      return "Ball Reject";
 
     // Both switches pressed
     } else if (!bottomLimitSwitch.get() && !topLimitSwitch.get()) { 
@@ -293,24 +278,6 @@ public class Intake implements Loggable {
       if(indexTop.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 255,100)!=ErrorCode.OK) {mycounter++;}
       System.out.println("RESET DETECTED FOR TALONFX " + indexTop.getDeviceID() + " Errors:" + mycounter);
     }
-  }
-
-  @Log
-  public double getRedColor() {
-    return (double) colorSensor.getRed();
-    
-  }
-
-  @Log
-  public double getBlueColor() {
-    return (double) colorSensor.getBlue();
-    
-  }
-
-  @Log
-  public double getGreenColor() {
-    return (double) colorSensor.getGreen();
-    
   }
   
   @Log.BooleanBox(rowIndex = 1, columnIndex = 2)
